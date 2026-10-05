@@ -118,14 +118,14 @@ Block::~Block(){
 }
 #endif
 
-std::shared_ptr<Block> Block::Copy() const {
+std::shared_ptr<Block> Block::Copy(const std::shared_ptr<const Domain> &p_newParent) const {
 	torch::Tensor v = velocity;
 	torch::Tensor p = pressure;
 	optional<torch::Tensor> s = passiveScalar;
 	optional<torch::Tensor> c = m_vertexCoordinates;
 	const bool hasOnlyTransform = !m_vertexCoordinates && m_transform;
 	std::string n = name+"_copy";
-	std::shared_ptr<Block> cBlock = std::make_shared<Block>(v, p, s, c, n, getParentDomain());
+	std::shared_ptr<Block> cBlock = std::make_shared<Block>(v, p, s, c, n, p_newParent ? p_newParent : getParentDomain());
 	if(hasOnlyTransform){
 		// cBlock boundaries are default periodic here, so no boundary transform update happens.
 		torch::Tensor t = m_transform.value();
@@ -143,19 +143,19 @@ std::shared_ptr<Block> Block::Copy() const {
 	for(index_t i=0;i<static_cast<index_t>(boundaries.size());++i){
 		BoundaryType bt = boundaries[i]->type;
 		if(bt==BoundaryType::DIRICHLET || bt==BoundaryType::DIRICHLET_VARYING || bt==BoundaryType::FIXED){
-			cBlock->setBoundary(i, boundaries[i]->Copy());
+			cBlock->setBoundary(i, boundaries[i]->Copy(p_newParent));
 		}
 	}
 	return cBlock;
 }
-std::shared_ptr<Block> Block::Clone() const {
+std::shared_ptr<Block> Block::Clone(const std::shared_ptr<const Domain> &p_newParent) const {
 	torch::Tensor v = velocity.clone();
 	torch::Tensor p = pressure.clone();
 	optional<torch::Tensor> s = cloneOptionalTensor(passiveScalar);
 	optional<torch::Tensor> c = cloneOptionalTensor(m_vertexCoordinates);
 	const bool hasOnlyTransform = !m_vertexCoordinates && m_transform;
 	std::string n = name+"_clone";
-	std::shared_ptr<Block> cBlock = std::make_shared<Block>(v, p, s, c, n, getParentDomain());
+	std::shared_ptr<Block> cBlock = std::make_shared<Block>(v, p, s, c, n, p_newParent ? p_newParent : getParentDomain());
 	if(hasOnlyTransform){
 		// cBlock boundaries are default periodic here, so no boundary transform update happens.
 		torch::Tensor t = m_transform.value().clone();
@@ -173,7 +173,7 @@ std::shared_ptr<Block> Block::Clone() const {
 	for(index_t i=0;i<static_cast<index_t>(boundaries.size());++i){
 		BoundaryType bt = boundaries[i]->type;
 		if(bt==BoundaryType::DIRICHLET || bt==BoundaryType::DIRICHLET_VARYING || bt==BoundaryType::FIXED){
-			cBlock->setBoundary(i, boundaries[i]->Clone());
+			cBlock->setBoundary(i, boundaries[i]->Clone(p_newParent));
 		}
 	}
 	return cBlock;

@@ -161,23 +161,23 @@ void FixedBoundary::CopyPotentialBCTo(FixedBoundary &other, const bool cloneTens
 	other.m_potentialValues = cloneTensors ? cloneOptionalTensor(m_potentialValues) : m_potentialValues;
 }
 
-std::shared_ptr<Boundary> FixedBoundary::Copy() const {
+std::shared_ptr<Boundary> FixedBoundary::Copy(const std::shared_ptr<const Domain> &p_newParent) const {
 	torch::Tensor v = m_velocity;
 	//torch::Tensor p = pressure;
 	optional<torch::Tensor> s = m_passiveScalar;
 	optional<torch::Tensor> t = m_transform;
-	std::shared_ptr<FixedBoundary> newBound = std::make_shared<FixedBoundary>(v, m_velocityType, s, nullopt, t, getParentDomain());
+	std::shared_ptr<FixedBoundary> newBound = std::make_shared<FixedBoundary>(v, m_velocityType, s, nullopt, t, (p_newParent ? p_newParent : getParentDomain()));
 	if(hasPassiveScalar()){ newBound->setPassiveScalarType(m_passiveScalarTypes.value());}
 	CopyPotentialBCTo(*newBound, false);
 	return newBound;
 }
 
-std::shared_ptr<Boundary> FixedBoundary::Clone() const {
+std::shared_ptr<Boundary> FixedBoundary::Clone(const std::shared_ptr<const Domain> &p_newParent) const {
 	torch::Tensor v = m_velocity.clone();
 	//torch::Tensor p = pressure;
 	optional<torch::Tensor> s = cloneOptionalTensor(m_passiveScalar);
 	optional<torch::Tensor> t = cloneOptionalTensor(m_transform);
-	std::shared_ptr<FixedBoundary> newBound = std::make_shared<FixedBoundary>(v, m_velocityType, s, nullopt, t, getParentDomain());
+	std::shared_ptr<FixedBoundary> newBound = std::make_shared<FixedBoundary>(v, m_velocityType, s, nullopt, t, (p_newParent ? p_newParent : getParentDomain()));
 	if(hasPassiveScalar()){ newBound->setPassiveScalarType(m_passiveScalarTypes.value());}
 	CopyPotentialBCTo(*newBound, true);
 	return newBound;
@@ -605,17 +605,17 @@ StaticDirichletBoundary::StaticDirichletBoundary(torch::Tensor &slip, torch::Ten
 	TORCH_CHECK(slip.dtype()==velocity.dtype(), "slip and velocity must have same dtype.");
 	TORCH_CHECK(passiveScalar.dtype()==velocity.dtype(), "passiveScalar and velocity must have same dtype.");
 }
-std::shared_ptr<Boundary> StaticDirichletBoundary::Copy() const {
+std::shared_ptr<Boundary> StaticDirichletBoundary::Copy(const std::shared_ptr<const Domain> &p_newParent) const {
 	torch::Tensor s = slip;
 	torch::Tensor bv = boundaryVelocity;
 	torch::Tensor bs = boundaryScalar;
-	return std::make_shared<StaticDirichletBoundary>(s, bv, bs, getParentDomain());
+	return std::make_shared<StaticDirichletBoundary>(s, bv, bs, (p_newParent ? p_newParent : getParentDomain()));
 }
-std::shared_ptr<Boundary> StaticDirichletBoundary::Clone() const {
+std::shared_ptr<Boundary> StaticDirichletBoundary::Clone(const std::shared_ptr<const Domain> &p_newParent) const {
 	torch::Tensor s = slip.clone();
 	torch::Tensor bv = boundaryVelocity.clone();
 	torch::Tensor bs = boundaryScalar.clone();
-	return std::make_shared<StaticDirichletBoundary>(s, bv, bs, getParentDomain());
+	return std::make_shared<StaticDirichletBoundary>(s, bv, bs, (p_newParent ? p_newParent : getParentDomain()));
 }
 index_t StaticDirichletBoundary::getSpatialDims() const {
     return boundaryVelocity.size(0);
@@ -651,22 +651,22 @@ VaryingDirichletBoundary::VaryingDirichletBoundary(torch::Tensor &slip, torch::T
 	TORCH_CHECK(slip.dtype()==velocity.dtype(), "slip and velocity must have same dtype.");
 	TORCH_CHECK(passiveScalar.dtype()==velocity.dtype(), "passiveScalar and velocity must have same dtype.");
 }
-std::shared_ptr<Boundary> VaryingDirichletBoundary::Copy() const {
+std::shared_ptr<Boundary> VaryingDirichletBoundary::Copy(const std::shared_ptr<const Domain> &p_newParent) const {
 	torch::Tensor s = slip;
 	torch::Tensor bv = boundaryVelocity;
 	torch::Tensor bs = boundaryScalar;
-	std::shared_ptr<VaryingDirichletBoundary> newBound = std::make_shared<VaryingDirichletBoundary>(s, bv, bs, getParentDomain());
+	std::shared_ptr<VaryingDirichletBoundary> newBound = std::make_shared<VaryingDirichletBoundary>(s, bv, bs, (p_newParent ? p_newParent : getParentDomain()));
 	if(hasTransform){
 		torch::Tensor t = transform;
 		newBound->setTransform(t);
 	}
 	return newBound;
 }
-std::shared_ptr<Boundary> VaryingDirichletBoundary::Clone() const {
+std::shared_ptr<Boundary> VaryingDirichletBoundary::Clone(const std::shared_ptr<const Domain> &p_newParent) const {
 	torch::Tensor s = slip.clone();
 	torch::Tensor bv = boundaryVelocity.clone();
 	torch::Tensor bs = boundaryScalar.clone();
-	std::shared_ptr<VaryingDirichletBoundary> newBound = std::make_shared<VaryingDirichletBoundary>(s, bv, bs, getParentDomain());
+	std::shared_ptr<VaryingDirichletBoundary> newBound = std::make_shared<VaryingDirichletBoundary>(s, bv, bs, (p_newParent ? p_newParent : getParentDomain()));
 	if(hasTransform){
 		torch::Tensor t = transform.clone();
 		newBound->setTransform(t);

@@ -59,7 +59,7 @@ std::shared_ptr<Domain> Domain::Copy(optional<std::string> newName) const{
 	std::shared_ptr<Domain> cDomain = std::make_shared<Domain>(getSpatialDims(), v, n, getDtype(), pyDtype, getDevice(), getPassiveScalarChannels(), passiveScalarViscosity);
 
 	for(auto block : blocks){
-		cDomain->AddBlock(block->Copy());
+		cDomain->AddBlock(block->Copy(cDomain));
 	}
 
 	// copy connected boundaries
@@ -68,7 +68,7 @@ std::shared_ptr<Domain> Domain::Copy(optional<std::string> newName) const{
 			if(blocks[blockIdx]->boundaries[boundIdx]->type==BoundaryType::CONNECTED_GRID){
 				std::shared_ptr<ConnectedBoundary> boundary = std::static_pointer_cast<ConnectedBoundary> (blocks[blockIdx]->boundaries[boundIdx]);
 				index_t connectedIdx = getBlockIdx(boundary->getConnectedBlock());
-				std::shared_ptr<ConnectedBoundary> cBoundary = std::make_shared<ConnectedBoundary>(cDomain->getBlock(connectedIdx), boundary->axes, shared_from_this());
+				std::shared_ptr<ConnectedBoundary> cBoundary = std::make_shared<ConnectedBoundary>(cDomain->getBlock(connectedIdx), boundary->axes, cDomain);
 				cDomain->getBlock(blockIdx)->setBoundary(boundIdx, cBoundary);
 			}
 		}
@@ -88,7 +88,7 @@ std::shared_ptr<Domain> Domain::Clone(optional<std::string> newName) const{
 	std::shared_ptr<Domain> cDomain = std::make_shared<Domain>(getSpatialDims(), v, n, getDtype(), pyDtype, getDevice(), getPassiveScalarChannels(), psv);
 
 	for(auto block : blocks){
-		cDomain->AddBlock(block->Clone());
+		cDomain->AddBlock(block->Clone(cDomain));
 	}
 
 	// copy connected boundaries
@@ -97,7 +97,7 @@ std::shared_ptr<Domain> Domain::Clone(optional<std::string> newName) const{
 			if(blocks[blockIdx]->boundaries[boundIdx]->type==BoundaryType::CONNECTED_GRID){
 				std::shared_ptr<ConnectedBoundary> boundary = std::static_pointer_cast<ConnectedBoundary> (blocks[blockIdx]->boundaries[boundIdx]);
 				index_t connectedIdx = getBlockIdx(boundary->getConnectedBlock());
-				std::shared_ptr<ConnectedBoundary> cBoundary = std::make_shared<ConnectedBoundary>(cDomain->getBlock(connectedIdx), boundary->axes, shared_from_this());
+				std::shared_ptr<ConnectedBoundary> cBoundary = std::make_shared<ConnectedBoundary>(cDomain->getBlock(connectedIdx), boundary->axes, cDomain);
 				cDomain->getBlock(blockIdx)->setBoundary(boundIdx, cBoundary);
 			}
 		}
