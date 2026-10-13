@@ -18,7 +18,7 @@ The compiled ``_C.SampleTransformedGridLocalToGlobalMulti`` kernel is a
 raw pybind binding with no autograd wrapper, so it detaches every resampled
 observation from the simulation graph.
 ``sample_multi_coords_to_uniform_grid_diff`` reimplements it in torch, and
-``DiffMultiblockResampler`` adds cached geometry plus optional restriction to
+``MultiblockResampler`` adds cached geometry plus optional restriction to
 the output cells an observation actually reads.
 
 These tests cover
@@ -34,7 +34,7 @@ from conftest import import_fluidgym_on_phipict
 
 from phipict import _C
 from phipict.grid.resample import (
-    DiffMultiblockResampler,
+    MultiblockResampler,
     get_uniform_transform,
     sample_multi_coords_to_uniform_grid,
     sample_multi_coords_to_uniform_grid_diff,
@@ -225,7 +225,7 @@ def test_reference_matches_compiled_kernel_3d(case_3d, fill_max_steps):
 def test_cached_matches_compiled_kernel_3d(case_3d, fill_max_steps):
     coords, data, out_shape = case_3d
     reference = _kernel_resample(coords, data, out_shape, fill_max_steps)
-    resampler = DiffMultiblockResampler(
+    resampler = MultiblockResampler(
         coords, out_shape, data[0].dtype, fill_max_steps=fill_max_steps
     )
     torch.testing.assert_close(resampler(data), reference, atol=1e-10, rtol=1e-10)
@@ -239,7 +239,7 @@ def test_restricted_matches_kernel_3d(case_3d):
     picks = torch.stack(
         [torch.randint(0, out_shape[d], (24,), generator=generator) for d in range(3)]
     ).to(coords[0].device)
-    resampler = DiffMultiblockResampler(
+    resampler = MultiblockResampler(
         coords, out_shape, data[0].dtype, fill_max_steps=8, out_indices=picks
     )
     got = resampler(data)[0]
@@ -257,9 +257,7 @@ def test_sparse_case_forces_many_fill_steps(sparse_case):
     # Guard the premise of the restriction tests below: without real holes the
     # backward propagation through the fill steps is never exercised.
     coords, _, out_shape = sparse_case
-    resampler = DiffMultiblockResampler(
-        coords, out_shape, torch.float64, fill_max_steps=32
-    )
+    resampler = MultiblockResampler(coords, out_shape, torch.float64, fill_max_steps=32)
     assert len(resampler._fill_steps) > 5
     assert float(resampler._written.double().mean()) < 0.2
 
@@ -319,18 +317,31 @@ def test_reference_is_differentiable(cylinder_env):
 
 
 def test_compiled_kernel_detaches(cylinder_env):
-    # The motivation for all of the above: pin the fact that the compiled path
+    # The motivation for all of the above: pin the fact that the compiled kernel
     # breaks the graph, so a regression here is visible.
     coords, data, out_shape = _env_case(cylinder_env)
     leaves = [d.clone().requires_grad_(True) for d in data]
 
-    out = sample_multi_coords_to_uniform_grid(leaves, coords, out_shape)
+    out = _kernel_resample(coords, leaves, out_shape, 0)
     assert out.grad_fn is None
     assert not out.requires_grad
 
 
+@pytest.mark.parametrize("fill_max_steps", [0, 16])
+def test_public_sampler_matches_kernel(sparse_case, fill_max_steps):
+    # sample_multi_coords_to_uniform_grid is backed by the torch resampler now
+    coords, data, out_shape = sparse_case
+    reference = _kernel_resample(coords, data, out_shape, fill_max_steps)
+    result = sample_multi_coords_to_uniform_grid(
+        data, coords, out_shape, fill_max_steps=fill_max_steps
+    )
+    torch.testing.assert_close(result, reference, atol=1e-10, rtol=1e-10)
+    leaves = [d.clone().requires_grad_(True) for d in data]
+    assert sample_multi_coords_to_uniform_grid(leaves, coords, out_shape).requires_grad
+
+
 # ---------------------------------------------------------------------------
-# DiffMultiblockResampler: cached geometry (full grid)
+# MultiblockResampler: cached geometry (full grid)
 # ---------------------------------------------------------------------------
 
 
@@ -339,7 +350,7 @@ def test_cached_matches_compiled_kernel(cylinder_env, fill_max_steps):
     coords, data, out_shape = _env_case(cylinder_env)
 
     reference = _kernel_resample(coords, data, out_shape, fill_max_steps)
-    resampler = DiffMultiblockResampler(
+    resampler = MultiblockResampler(
         coords, out_shape, data[0].dtype, fill_max_steps=fill_max_steps
     )
     result = resampler(data)
@@ -353,7 +364,7 @@ def test_cached_matches_compiled_kernel_with_holes(sparse_case, fill_max_steps):
     coords, data, out_shape = sparse_case
 
     reference = _kernel_resample(coords, data, out_shape, fill_max_steps)
-    resampler = DiffMultiblockResampler(
+    resampler = MultiblockResampler(
         coords, out_shape, data[0].dtype, fill_max_steps=fill_max_steps
     )
     torch.testing.assert_close(resampler(data), reference, atol=1e-10, rtol=1e-10)
@@ -363,9 +374,7 @@ def test_cached_is_reusable_across_calls(sparse_case):
     # The point of caching: the same operator, applied to different data and to
     # different channel counts, keeps giving the kernel's answer.
     coords, data, out_shape = sparse_case
-    resampler = DiffMultiblockResampler(
-        coords, out_shape, data[0].dtype, fill_max_steps=16
-    )
+    resampler = MultiblockResampler(coords, out_shape, data[0].dtype, fill_max_steps=16)
     for scale in (1.0, -3.5, 0.25):
         scaled = [d * scale for d in data]
         reference = _kernel_resample(coords, scaled, out_shape, 16)
@@ -395,7 +404,7 @@ def test_cached_gradient_matches_reference(cylinder_env):
 
     grad_ref = torch.autograd.grad((out_ref * weight).sum(), ref_leaves)
 
-    resampler = DiffMultiblockResampler(
+    resampler = MultiblockResampler(
         coords, out_shape, data[0].dtype, fill_max_steps=fill
     )
     grad_cached = torch.autograd.grad(
@@ -407,7 +416,7 @@ def test_cached_gradient_matches_reference(cylinder_env):
 
 
 # ---------------------------------------------------------------------------
-# DiffMultiblockResampler: restriction to selected output cells
+# MultiblockResampler: restriction to selected output cells
 # ---------------------------------------------------------------------------
 
 
@@ -430,7 +439,7 @@ def test_restricted_matches_kernel(cylinder_env, fill_max_steps):
     reference = _kernel_resample(coords, data, out_shape, fill_max_steps)
     expected = reference[0][:, indices[1].long(), indices[0].long()].unsqueeze(0)
 
-    resampler = DiffMultiblockResampler(
+    resampler = MultiblockResampler(
         coords,
         out_shape,
         data[0].dtype,
@@ -454,7 +463,7 @@ def test_restricted_matches_kernel_with_holes(sparse_case, fill_max_steps):
     reference = _kernel_resample(coords, data, out_shape, fill_max_steps)
     expected = reference[0][:, indices[1].long(), indices[0].long()].unsqueeze(0)
 
-    resampler = DiffMultiblockResampler(
+    resampler = MultiblockResampler(
         coords,
         out_shape,
         data[0].dtype,
@@ -472,10 +481,10 @@ def test_restricted_accepts_flat_indices(sparse_case):
     # out_spatial is out_shape reversed, so the flat index is y * nx + x.
     flat = indices[1].long() * out_shape[0] + indices[0].long()
 
-    by_axis = DiffMultiblockResampler(
+    by_axis = MultiblockResampler(
         coords, out_shape, data[0].dtype, fill_max_steps=8, out_indices=indices
     )
-    by_flat = DiffMultiblockResampler(
+    by_flat = MultiblockResampler(
         coords, out_shape, data[0].dtype, fill_max_steps=8, out_indices=flat
     )
     torch.testing.assert_close(by_axis(data), by_flat(data))
@@ -487,10 +496,8 @@ def test_restricted_gradient_matches_full(sparse_case):
     indices = _random_out_indices(out_shape, 64, data[0].device)
     fill = 32
 
-    full = DiffMultiblockResampler(
-        coords, out_shape, data[0].dtype, fill_max_steps=fill
-    )
-    restricted = DiffMultiblockResampler(
+    full = MultiblockResampler(coords, out_shape, data[0].dtype, fill_max_steps=fill)
+    restricted = MultiblockResampler(
         coords, out_shape, data[0].dtype, fill_max_steps=fill, out_indices=indices
     )
 
@@ -524,14 +531,12 @@ def test_restricted_operator_is_small(cylinder_env):
     fill = cylinder_env._sim.output_resampling_fill_max_steps
     indices = _random_out_indices(out_shape, 32, data[0].device)
 
-    full = DiffMultiblockResampler(
-        coords, out_shape, data[0].dtype, fill_max_steps=fill
-    )
-    restricted = DiffMultiblockResampler(
+    full = MultiblockResampler(coords, out_shape, data[0].dtype, fill_max_steps=fill)
+    restricted = MultiblockResampler(
         coords, out_shape, data[0].dtype, fill_max_steps=fill, out_indices=indices
     )
 
-    assert restricted._rows.numel() < full._rows.numel() / 100
+    assert restricted.nnz < full.nnz / 100
     assert restricted._fill_steps == []
 
 
@@ -540,7 +545,7 @@ def test_restricted_gradient_matches_finite_difference(sparse_case):
     # cell values, so the analytic gradient must match a finite-difference probe.
     coords, data, out_shape = sparse_case
     indices = _random_out_indices(out_shape, 16, data[0].device)
-    resampler = DiffMultiblockResampler(
+    resampler = MultiblockResampler(
         coords, out_shape, data[0].dtype, fill_max_steps=16, out_indices=indices
     )
 
@@ -571,3 +576,107 @@ def test_restricted_gradient_matches_finite_difference(sparse_case):
         torch.testing.assert_close(
             analytic.reshape(-1)[p].item(), finite_difference, atol=1e-6, rtol=1e-6
         )
+
+
+# ---------------------------------------------------------------------------
+# Batched data: [B, C, ...] per block, shared [1, C, ...] blocks, chunking
+# ---------------------------------------------------------------------------
+
+
+def _batched(data, n_batch, seed):
+    generator = torch.Generator(device=data[0].device).manual_seed(seed)
+    return [
+        torch.randn(
+            (n_batch, *d.shape[1:]),
+            dtype=d.dtype,
+            device=d.device,
+            generator=generator,
+        )
+        for d in data
+    ]
+
+
+@pytest.mark.parametrize("restricted", [False, True])
+def test_batched_matches_per_element(sparse_case, restricted):
+    coords, data, out_shape = sparse_case
+    indices = _random_out_indices(out_shape, 16, data[0].device) if restricted else None
+    resampler = MultiblockResampler(
+        coords, out_shape, data[0].dtype, fill_max_steps=16, out_indices=indices
+    )
+    batch = _batched(data, 5, seed=3)
+    # block 1 shared by the whole batch
+    batch[1] = batch[1][:1]
+
+    out = resampler(batch)
+    assert out.size(0) == 5
+    for e in range(5):
+        single = resampler([batch[0][e : e + 1], batch[1]])
+        torch.testing.assert_close(out[e : e + 1], single, atol=1e-12, rtol=1e-12)
+
+
+@pytest.mark.parametrize("restricted", [False, True])
+def test_chunked_matches_unchunked(sparse_case, restricted, monkeypatch):
+    coords, data, out_shape = sparse_case
+    indices = _random_out_indices(out_shape, 16, data[0].device) if restricted else None
+    resampler = MultiblockResampler(
+        coords, out_shape, data[0].dtype, fill_max_steps=16, out_indices=indices
+    )
+    batch = _batched(data, 7, seed=4)
+    batch[0] = batch[0][:1]
+    reference = resampler(batch)
+
+    # a budget of a single output channel per chunk
+    monkeypatch.setattr(MultiblockResampler, "CHUNK_BYTES", 1)
+    leaves = [d.clone().requires_grad_(True) for d in batch]
+    chunked = resampler(leaves)
+    torch.testing.assert_close(chunked, reference, atol=1e-12, rtol=1e-12)
+
+    # and the gradient flows through the chunked assembly
+    grads = torch.autograd.grad(chunked.sum(), leaves)
+    assert all(torch.count_nonzero(g) > 0 for g in grads)
+
+
+def test_batched_rejects_mismatched_batch(sparse_case):
+    coords, data, out_shape = sparse_case
+    resampler = MultiblockResampler(coords, out_shape, data[0].dtype)
+    with pytest.raises(ValueError):
+        resampler([*_batched(data[:1], 3, seed=5), *_batched(data[1:], 2, seed=6)])
+
+
+# ---------------------------------------------------------------------------
+# Simulation.resample
+# ---------------------------------------------------------------------------
+
+
+def test_simulation_resample_matches_kernel(cylinder_env):
+    from phipict.core.fields import Fields
+
+    env = cylinder_env
+    sim = env._sim
+    coords, data, out_shape = _env_case(env)
+    fill = sim.output_resampling_fill_max_steps
+    reference = _kernel_resample(coords, data, out_shape, fill)
+
+    with torch.no_grad():
+        full = sim.resample(Fields.VELOCITY)
+    torch.testing.assert_close(full, reference, atol=1e-3, rtol=1e-3)
+
+    indices = _random_out_indices(out_shape, 32, data[0].device)
+    with torch.no_grad():
+        at = sim.resample(Fields.VELOCITY, indices)
+    expected = reference[(slice(None), slice(None), *reversed(list(indices.long())))]
+    torch.testing.assert_close(at, expected, atol=1e-3, rtol=1e-3)
+
+
+def test_simulation_resample_caches_by_value(cylinder_env):
+    from phipict.core.fields import Fields
+
+    sim = cylinder_env._sim
+    _, data, out_shape = _env_case(cylinder_env)
+    indices = _random_out_indices(out_shape, 8, data[0].device)
+    with torch.no_grad():
+        sim.resample(Fields.PRESSURE, indices)
+        n_cached = len(sim._output_resamplers)
+        # an equal index tensor, a different object: no new operator
+        sim.resample(Fields.PRESSURE, indices.clone())
+    assert len(sim._output_resamplers) == n_cached

@@ -71,6 +71,13 @@ install-dev:
 	$(PIP) install --no-build-isolation -e ".[dev]"
 	$(MAKE) stubs
 
+# Same as install-dev, but with the CUDA toolkit of the active conda env (it matches
+# the env's torch; a system CUDA < 12.4 builds the Krylov solvers without CUDA graphs).
+.PHONY: install-dev-conda
+install-dev-conda:
+	@test -x "$(CONDA_PREFIX)/bin/nvcc" || { echo "No nvcc in the conda env ($(CONDA_PREFIX))." >&2; exit 1; }
+	$(MAKE) install-dev CUDA_HOME="$(CONDA_PREFIX)"
+
 .PHONY: clean
 clean:
 	rm -rf build dist __pycache__ src/*.egg-info

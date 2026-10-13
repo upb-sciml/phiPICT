@@ -38,7 +38,9 @@ from scipy.sparse.linalg import spsolve
 from phipict import _C
 from phipict.batching import EnvStateSnapshot
 from phipict.core import piso_diff
+from phipict.core.fields import Fields, domain_field
 from phipict.core.hooks import Hook, Hooks
+from phipict.grid.resample import MultiblockResampler
 from phipict.io.domain_io import save_domain
 from phipict.io.output import (
     ResamplingShape,
@@ -1230,6 +1232,8 @@ class Simulation:
 
         self.output_mode3D = output_mode3D
         self.log_fn = log_fn
+        # cached resamplers of `resample`, see `_output_resampler`
+        self._output_resamplers: dict[tuple, tuple[list, MultiblockResampler]] = {}
         self.output_resampling_coords = output_resampling_coords
         self.output_resampling_shape = output_resampling_shape
         self.output_resampling_fill_max_steps = output_resampling_fill_max_steps
@@ -1406,6 +1410,125 @@ class Simulation:
             Vertex coordinates for resampled images, defaulting to the domain's.
         """
         self.__output_resampling_coords = output_resampling_coords
+
+    def resample(
+        self,
+        field: Fields | Sequence[torch.Tensor],
+        out_indices: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        """Resample a field of all blocks onto the uniform output grid.
+
+        The grid is given by :attr:`output_resampling_coords`,
+        ``output_resampling_shape`` and ``output_resampling_fill_max_steps``.
+        The resample is a linear map that depends only on the geometry; it is
+        built once per geometry, ``out_indices`` and dtype, and cached.
+
+        With ``out_indices`` only those output cells are computed: same values
+        as indexing the full grid, at a fraction of the cost and memory. Use this
+        for point sensors.
+
+        The result is differentiable with respect to the block data, and memory
+        apart from the result itself does not grow with the batch size, see
+        :class:`~phipict.grid.resample.MultiblockResampler`.
+
+        Parameters
+        ----------
+        field : Fields or Sequence of torch.Tensor
+            A single field of the blocks (e.g. ``Fields.VELOCITY``), or per-block
+            data ``[B, C, *spatial]`` (or ``[1, C, *spatial]``, shared by the
+            batch) in block order, for derived quantities such as vorticity.
+        out_indices : torch.Tensor or None, optional
+            Output cells to compute: a 1D tensor of flat indices into the output
+            grid (``(z, y, x)`` layout), or a ``[dims, R]`` integer tensor of
+            per-axis ``(x, y[, z])`` indices. None (the default) for the full grid.
+
+        Returns
+        -------
+        torch.Tensor
+            ``[B, C, *out_spatial]`` (``out_spatial`` in ``(z, y, x)`` order) for
+            the full grid, or ``[B, C, R]`` in the order of ``out_indices``.
+
+        Raises
+        ------
+        RuntimeError
+            If no output resampling shape is set.
+        """
+        if self.output_resampling_shape is None:
+            raise RuntimeError("No output_resampling_shape set.")
+        data_list = (
+            domain_field(self.domain, field)
+            if isinstance(field, Fields)
+            else list(field)
+        )
+        resampler = self._output_resampler(data_list[0].dtype, out_indices)
+        return resampler(data_list)
+
+    def _output_resampler(
+        self, dtype: torch.dtype, out_indices: torch.Tensor | None
+    ) -> MultiblockResampler:
+        """The cached resampler of :meth:`resample`.
+
+        Parameters
+        ----------
+        dtype : torch.dtype
+            Dtype of the data to resample.
+        out_indices : torch.Tensor or None
+            See :meth:`resample`.
+
+        Returns
+        -------
+        MultiblockResampler
+            The resampler for the current output grid.
+        """
+        coords = self.output_resampling_coords
+        if coords is None:
+            raise RuntimeError("No output resampling coordinates.")
+        # `domain.getVertexCoordinates()` returns fresh tensor objects on every
+        # call, so the key is the storage, not `id()`. The entry keeps the
+        # coordinates alive, so an address cannot be reused by other data while
+        # an entry names it, and `_version` catches in-place updates.
+        grid_key = tuple(
+            (t.data_ptr(), tuple(t.shape), t.dtype, t._version) for t in coords
+        )
+        # Sensor indices are small: key them by value, so callers need not keep
+        # the same tensor around
+        out_key = (
+            None
+            if out_indices is None
+            else (
+                tuple(out_indices.shape),
+                out_indices.detach().cpu().numpy().tobytes(),
+            )
+        )
+        shape = self.output_resampling_shape
+        shape_key = (
+            tuple(shape.tolist())
+            if isinstance(shape, torch.Tensor)
+            else tuple(shape)
+            if isinstance(shape, Sequence)
+            else shape
+        )
+        fill = self.output_resampling_fill_max_steps
+        key = (grid_key, out_key, shape_key, fill, dtype)
+
+        cached = self._output_resamplers.get(key)
+        if cached is not None:
+            return cached[1]
+
+        resampler = MultiblockResampler(
+            coords_list=coords,
+            out_shape=shape,
+            dtype=dtype,
+            fill_max_steps=fill,
+            out_indices=out_indices,
+        )
+        # Keep only the resamplers of the current grid, so changing the grid
+        # does not accumulate them (or keep the old coordinates alive)
+        self._output_resamplers = {
+            k: v for k, v in self._output_resamplers.items() if k[0] == grid_key
+        }
+        self._output_resamplers[key] = (list(coords), resampler)
+        return resampler
 
     @property
     def density_viscosity(self) -> float | None:

@@ -510,10 +510,15 @@ def sample_multi_coords_to_uniform_grid(
 ) -> torch.Tensor:
     """Resample data of multiple blocks onto a common uniform grid.
 
+    Builds a :class:`MultiblockResampler` for this one call. To resample the same
+    geometry repeatedly, keep the resampler, or use
+    :meth:`phipict.core.piso_simulation.Simulation.resample`, which caches it.
+
     Parameters
     ----------
     data_list : Sequence of torch.Tensor
-        Per-block cell data, each of shape ``[1, C, *spatial]``.
+        Per-block cell data, each of shape ``[B, C, *spatial]`` or
+        ``[1, C, *spatial]`` (shared by the batch).
     coords_list : Sequence of torch.Tensor
         Per-block coordinates (NCDHW with C = dims).
     out_shape : OutShape
@@ -529,7 +534,7 @@ def sample_multi_coords_to_uniform_grid(
     Returns
     -------
     torch.Tensor
-        Resampled data of shape ``[1, C, *out_spatial]``.
+        Resampled data of shape ``[B, C, *out_spatial]``.
 
     Raises
     ------
@@ -538,50 +543,22 @@ def sample_multi_coords_to_uniform_grid(
     """
     assert len(data_list) == len(coords_list)
     assert len(data_list) > 0
-    dims = len(data_list[0].size()) - 2
-    # out_shape is x,y,z
-    # coords: NCDHW with C=x,y,z coords
-    out_shape = get_output_shape(out_shape, dims)
+    if (
+        is_cell_coords
+        and isinstance(transform_uniform, str)
+        and transform_uniform.startswith("AABB")
+    ):
+        raise NotImplementedError("vertex_coords are required for bounding box.")
 
-    vertex_coords: torch.Tensor | None
-    vertex_coords_list = []
-    cell_coords_list = []
-    for coords in coords_list:
-        if is_cell_coords:
-            if isinstance(transform_uniform, str) and transform_uniform.startswith(
-                "AABB"
-            ):
-                raise NotImplementedError(
-                    "vertex_coords are required for bounding box."
-                )
-            cell_coords_list.append(coords)
-        else:
-            vertex_coords = coords
-            vertex_coords_list.append(vertex_coords)
-            cell_coords_list.append(coords_to_center_coords(vertex_coords))
-
-    # get bounding box, assuming N=1
-    if is_cell_coords:
-        vertex_coords = None
-    else:
-        vertex_coords = torch.cat(
-            [_.view(dims, -1) for _ in vertex_coords_list], dim=-1
-        )
-
-    mat = get_uniform_transform(
-        transform_uniform, vertex_coords, out_shape, dims, dtype=data_list[0].dtype
+    resampler = MultiblockResampler(
+        coords_list,
+        out_shape,
+        data_list[0].dtype,
+        is_cell_coords=is_cell_coords,
+        transform_uniform=transform_uniform,
+        fill_max_steps=fill_max_steps,
     )
-
-    out_shape_tensor = (
-        out_shape.to(torch.int32)
-        if isinstance(out_shape, torch.Tensor)
-        else torch.tensor(out_shape, dtype=torch.int32)
-    )
-    out_data, out_weights = _C.SampleTransformedGridLocalToGlobalMulti(
-        data_list, cell_coords_list, mat, out_shape_tensor, fillMaxSteps=fill_max_steps
-    )
-
-    return out_data
+    return resampler(data_list)
 
 
 def sample_transform_from_uniform_grid(
@@ -1000,13 +977,14 @@ def _face_neighbour_kernel(
     return k.view(1, 1, *([3] * dims))
 
 
-class DiffMultiblockResampler:
-    """Differentiable multi-block -> uniform-grid resampler with cached geometry.
+class MultiblockResampler:
+    """Multi-block -> uniform-grid resampler with cached geometry.
 
-    Same operation and same result as :func:`sample_multi_coords_to_uniform_grid`
-    (and its reference torch port
-    :func:`sample_multi_coords_to_uniform_grid_diff`), but built for use inside a
-    BPTT graph:
+    The resampler behind :func:`sample_multi_coords_to_uniform_grid` and
+    :meth:`phipict.core.piso_simulation.Simulation.resample`. Same result as the
+    compiled ``_C.SampleTransformedGridLocalToGlobalMulti`` kernel (and its
+    reference torch port :func:`sample_multi_coords_to_uniform_grid_diff`), but
+    pure torch, so it is differentiable, and built to be reused:
 
     1. **Cached geometry.** The splat indices, weights and per-cell normalisation
        depend only on the grid, which never changes over the lifetime of an
@@ -1209,18 +1187,60 @@ class DiffMultiblockResampler:
         # Restriction to the requested output cells
         # -------------------------------------------------------------------
         self.out_indices: torch.Tensor | None = None
-        if out_indices is None:
-            self._rows = rows
-            self._cols = cols
-            self._weights = weights
-        else:
+        if out_indices is not None:
             flat = self._flatten_out_indices(out_indices)
             self.out_indices = flat
-            self._rows, self._cols, self._weights = self._restrict(
-                flat, rows, cols, weights
-            )
+            rows, cols, weights = self._restrict(flat, rows, cols, weights)
             # The full-grid operator and the fill masks are no longer needed.
             self._fill_steps = []
+        self._block_ops = self._split_by_block(rows, cols, weights)
+
+    @property
+    def nnz(self) -> int:
+        """Number of nonzeros of the (restricted) splat operator.
+
+        Returns
+        -------
+        int
+            Entries of the operator over all blocks.
+        """
+        return sum(rows.numel() for rows, _, _ in self._block_ops)
+
+    def _split_by_block(
+        self, rows: torch.Tensor, cols: torch.Tensor, weights: torch.Tensor
+    ) -> list[tuple[torch.Tensor, torch.Tensor, torch.Tensor]]:
+        """Split the operator into one part per source block.
+
+        A call then gathers from each block's data directly, so the blocks are
+        never concatenated into one copy of the whole source field.
+
+        Parameters
+        ----------
+        rows, cols, weights : torch.Tensor
+            The operator in COO format, ``cols`` indexing the concatenated
+            source cells of all blocks.
+
+        Returns
+        -------
+        list of tuple of torch.Tensor
+            Per block: output rows, block-local source columns and weights.
+        """
+        order = torch.argsort(cols)
+        rows, cols, weights = rows[order], cols[order], weights[order]
+        offsets = torch.tensor(
+            [0, *np.cumsum(self.block_sizes).tolist()],
+            device=cols.device,
+            dtype=cols.dtype,
+        )
+        bounds = torch.searchsorted(cols, offsets).tolist()
+        return [
+            (
+                rows[bounds[b] : bounds[b + 1]],
+                cols[bounds[b] : bounds[b + 1]] - int(offsets[b]),
+                weights[bounds[b] : bounds[b + 1]],
+            )
+            for b in range(len(self.block_sizes))
+        ]
 
     @property
     def n_out(self) -> int:
@@ -1380,46 +1400,130 @@ class DiffMultiblockResampler:
         r_vals = s_vals[pos] * torch.repeat_interleave(g_val, take)
         return r_rows, r_cols, r_vals
 
+    # Bytes of temporaries a call may hold per chunk of output channels: the
+    # gathered contributions and, for shared data, the selected source rows.
+    CHUNK_BYTES = 256 * 2**20
+
     def __call__(self, data_list: Sequence[torch.Tensor]) -> torch.Tensor:
         """Resample per-block cell data onto the uniform grid, differentiably.
+
+        The leading dim is a batch (e.g. of environments): every block holds
+        either one entry per batch element or a single entry shared by all of
+        them. The blocks are read in place, and the work runs over chunks of the
+        ``batch * C`` output channels, so the temporaries stay below
+        :attr:`CHUNK_BYTES` however large the batch is. Only the result scales
+        with it.
 
         Parameters
         ----------
         data_list : Sequence of torch.Tensor
-            Per-block cell data, each of shape ``[1, C, *spatial]``, in the same
-            block order as the ``coords_list`` this was built from.
+            Per-block cell data, each of shape ``[B, C, *spatial]`` or
+            ``[1, C, *spatial]``, in the same block order as the ``coords_list``
+            this was built from.
 
         Returns
         -------
         torch.Tensor
-            ``[1, C, *out_spatial]`` for the full grid, or ``[1, C, R]`` when
+            ``[B, C, *out_spatial]`` for the full grid, or ``[B, C, R]`` when
             built with ``out_indices`` (in the order the indices were given).
         """
         if len(data_list) != len(self.block_sizes):
             raise ValueError(
                 f"Expected {len(self.block_sizes)} blocks, got {len(data_list)}."
             )
+        n_batch = max(data.size(0) for data in data_list)
         channels = data_list[0].size(1)
-        flat_blocks = []
-        for data, n_src in zip(data_list, self.block_sizes, strict=False):
-            block = data.reshape(channels, -1)
-            if block.size(1) != n_src:
+        sources = []
+        for data, n_src in zip(data_list, self.block_sizes, strict=True):
+            if data.size(0) not in (1, n_batch) or data.size(1) != channels:
                 raise ValueError(
-                    f"Block has {block.size(1)} cells, operator expects {n_src}."
+                    f"Block data of shape {tuple(data.shape)} does not match a "
+                    f"batch of {n_batch} with {channels} channels."
                 )
-            flat_blocks.append(block)
-        vals = torch.cat(flat_blocks, dim=1) if len(flat_blocks) > 1 else flat_blocks[0]
+            if data[0, 0].numel() != n_src:
+                raise ValueError(
+                    f"Block has {data[0, 0].numel()} cells, operator expects {n_src}."
+                )
+            sources.append(data.reshape(data.size(0) * channels, n_src))
 
-        contrib = vals.index_select(1, self._cols) * self._weights
-        out = torch.zeros((channels, self.n_out), device=vals.device, dtype=vals.dtype)
-        out = out.index_add(1, self._rows, contrib)
+        # [B * C, n_out], built chunk by chunk of output channels
+        n_rows = n_batch * channels
+        ref = sources[0]
+        per_row = max(
+            rows.numel() + (n_src if src.size(0) != n_rows else 0)
+            for (rows, _, _), src, n_src in zip(
+                self._block_ops, sources, self.block_sizes, strict=True
+            )
+        )
+        chunk = max(1, self.CHUNK_BYTES // max(1, per_row * ref.element_size()))
+        chunk = min(chunk, n_rows)
+
+        out = None
+        if chunk < n_rows:
+            out = torch.empty((n_rows, self.n_out), device=ref.device, dtype=ref.dtype)
+        for start in range(0, n_rows, chunk):
+            stop = min(start + chunk, n_rows)
+            part = self._resample_rows(sources, start, stop, channels, n_rows)
+            if out is None:
+                out = part
+            else:
+                out[start:stop] = part
+        assert out is not None
 
         if self.out_indices is not None:
-            return out.reshape(1, channels, -1)
+            return out.reshape(n_batch, channels, -1)
+        return out.reshape([n_batch, channels, *self.out_spatial])
 
-        out = out.reshape([channels, *self.out_spatial])
+    def _resample_rows(
+        self,
+        sources: Sequence[torch.Tensor],
+        start: int,
+        stop: int,
+        channels: int,
+        n_rows: int,
+    ) -> torch.Tensor:
+        """Output channels ``start:stop`` of the flattened ``[B * C]`` channels.
+
+        Parameters
+        ----------
+        sources : Sequence of torch.Tensor
+            Per-block data, ``[B * C, n_src]`` or ``[C, n_src]`` if shared.
+        start, stop : int
+            The range of output channels.
+        channels : int
+            Channels per batch element, ``C``.
+        n_rows : int
+            Total output channels, ``B * C``.
+
+        Returns
+        -------
+        torch.Tensor
+            ``[stop - start, n_out]``, hole filling applied.
+        """
+        ref = sources[0]
+        out = torch.zeros(
+            (stop - start, self.n_out), device=ref.device, dtype=ref.dtype
+        )
+        for (rows, cols, weights), src in zip(self._block_ops, sources, strict=True):
+            if src.size(0) == n_rows:
+                vals = src[start:stop]
+            else:  # shared by the batch: output channel k reads channel k % C
+                select = torch.arange(start, stop, device=src.device) % channels
+                vals = src.index_select(0, select)
+            out.index_add_(1, rows, vals.index_select(1, cols) * weights)
+
         if not self._fill_steps:
-            return out.reshape([1, channels, *self.out_spatial])
+            return out
+
+        conv = (
+            torch.nn.functional.conv2d if self.dims == 2 else torch.nn.functional.conv3d
+        )
+        kernel = _face_neighbour_kernel(self.dims, out.dtype, out.device)
+        out = out.view(-1, *self.out_spatial)
+        for filled, _newly, scale in self._fill_steps:
+            num = conv((out * filled).unsqueeze(1), kernel, padding=1)[:, 0]
+            out = out + num * scale
+        return out.reshape(stop - start, self.n_out)
 
         conv = (
             torch.nn.functional.conv2d if self.dims == 2 else torch.nn.functional.conv3d

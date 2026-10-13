@@ -37,7 +37,6 @@ import struct
 import zlib
 from collections.abc import Sequence
 from dataclasses import dataclass
-from enum import Flag, auto
 from pathlib import Path
 from typing import TYPE_CHECKING
 from xml.sax.saxutils import quoteattr
@@ -46,26 +45,12 @@ import numpy as np
 import torch
 
 from phipict import _C
+from phipict.core.fields import Fields, block_field
 
 if TYPE_CHECKING:
     from phipict.meshing import Mesh
 
 __all__ = ["Fields", "write_vtk", "write_vts"]
-
-
-class Fields(Flag):
-    """Cell fields to export."""
-
-    VELOCITY = auto()
-    PRESSURE = auto()
-    PASSIVE_SCALAR = auto()
-    VELOCITY_SOURCE = auto()
-    EPOT = auto()
-    VISCOSITY = auto()
-    #: Cell volume and scaled Jacobian, computed from the vertices.
-    QUALITY = auto()
-    NONE = 0
-    ALL = VELOCITY | PRESSURE | PASSIVE_SCALAR | VELOCITY_SOURCE | EPOT | VISCOSITY
 
 
 _VTK_TYPES = {
@@ -181,26 +166,12 @@ def _block_fields(
     block: _C.Block, fields: Fields, batch_index: int, ndims: int
 ) -> list[_Array]:
     out: list[_Array | None] = []
-    if Fields.VELOCITY in fields:
-        out.append(_cell_array("velocity", block.velocity, batch_index, ndims))
-    if Fields.PRESSURE in fields:
-        out.append(_cell_array("pressure", block.pressure, batch_index, ndims))
-    if Fields.PASSIVE_SCALAR in fields and block.hasPassiveScalar():
-        assert block.passiveScalar is not None
-        out.append(
-            _cell_array("passiveScalar", block.passiveScalar, batch_index, ndims)
-        )
-    if Fields.VELOCITY_SOURCE in fields and block.hasVelocitySource():
-        assert block.velocitySource is not None
-        out.append(
-            _cell_array("velocitySource", block.velocitySource, batch_index, ndims)
-        )
-    if Fields.EPOT in fields and block.hasEpot():
-        assert block.epot is not None
-        out.append(_cell_array("epot", block.epot, batch_index, ndims))
-    if Fields.VISCOSITY in fields and block.hasViscosity():
-        assert block.viscosity is not None
-        out.append(_cell_array("viscosity", block.viscosity, batch_index, ndims))
+    for field in Fields.ALL:
+        if field not in fields:
+            continue
+        data = block_field(block, field)
+        if data is not None:
+            out.append(_cell_array(field.attr, data, batch_index, ndims))
     return [a for a in out if a is not None]
 
 
