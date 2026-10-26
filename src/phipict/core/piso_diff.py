@@ -25,6 +25,7 @@ Each wrapper runs a CUDA kernel of :mod:`phipict._C` inside a
 domain fields it reads and writes.
 """
 
+import functools
 import logging
 import math
 from collections.abc import Callable, Collection, Sequence
@@ -35,7 +36,7 @@ import torch
 from phipict import _C
 from phipict.io.output import StringWriter
 from phipict.solvers import stats as solver_stats
-from phipict.solvers.amg import AMGHierarchy, BatchedAMGHierarchy, amg_pcg_solve
+from phipict.solvers.amg import AMGHierarchy, amg_pcg_solve
 from phipict.solvers.tolerance import (
     ADJOINT_RTOL_FALLBACK,
     PRECISION_FLOOR_FACTOR,
@@ -376,6 +377,81 @@ def set_domain_tensors_from_flat(
                     "BOUNDARY_PASSIVE_SCALAR_GRAD",
                     bound.setPassiveScalarGrad,
                 )
+
+
+def _tensor_names(domain_dict: dict[str, Any]) -> set[str]:
+    """Names of the tensors a :func:`flatten_domain` description indexes."""
+    names = set()
+    for key, value in domain_dict.items():
+        if key == "BLOCKS":
+            for block_dict in value:
+                names |= _tensor_names(block_dict)
+        elif key == "BOUNDARIES":
+            for bound_dict in value:
+                if bound_dict is not None:
+                    names |= _tensor_names(bound_dict)
+        else:
+            names.add(key)
+    return names
+
+
+def _keeps_live_tensors(
+    domain: _C.Domain,
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    """Decorate a ``backward`` so that it leaves the live domain tensors in place.
+
+    A backward runs its kernels on the forward tensors its node saved
+    (``ctx.saved_tensors_domain_dict``), which it writes into the domain with
+    :func:`set_domain_tensors_from_flat`. Left there, they would replace the state
+    the forward has reached since, and a forward that continues after the
+    backward (truncated BPTT without checkpoints) would resume from it: the
+    advective outflow, for one, would restart from an old boundary velocity. The
+    decorated backward puts the tensors it found back when it is done.
+
+    Parameters
+    ----------
+    domain : phipict._C.Domain
+        The domain the backward writes to.
+
+    Returns
+    -------
+    Callable
+        The decorator.
+    """
+
+    def decorator(backward: Callable[..., Any]) -> Callable[..., Any]:
+        @functools.wraps(backward)
+        def wrapper(ctx: Any, *grads: Any) -> Any:
+            saved_dict = getattr(ctx, "saved_tensors_domain_dict", None)
+            if saved_dict is None:
+                return backward(ctx, *grads)
+            live_dict, live_tensors = flatten_domain(domain, _tensor_names(saved_dict))
+            try:
+                return backward(ctx, *grads)
+            finally:
+                set_domain_tensors_from_flat(domain, live_dict, live_tensors)
+                domain.UpdateDomainData()
+
+        return wrapper
+
+    return decorator
+
+
+def _upwind_backward_tensors(domain: _C.Domain, *names: str) -> list[str]:
+    """``names`` if the domain uses LINEAR_UPWIND advection, else none.
+
+    LINEAR_UPWIND keeps first-order upwind in the advection matrix and the
+    high-order rest as a deferred correction on the right-hand sides of the
+    velocity, passive-scalar and pressure systems, evaluated from the block
+    fields (``F * 0.5 * (phi_U - phi_UU)``, with the face fluxes ``F`` from the
+    block velocity). Its adjoint kernels read the same block fields, and the
+    upwind matrix the sign of the same fluxes, so the backward has to run on the
+    fields of the forward, not on the ones the domain holds by then. CENTRAL
+    assembles everything into the matrix, whose adjoint needs none of them.
+    """
+    if domain.getAdvectionScheme() == _C.AdvectionScheme.LINEAR_UPWIND:
+        return list(names)
+    return []
 
 
 @overload
@@ -1104,7 +1180,7 @@ def linear_solve_GPU(
     adjoint_rank_deficient: bool = False,
     tag: str = "unknown",
     x0: torch.Tensor | None = None,
-    amg_hierarchy: AMGHierarchy | BatchedAMGHierarchy | None = None,
+    amg_hierarchy: AMGHierarchy | None = None,
     matrix_rank_deficient: bool = False,
     residual_reset_step: int = 0,
     fwd_rtol: float | None = None,
@@ -1506,7 +1582,9 @@ def SetupAdvectionMatrix(
     Notes
     -----
     Tracked inputs: block.velocity, boundary.velocity, domain.viscosity and
-    block.viscosity (or the passive scalar viscosity).
+    block.viscosity (or the passive scalar viscosity). With LINEAR_UPWIND the
+    velocities are also saved for the backward, which needs the signs of their
+    face fluxes.
     """
     # input tensors that need to be tracked by pytorch
     tracked_tensor_filter = ["VELOCITY", "BOUNDARY_VELOCITY", "VISCOSITY"]
@@ -1521,7 +1599,9 @@ def SetupAdvectionMatrix(
     domain_dict, tracked_tensors = flatten_domain(domain, tracked_tensor_filter)
 
     # filter for any forward tensors that need to be saved for backwards
-    backwards_tensor_filter: list[str] = []
+    backwards_tensor_filter = _upwind_backward_tensors(
+        domain, "VELOCITY", "BOUNDARY_VELOCITY"
+    )
 
     class SetupAdvectionMatrixFunction(torch.autograd.Function):
         """Autograd node of :func:`SetupAdvectionMatrix`.
@@ -1566,13 +1646,21 @@ def SetupAdvectionMatrix(
                     passiveScalarChannel=passiveScalarChannel,
                 )
 
-                saved_tensors = []
+                if backwards_tensor_filter:
+                    domain_dict, saved_tensors = flatten_domain(
+                        domain, backwards_tensor_filter
+                    )
+                    ctx.saved_tensors_domain_dict = domain_dict
+                else:
+                    ctx.saved_tensors_domain_dict = None
+                    saved_tensors = []
                 saved_tensors.append(time_step)
                 ctx.save_for_backward(*saved_tensors)
 
             return domain.A, domain.C.value  # .clone()
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, A_grad: torch.Tensor, C_val_grad: torch.Tensor
@@ -1600,6 +1688,10 @@ def SetupAdvectionMatrix(
                     if _LOG_DEBUG:
                         _LOG.debug("SetupAdvectionMatrix backward")
                     time_step = ctx.saved_tensors[-1]
+                    if ctx.saved_tensors_domain_dict is not None:
+                        set_domain_tensors_from_flat(
+                            domain, ctx.saved_tensors_domain_dict, ctx.saved_tensors
+                        )
                     # domain.setAGrad(A_grad)
                     _set_gradient_input(
                         A_grad, domain.setAGrad, "SetupAdvectionMatrix", "A_GRAD"
@@ -1667,7 +1759,9 @@ def SetupAdvectionScalar(
     -----
     Inputs:
 
-    - block.passiveScalar (not needed for backwards)
+    - block.passiveScalar (needed for backwards with LINEAR_UPWIND only)
+    - block.velocity (LINEAR_UPWIND only: the face fluxes of the deferred
+      correction)
     - domain.scalarResult (if non-orthogonal)
     - block.transform (must be static, not differentiable)
     - domain.viscosity
@@ -1688,6 +1782,9 @@ def SetupAdvectionScalar(
     ]
     if is_non_ortho:
         tracked_tensor_filter.append("PASSIVE_SCALAR_RESULT")
+    # The deferred correction of LINEAR_UPWIND makes the right-hand side depend on
+    # the block velocity, through its face fluxes
+    tracked_tensor_filter += _upwind_backward_tensors(domain, "VELOCITY")
 
     grad_tensor_filter = [s + "_GRAD" for s in tracked_tensor_filter]
 
@@ -1701,6 +1798,9 @@ def SetupAdvectionScalar(
     ]
     if is_non_ortho:
         backwards_tensor_filter.append("PASSIVE_SCALAR_RESULT")
+    backwards_tensor_filter += _upwind_backward_tensors(
+        domain, "VELOCITY", "PASSIVE_SCALAR"
+    )
 
     class SetupAdvectionScalarFunction(torch.autograd.Function):
         """Autograd node of :func:`SetupAdvectionScalar`.
@@ -1749,6 +1849,7 @@ def SetupAdvectionScalar(
             return domain.scalarRHS  # .clone()
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, grad_rhs: torch.Tensor
@@ -1792,6 +1893,10 @@ def SetupAdvectionScalar(
                         domain.CreatePassiveScalarGradOnBlocks()
                         domain.CreatePassiveScalarGradOnBoundaries()
                         domain.CreateVelocityGradOnBoundaries()
+                        if "VELOCITY" in tracked_tensor_filter:
+                            # A fresh buffer: the flux scatter of the deferred
+                            # correction adds into it
+                            domain.CreateVelocityGradOnBlocks()
                         if is_non_ortho:
                             domain.CreateScalarResultGrad()
                         domain.UpdateDomainData()
@@ -1873,6 +1978,7 @@ def SetupAdvectionVelocity(
     domain_dict, tracked_tensors = flatten_domain(domain, tracked_tensor_filter)
 
     backwards_tensor_filter = ["BOUNDARY_VELOCITY", "VISCOSITY", "VISCOSITY_BLOCK"]
+    backwards_tensor_filter += _upwind_backward_tensors(domain, "VELOCITY")
     backwards_tensor_filter.append(
         "VELOCITY_SOURCE"
     )  # DEBUG: value not needed but needs to be set to receive gradients
@@ -1928,6 +2034,7 @@ def SetupAdvectionVelocity(
             return domain.velocityRHS  # .clone()
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, grad_rhs: torch.Tensor
@@ -2847,6 +2954,8 @@ def SetupPressureCorrection(
     backwards_tensor_filter.append(
         "VELOCITY_SOURCE"
     )  # DEBUG: value not needed but needs to be set to receive gradients
+    # hbyA repeats the predictor's deferred correction
+    backwards_tensor_filter += _upwind_backward_tensors(domain, "VELOCITY")
     if is_non_ortho:
         tracked_tensor_filter.append("PRESSURE_RESULT")
 
@@ -2911,6 +3020,7 @@ def SetupPressureCorrection(
             return domain.P.value, domain.pressureRHS, domain.pressureRHSdiv
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any,
@@ -3097,6 +3207,7 @@ def SetupPressureMatrix(
             return domain.P.value
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, P_value_grad: torch.Tensor
@@ -3234,6 +3345,8 @@ def SetupPressureRHS(
     backwards_tensor_filter.append(
         "VELOCITY_SOURCE"
     )  # DEBUG: value not needed but needs to be set to receive gradients
+    # hbyA repeats the predictor's deferred correction
+    backwards_tensor_filter += _upwind_backward_tensors(domain, "VELOCITY")
     # if is_non_ortho:
     #    tracked_tensor_filter.append("PRESSURE_RESULT")
 
@@ -3295,6 +3408,7 @@ def SetupPressureRHS(
             return domain.pressureRHS, domain.pressureRHSdiv
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, pressureRHS_grad: torch.Tensor, pressureRHSdiv_grad: torch.Tensor
@@ -3494,6 +3608,7 @@ def SetupPressureRHSdiv(
             return domain.pressureRHSdiv
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, pressureRHSdiv_grad: torch.Tensor
@@ -3668,6 +3783,7 @@ def CorrectVelocity(
             return domain.velocityResult
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, velocity_result_grad: torch.Tensor

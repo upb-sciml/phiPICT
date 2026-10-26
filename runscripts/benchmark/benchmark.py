@@ -40,8 +40,6 @@ from ablate_solver_improvements import (
 )
 from omegaconf import DictConfig, OmegaConf
 
-from phipict.core.piso_simulation import Simulation as PISOSimulation
-
 logger = logging.getLogger("benchmark")
 
 RESULTS_FILE = "benchmark.csv"
@@ -71,18 +69,11 @@ def make_variants(cfg: DictConfig) -> tuple[list[DictConfig], DictConfig]:
 def make_env(cfg: DictConfig, variant: DictConfig, n_envs: int | None) -> Any:
     """Create and reset the env with the variant's switches applied."""
     apply_global_settings(variant)
-    # Avoid the AMG setup in reset() for variants without AMG
-    auto_min_rows = PISOSimulation.PRESSURE_AMG_AUTO_MIN_ROWS
-    if variant.pressure_amg is False:
-        PISOSimulation.PRESSURE_AMG_AUTO_MIN_ROWS = 2**62
-    try:
-        env = fluidgym.make(
-            cfg.env_id, **FORCED_ENV_KWARGS, differentiable=False, n_envs=n_envs
-        )
-        env.seed(cfg.seed)
-        env.reset()
-    finally:
-        PISOSimulation.PRESSURE_AMG_AUTO_MIN_ROWS = auto_min_rows
+    env = fluidgym.make(
+        cfg.env_id, **FORCED_ENV_KWARGS, differentiable=False, n_envs=n_envs
+    )
+    env.seed(cfg.seed)
+    env.reset()
     apply_sim_settings(cfg, env._sim, variant)
     return env
 

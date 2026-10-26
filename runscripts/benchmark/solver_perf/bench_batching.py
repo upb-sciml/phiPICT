@@ -44,7 +44,7 @@ def make_duct(nx: int, ny: int, dtype: torch.dtype) -> phipict.Domain:
     return domain
 
 
-def make_sim(domain: phipict.Domain, dt: float, pressure_amg: bool | None = False) -> phipict.MHDSimulation:
+def make_sim(domain: phipict.Domain, dt: float) -> phipict.MHDSimulation:
     return phipict.MHDSimulation(
         domain=domain,
         dt=dt,
@@ -59,7 +59,6 @@ def make_sim(domain: phipict.Domain, dt: float, pressure_amg: bool | None = Fals
         pressure_warm_start=True,
         potential_reuse_result=True,
         potential_use_preconditioner=False,  # 2D: no potential AMG in the env either
-        pressure_use_amg=pressure_amg,
     )
 
 
@@ -99,7 +98,6 @@ def main() -> None:
     parser.add_argument("--warmup", type=int, default=5)
     parser.add_argument("--dt", type=float, default=5e-3)
     parser.add_argument("--dtype", default="float64")
-    parser.add_argument("--pressure-amg", choices=["off", "on", "auto"], default="off")
     parser.add_argument("--out", default="output/solver_perf/bench_batching.jsonl")
     args = parser.parse_args()
     dtype = getattr(torch, args.dtype)
@@ -114,11 +112,11 @@ def main() -> None:
             domain.setBatchSize(B)
             domain.PrepareSolve()
         init_envs(domain, B, seed=B)
-        sim = make_sim(domain, args.dt, {"off": False, "on": True, "auto": None}[args.pressure_amg])
+        sim = make_sim(domain, args.dt)
         t = time_steps(sim, args.steps, args.warmup)
         if B == 1:
             t_single = t
-        row = dict(B=B, pressure_amg=args.pressure_amg, nx=args.nx, ny=args.ny, dtype=args.dtype, s_per_piso_step=t, env_steps_per_s=B / t,
+        row = dict(B=B, nx=args.nx, ny=args.ny, dtype=args.dtype, s_per_piso_step=t, env_steps_per_s=B / t,
                    speedup_vs_sequential=(t_single * B / t) if t_single else None,
                    peak_mem_gib=torch.cuda.max_memory_allocated() / 2**30,
                    finite=bool(torch.isfinite(domain.getBlocks()[0].velocity).all()))

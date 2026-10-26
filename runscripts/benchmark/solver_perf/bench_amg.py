@@ -1,12 +1,8 @@
 """Benchmark AMG-preconditioned CG on captured systems.
 
 Compares the pure-torch AMG-PCG with the native CUDA one (fp64 and fp32
-preconditioner) on:
-  - the epot systems, with the hierarchy the simulation built (pickled by
-    ``capture_systems.py``),
-  - the pressure systems, with the epot interpolation frozen and the coarse
-    operators refreshed by Galerkin products (``galerkin_refresh``), and
-    optionally with a dedicated pyamg setup on the pressure matrix.
+preconditioner) on the epot systems, with the hierarchy the simulation built
+(pickled by ``capture_systems.py``).
 
 Usage:
     python runscripts/benchmark/solver_perf/bench_amg.py \
@@ -56,7 +52,6 @@ def main() -> None:
     parser.add_argument("dir")
     parser.add_argument("--variants", default="python,native,native_fp32")
     parser.add_argument("--repeats", type=int, default=3)
-    parser.add_argument("--pressure-own-setup", action="store_true", help="also time a dedicated pyamg setup on the pressure matrix")
     parser.add_argument("--out", default=None)
     args = parser.parse_args()
     d = Path(args.dir)
@@ -71,27 +66,12 @@ def main() -> None:
         A = torch.sparse_csr_tensor(data["row"].long().to(dev), data["index"].long().to(dev), data["value"].to(dev), (n, n))
         return data, A
 
-    for f in sorted(d.glob("epot_amg_[0-9][0-9][0-9].pt")) + sorted(d.glob("pressure_[0-9][0-9][0-9].pt")):
+    for f in sorted(d.glob("epot_amg_[0-9][0-9][0-9].pt")):
         data, A = load(f)
         meta = data["meta"]
         b, x0 = data["rhs"].to(dev), data["x0"].to(dev)
         tol = meta["args"]["tol"]
-        hierarchies = {}
-        if f.name.startswith("epot"):
-            hierarchies["own"] = base
-        else:
-            torch.cuda.synchronize()
-            t0 = time.perf_counter()
-            h = amg.galerkin_refresh(base, A)
-            torch.cuda.synchronize()
-            h.setup_seconds = time.perf_counter() - t0
-            hierarchies["galerkin(epot P/R)"] = h
-            if args.pressure_own_setup:
-                import scipy.sparse as sp  # noqa: F401
-                from phipict import _C
-
-                csr = _C.CSRmatrix(data["value"].to(dev), data["index"].to(dev), data["row"].to(dev))
-                hierarchies["own pyamg"] = amg.build_amg_hierarchy(csr, project_constant=base.project_constant)
+        hierarchies = {"own": base}
         for hname, h in hierarchies.items():
             for variant in args.variants.split(","):
                 t, info, res, _ = run(h, A, b, x0, tol, 500, variant, args.repeats)

@@ -158,10 +158,7 @@ def main() -> None:
         .append(Hook.PRE, mesh.outflow_hook(domain, velocity=1.0))
         .append(Hook.POST, series.hook(every=max(1, args.steps // 20)))
     )
-    # AMG-preconditioned pressure solves: plain CG struggles on the skewed O-grid
-    sim = phipict.Simulation(
-        domain=domain, dt=0.05, substeps="ADAPTIVE", hooks=hooks, pressure_use_amg=True
-    )
+    sim = phipict.Simulation(domain=domain, dt=0.05, substeps="ADAPTIVE", hooks=hooks)
     sim.make_divergence_free()
     for _ in range(args.steps):
         sim.single_step()

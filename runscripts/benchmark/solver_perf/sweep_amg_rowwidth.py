@@ -10,11 +10,11 @@ from phipict.solvers import amg
 D = sys.argv[1]
 base = torch.load(D + "/epot_amg_hierarchy.pt", weights_only=False)
 cases = []
-for name in ["epot_amg_001", "pressure_002"]:
+for name in ["epot_amg_001"]:
     d = torch.load(f"{D}/{name}.pt", weights_only=False)
     n = d["row"].numel() - 1
     A = torch.sparse_csr_tensor(d["row"].long().cuda(), d["index"].long().cuda(), d["value"].cuda(), (n, n))
-    h = base if name.startswith("epot") else amg.galerkin_refresh(base, A)
+    h = base
     cases.append((name, h, d["rhs"].cuda(), d["x0"].cuda(), d["meta"]["args"]["tol"]))
 for width in ["auto", "1", "2", "4", "8", "16", "32"]:
     if width == "auto":

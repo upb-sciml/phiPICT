@@ -9,10 +9,8 @@ cg_preconditioner: none     # none | jacobi (CG solves without AMG)
 bicg_preconditioner: none   # none | jacobi
 # AMG
 native_amg: false               # CUDA AMG-PCG vs. pure-torch implementation
-pressure_amg: false             # true | false | null (auto: large systems only)
 share_amg_interpolation: false  # one host-side setup per sparsity pattern + GPU Galerkin refresh
 amg_fp32_vcycle: false          # float32 V-cycle for float64 solves
-coarse_refresh_interval: 1      # full Galerkin refresh of the pressure hierarchy every n-th matrix
 # per-simulation features
 intermediate_tol: false     # looser tolerance (ablation.pressure_tol_intermediate) for all but the last corrector
 pressure_warm_start: false  # start pressure solves from the previous result

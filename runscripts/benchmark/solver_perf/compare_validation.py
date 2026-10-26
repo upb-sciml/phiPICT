@@ -42,7 +42,7 @@ def _hartmann_error(u: np.ndarray, ha: float) -> float:
 
 
 def main() -> None:
-    stacks = sys.argv[1:] or ["legacy", "new", "new_amg"]
+    stacks = sys.argv[1:] or ["legacy", "new"]
     for case_dir in sorted(REF.glob("*/*/*")):
         typ, ha, res = case_dir.parts[-3:]
         try:

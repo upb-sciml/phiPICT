@@ -29,17 +29,14 @@ import torch
 
 __all__ = [
     "AMGHierarchy",
-    "BatchedAMGHierarchy",
     "AMGSolveInfo",
     "amg_pcg_solve",
     "build_amg_hierarchy",
     "csr_to_scipy",
-    "batched_hierarchy_for",
     "clear_interpolation_cache",
     "galerkin_refresh",
     "hierarchy_for",
     "is_pyamg_available",
-    "values_fingerprint",
     "native_amg_available",
 ]
 
@@ -748,7 +745,6 @@ def galerkin_refresh(
     csr_mat: Any,
     *,
     project_constant: bool | None = None,
-    coarse: bool = True,
 ) -> AMGHierarchy:
     """Re-use the interpolation of ``hierarchy`` for a new fine-level operator.
 
@@ -757,8 +753,7 @@ def galerkin_refresh(
     on the GPU. This is much cheaper than a new (host-side) AMG setup and stays
     an effective preconditioner as long as the new operator has the same
     sparsity pattern and a similar strength-of-connection structure, e.g. the
-    pressure matrix of consecutive time steps, or the pressure matrix versus the
-    electric-potential matrix of the same grid.
+    electric-potential matrices of consecutive episodes on the same grid.
 
     Parameters
     ----------
@@ -769,12 +764,6 @@ def galerkin_refresh(
         the same size as the finest level of ``hierarchy``.
     project_constant : bool or None, optional
         Overrides ``hierarchy.project_constant``. Default is None (keep).
-    coarse : bool, optional
-        Recompute the coarse operators (default). With False only the finest
-        level is replaced and the coarse levels of ``hierarchy`` are re-used as
-        they are: still a valid (slightly weaker) preconditioner when the
-        operator changed little, at the cost of a diagonal extraction instead of
-        the Galerkin products.
 
     Returns
     -------
@@ -794,10 +783,7 @@ def galerkin_refresh(
     A = A.to(dtype=fine.D_inv.dtype, device=fine.D_inv.device)
 
     levels: list[_Level] = []
-    for i, lvl in enumerate(hierarchy.levels):
-        if i > 0 and not coarse:
-            levels.extend(hierarchy.levels[i:])
-            break
+    for lvl in hierarchy.levels:
         if getattr(lvl, "native_rp", None) is None:
             lvl.native_rp = {}
         levels.append(
@@ -813,12 +799,9 @@ def galerkin_refresh(
             break
         A = _galerkin_product(lvl.R, A, lvl.P)
 
-    if coarse or len(levels) == 1:
-        coarse_pinv = torch.linalg.pinv(levels[-1].A.to_dense().to(torch.float64)).to(
-            fine.D_inv.dtype
-        )
-    else:
-        coarse_pinv = hierarchy.coarse_pinv
+    coarse_pinv = torch.linalg.pinv(levels[-1].A.to_dense().to(torch.float64)).to(
+        fine.D_inv.dtype
+    )
     return AMGHierarchy(
         levels=levels,
         coarse_pinv=coarse_pinv,
@@ -838,9 +821,9 @@ def galerkin_refresh(
 # ---------------------------------------------------------------------------
 
 # Hierarchies whose P/R are re-used for every operator with the same sparsity
-# pattern, keyed by `_sparsity_key`. The pressure and electric-potential matrices
-# of a grid share their pattern, and so do the matrices of every episode of an
-# environment, so one host-side pyamg setup serves all of them.
+# pattern, keyed by `_sparsity_key`. The electric-potential matrices of every
+# episode of an environment share their pattern, so one host-side pyamg setup
+# serves all of them.
 _INTERPOLATION_CACHE: dict[tuple, AMGHierarchy] = {}
 
 
@@ -863,23 +846,6 @@ def _sparsity_key(csr_mat: Any) -> tuple:
         [col64.sum(), (col64 * weights).sum(), row.to(torch.int64).sum()]
     )
     return (str(value.device), n, col.numel(), *checks.tolist())
-
-
-def values_fingerprint(value: torch.Tensor) -> tuple[float, float]:
-    """Fingerprint of matrix values, used to detect a changed operator.
-
-    Parameters
-    ----------
-    value : torch.Tensor
-        Matrix values.
-
-    Returns
-    -------
-    tuple of float
-        Sum and sum of squares of the values, in float64.
-    """
-    v = value.detach().reshape(-1).to(torch.float64)
-    return tuple(torch.stack([v.sum(), (v * v).sum()]).tolist())  # type: ignore[return-value]
 
 
 def _cache_file(
@@ -1041,440 +1007,6 @@ def hierarchy_for(
 
 
 # ---------------------------------------------------------------------------
-# Batched environments
-# ---------------------------------------------------------------------------
-
-
-@dataclass
-class _GalerkinMap:
-    """Fixed linear map from the fine to the coarse operator values of one level.
-
-    For fixed sparsity patterns of ``A``, ``R`` and ``P``, the values of the
-    Galerkin operator ``R A P`` are a linear function of the values of ``A``:
-    ``a_coarse = G @ a_fine`` with ``G[e, k] = sum R[c, i] P[j, d]`` over the
-    entries ``k = (i, j)`` of ``A`` that contribute to the coarse entry
-    ``e = (c, d)``. With ``G`` built once, the coarse operators of any number of
-    operators with that pattern (batched environments) are one sparse-dense
-    product.
-
-    ``G`` has one entry per intermediate product of ``R A P``, which does not fit
-    in memory for large operators. Beyond :data:`GALERKIN_MAP_PRODUCTS` it is
-    None, and every environment's coarse operator is its own (chunked) Galerkin
-    product instead, scattered into the coarse pattern.
-    """
-
-    G: torch.Tensor | None  # sparse CSR [nnz_coarse, nnz_fine]
-    crow: torch.Tensor  # coarse pattern, int64
-    col: torch.Tensor
-    diag_pos: torch.Tensor  # position of the diagonal entry per coarse row
-
-
-def _pattern_diag_pos(crow: torch.Tensor, col: torch.Tensor) -> torch.Tensor:
-    """Position of the diagonal entry of every row of a CSR pattern (-1 if absent)."""
-    n = crow.numel() - 1
-    rows = torch.repeat_interleave(
-        torch.arange(n, device=crow.device), crow[1:] - crow[:-1]
-    )
-    pos = torch.full((n,), -1, dtype=torch.int64, device=crow.device)
-    on_diag = rows == col
-    pos[rows[on_diag]] = torch.nonzero(on_diag).reshape(-1)
-    return pos
-
-
-def _expand_rows(
-    crow: torch.Tensor, rows: torch.Tensor
-) -> tuple[torch.Tensor, torch.Tensor]:
-    """For every entry of ``rows``, enumerate the CSR positions of that row.
-
-    Returns
-    -------
-    owner : torch.Tensor
-        Index into ``rows`` of every expanded entry.
-    pos : torch.Tensor
-        CSR position of every expanded entry.
-    """
-    counts = (crow[1:] - crow[:-1])[rows]
-    owner = torch.repeat_interleave(
-        torch.arange(rows.numel(), device=rows.device), counts
-    )
-    starts = torch.cumsum(counts, 0) - counts
-    within = torch.arange(owner.numel(), device=rows.device) - starts[owner]
-    return owner, crow[rows][owner] + within
-
-
-# Largest number of intermediate products of ``R A P`` for which a batched
-# hierarchy precomputes the Galerkin map of a level. The map and its setup take
-# ~50 bytes per product; beyond, the coarse operators are computed per env.
-GALERKIN_MAP_PRODUCTS = 50_000_000
-
-
-def _galerkin_map(
-    crow: torch.Tensor,
-    col: torch.Tensor,
-    R: torch.Tensor,
-    P: torch.Tensor,
-    max_products: int | None = None,
-) -> _GalerkinMap:
-    """Build the :class:`_GalerkinMap` of ``R A P`` for the pattern ``(crow, col)``.
-
-    With more than ``max_products`` (default :data:`GALERKIN_MAP_PRODUCTS`)
-    intermediate products, only the coarse pattern is built (``G`` is None).
-    """
-    if max_products is None:
-        max_products = GALERKIN_MAP_PRODUCTS
-    device = crow.device
-    n = crow.numel() - 1
-    nnz = col.numel()
-    rows = torch.repeat_interleave(torch.arange(n, device=device), crow[1:] - crow[:-1])
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore", message="Sparse CSR tensor support is in beta state"
-        )
-        RT = R.t().to_sparse_csr()  # row i of R^T: the entries R[c, i]
-    i64 = torch.int64
-    rt_crow, rt_col, rt_val = (
-        RT.crow_indices().to(i64),
-        RT.col_indices().to(i64),
-        RT.values(),
-    )
-    p_crow, p_col, p_val = P.crow_indices().to(i64), P.col_indices().to(i64), P.values()
-    nc = P.shape[1]
-
-    products = int(
-        ((rt_crow[1:] - rt_crow[:-1])[rows] * (p_crow[1:] - p_crow[:-1])[col]).sum()
-    )
-    if products > max_products:
-        del RT, rt_crow, rt_col, rt_val, rows
-        return _galerkin_pattern(crow, col, R, P)
-
-    # fine entry k=(i,j) -> entries (c, R[c,i]) of R^T row i ...
-    k1, pos_r = _expand_rows(rt_crow, rows)
-    c1, w1 = rt_col[pos_r], rt_val[pos_r]
-    # ... -> entries (d, P[j,d]) of P row j
-    k2, pos_p = _expand_rows(p_crow, col[k1])
-    fine = k1[k2]
-    coarse_key = c1[k2] * nc + p_col[pos_p]
-    weight = w1[k2] * p_val[pos_p]
-
-    keys, entry = torch.unique(coarse_key, sorted=True, return_inverse=True)
-    c_rows = keys // nc
-    c_col = keys % nc
-    c_crow = torch.zeros(nc + 1, dtype=torch.int64, device=device)
-    c_crow[1:] = torch.cumsum(torch.bincount(c_rows, minlength=nc), 0)
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore", message="Sparse CSR tensor support is in beta state"
-        )
-        G = (
-            torch.sparse_coo_tensor(
-                torch.stack([entry, fine]), weight, (keys.numel(), nnz)
-            )
-            .coalesce()
-            .to_sparse_csr()
-        )
-    return _GalerkinMap(
-        G=G, crow=c_crow, col=c_col, diag_pos=_pattern_diag_pos(c_crow, c_col)
-    )
-
-
-def _galerkin_pattern(
-    crow: torch.Tensor, col: torch.Tensor, R: torch.Tensor, P: torch.Tensor
-) -> _GalerkinMap:
-    """The coarse pattern of ``R A P`` for the pattern ``(crow, col)``, without map.
-
-    The pattern is structural: that of the product of the patterns, whatever the
-    values (SpGEMM keeps entries that cancel numerically).
-    """
-    ones = torch.ones(col.numel(), dtype=P.dtype, device=col.device)
-    C = _galerkin_product(R, _csr(crow, col, ones), P)
-    c_crow = C.crow_indices().to(torch.int64)
-    c_col = C.col_indices().to(torch.int64)
-    return _GalerkinMap(
-        G=None, crow=c_crow, col=c_col, diag_pos=_pattern_diag_pos(c_crow, c_col)
-    )
-
-
-def _csr(crow: torch.Tensor, col: torch.Tensor, values: torch.Tensor) -> torch.Tensor:
-    """Square sparse CSR matrix of the pattern ``(crow, col)`` with ``values``."""
-    n = crow.numel() - 1
-    idx = torch.int64 if col.numel() > torch.iinfo(torch.int32).max else torch.int32
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore", message="Sparse CSR tensor support is in beta state"
-        )
-        return torch.sparse_csr_tensor(crow.to(idx), col.to(idx), values, size=(n, n))
-
-
-def _coarse_values_per_env(
-    values: torch.Tensor,
-    crow: torch.Tensor,
-    col: torch.Tensor,
-    R: torch.Tensor,
-    P: torch.Tensor,
-    coarse: _GalerkinMap,
-) -> torch.Tensor:
-    """Coarse operator values ``[B, nnz_c]`` of the B operators ``values [B, nnz]``.
-
-    One Galerkin product per environment, scattered into the pattern of
-    ``coarse`` (see :func:`_galerkin_pattern`).
-    """
-    nc = coarse.crow.numel() - 1
-    c_rows = torch.repeat_interleave(
-        torch.arange(nc, device=crow.device), coarse.crow[1:] - coarse.crow[:-1]
-    )
-    keys = c_rows * nc + coarse.col  # sorted: CSR rows, sorted columns
-    out = torch.zeros(
-        values.size(0), coarse.col.numel(), dtype=values.dtype, device=values.device
-    )
-    for b in range(values.size(0)):
-        C = _galerkin_product(R, _csr(crow, col, values[b].to(P.dtype)), P)
-        C_crow = C.crow_indices().to(torch.int64)
-        rows_b = torch.repeat_interleave(
-            torch.arange(nc, device=crow.device), C_crow[1:] - C_crow[:-1]
-        )
-        pos = torch.searchsorted(keys, rows_b * nc + C.col_indices().to(torch.int64))
-        out[b, pos] = C.values().to(values.dtype)
-    return out
-
-
-@dataclass
-class BatchedAMGHierarchy:
-    """AMG hierarchies of B operators with one sparsity pattern (batched environments).
-
-    All environments share the interpolation (``R``, ``P``) of ``base``; every
-    environment has its own operators on every level, refreshed together by the
-    fixed Galerkin maps (one sparse-dense product per level). Solved by the
-    native AMG-PCG, one V-cycle per environment and iteration, until every
-    environment has converged.
-    """
-
-    base: AMGHierarchy
-    batch_size: int
-    maps: list[_GalerkinMap]
-    fine_crow: torch.Tensor  # int64 pattern of the finest level
-    fine_col: torch.Tensor
-    fine_diag_pos: torch.Tensor
-    values: list[torch.Tensor]  # per level [B, nnz_l], hierarchy dtype of the refresh
-    dinv: list[torch.Tensor]  # per level [B, n_l]
-    coarse_pinv: torch.Tensor  # [B, nc, nc]
-    project_constant: bool = False
-    native_dtype: torch.dtype | None = None
-    num_pre_smooth: int = 1
-    num_post_smooth: int = 1
-    setup_seconds: float = 0.0
-    # persistent native buffers (stable pointers keep the CUDA graphs valid)
-    _native: dict[Any, Any] = field(default_factory=dict)
-
-    @staticmethod
-    def build(
-        base: AMGHierarchy, crow: torch.Tensor, col: torch.Tensor, batch_size: int
-    ) -> BatchedAMGHierarchy:
-        """Build the Galerkin maps of the pattern for the interpolation of ``base``."""
-        import time
-
-        start = time.perf_counter()
-        crow, col = crow.to(torch.int64), col.to(torch.int64)
-        maps: list[_GalerkinMap] = []
-        c_crow, c_col = crow, col
-        for lvl in base.levels:
-            if lvl.R is None or lvl.P is None:
-                break
-            m = _galerkin_map(c_crow, c_col, lvl.R, lvl.P)
-            maps.append(m)
-            c_crow, c_col = m.crow, m.col
-        dtype = base.levels[0].D_inv.dtype
-        device = crow.device
-        sizes = [crow.numel() - 1] + [m.crow.numel() - 1 for m in maps]
-        nnzs = [col.numel()] + [m.col.numel() for m in maps]
-        h = BatchedAMGHierarchy(
-            base=base,
-            batch_size=batch_size,
-            maps=maps,
-            fine_crow=crow,
-            fine_col=col,
-            fine_diag_pos=_pattern_diag_pos(crow, col),
-            values=[
-                torch.zeros(batch_size, nz, dtype=dtype, device=device) for nz in nnzs
-            ],
-            dinv=[torch.ones(batch_size, n, dtype=dtype, device=device) for n in sizes],
-            coarse_pinv=torch.zeros(
-                batch_size, sizes[-1], sizes[-1], dtype=dtype, device=device
-            ),
-            project_constant=base.project_constant,
-            native_dtype=base.native_dtype,
-            num_pre_smooth=base.num_pre_smooth,
-            num_post_smooth=base.num_post_smooth,
-        )
-        h.setup_seconds = time.perf_counter() - start
-        return h
-
-    @staticmethod
-    def _inverse_diag(values: torch.Tensor, diag_pos: torch.Tensor) -> torch.Tensor:
-        diag = torch.where(
-            diag_pos >= 0,
-            values[:, diag_pos.clamp(min=0)],
-            torch.zeros_like(values[:, :1]),
-        )
-        return torch.where(
-            diag.abs() > _MIN_ABS_DIAG, 1.0 / diag, torch.ones_like(diag)
-        )
-
-    def refresh(self, fine_values: torch.Tensor, coarse: bool = True) -> None:
-        """Set the finest operators (``[B * nnz]``) and recompute the hierarchy.
-
-        Parameters
-        ----------
-        fine_values : torch.Tensor
-            Values of the B finest operators, consecutive.
-        coarse : bool, optional
-            Recompute the coarse operators (default); False only updates the
-            finest level, see :func:`galerkin_refresh`.
-        """
-        B = self.batch_size
-        with torch.no_grad():
-            self.values[0].copy_(fine_values.detach().reshape(B, -1))
-            self.dinv[0].copy_(self._inverse_diag(self.values[0], self.fine_diag_pos))
-            if not coarse:
-                return
-            patterns = [(self.fine_crow, self.fine_col)] + [
-                (m.crow, m.col) for m in self.maps
-            ]
-            for level, m in enumerate(self.maps):
-                if m.G is not None:
-                    # [nnz_c, nnz_f] @ [nnz_f, B] -> values of all environments
-                    self.values[level + 1].copy_((m.G @ self.values[level].T).T)
-                else:
-                    lvl = self.base.levels[level]
-                    assert lvl.R is not None and lvl.P is not None
-                    self.values[level + 1].copy_(
-                        _coarse_values_per_env(
-                            self.values[level], *patterns[level], lvl.R, lvl.P, m
-                        )
-                    )
-                self.dinv[level + 1].copy_(
-                    self._inverse_diag(self.values[level + 1], m.diag_pos)
-                )
-            last = self.maps[-1]
-            nc = last.crow.numel() - 1
-            rows = torch.repeat_interleave(
-                torch.arange(nc, device=last.crow.device),
-                last.crow[1:] - last.crow[:-1],
-            )
-            dense = torch.zeros(B, nc, nc, dtype=torch.float64, device=last.crow.device)
-            dense[:, rows, last.col] = self.values[-1].to(torch.float64)
-            self.coarse_pinv.copy_(torch.linalg.pinv(dense))
-
-    def native_arguments(
-        self, dtype: torch.dtype, pdtype: torch.dtype
-    ) -> tuple[list[torch.Tensor], list[list[torch.Tensor]], torch.Tensor]:
-        """Arguments of ``_C.AMGPCGSolve`` in persistent buffers, updated in place."""
-        key = (dtype, pdtype)
-        buf = self._native.get(key)
-        if buf is None:
-            i32 = torch.int32
-            fine = [
-                self.fine_crow.to(i32),
-                self.fine_col.to(i32),
-                torch.empty(
-                    self.values[0].numel(), dtype=dtype, device=self.fine_crow.device
-                ),
-            ]
-            levels = []
-            patterns = [(self.fine_crow, self.fine_col)] + [
-                (m.crow, m.col) for m in self.maps
-            ]
-            for level, lvl in enumerate(self.base.levels[: len(self.maps)]):
-                crow, col = patterns[level]
-                assert lvl.R is not None and lvl.P is not None
-                levels.append(
-                    [
-                        crow.to(i32),
-                        col.to(i32),
-                        torch.empty(
-                            self.values[level].numel(), dtype=pdtype, device=crow.device
-                        ),
-                        torch.empty(
-                            self.dinv[level].numel(), dtype=pdtype, device=crow.device
-                        ),
-                        lvl.R.crow_indices().to(i32),
-                        lvl.R.col_indices().to(i32),
-                        lvl.R.values().to(pdtype),
-                        lvl.P.crow_indices().to(i32),
-                        lvl.P.col_indices().to(i32),
-                        lvl.P.values().to(pdtype),
-                    ]
-                )
-            pinv = torch.empty_like(self.coarse_pinv, dtype=pdtype)
-            buf = (fine, levels, pinv)
-            self._native[key] = buf
-        fine, levels, pinv = buf
-        with torch.no_grad():
-            fine[2].copy_(self.values[0].reshape(-1))
-            for level, t in enumerate(levels):
-                t[2].copy_(self.values[level].reshape(-1))
-                t[3].copy_(self.dinv[level].reshape(-1))
-            pinv.copy_(self.coarse_pinv)
-        return fine, levels, pinv
-
-
-def batched_hierarchy_for(
-    csr_mat: Any,
-    batch_size: int,
-    *,
-    project_constant: bool = False,
-    previous: BatchedAMGHierarchy | None = None,
-    coarse: bool = True,
-    **kwargs: Any,
-) -> BatchedAMGHierarchy:
-    """Batched AMG hierarchy for the B operators of a batched ``_C.CSRmatrix``.
-
-    The interpolation is the shared, cached one of the sparsity pattern (see
-    :func:`hierarchy_for`), set up from the first environment's operator if the
-    pattern is new. ``previous`` (same pattern and batch size) is refreshed in
-    place instead of building new Galerkin maps.
-
-    Parameters
-    ----------
-    csr_mat : phipict._C.CSRmatrix
-        Matrix with ``batch_size`` value arrays and one pattern.
-    batch_size : int
-        Number of environments.
-    project_constant : bool, optional
-        Singular operators with the constant nullspace.
-    previous : BatchedAMGHierarchy or None, optional
-        Hierarchy to refresh.
-    coarse : bool, optional
-        Recompute the coarse operators, see :meth:`BatchedAMGHierarchy.refresh`.
-    **kwargs : Any
-        Forwarded to :func:`hierarchy_for` for the interpolation.
-
-    Returns
-    -------
-    BatchedAMGHierarchy
-        Refreshed hierarchy.
-    """
-    from phipict import _C
-
-    nnz = csr_mat.getNnz()
-    if (
-        previous is None
-        or previous.batch_size != batch_size
-        or previous.fine_col.numel() != nnz
-    ):
-        first = _C.CSRmatrix(
-            csr_mat.value[:nnz].contiguous(), csr_mat.index, csr_mat.row
-        )
-        base = hierarchy_for(first, project_constant=project_constant, **kwargs)
-        previous = BatchedAMGHierarchy.build(
-            base, csr_mat.row, csr_mat.index, batch_size
-        )
-        coarse = True
-    previous.project_constant = project_constant
-    previous.refresh(csr_mat.value, coarse=coarse)
-    return previous
-
-
-# ---------------------------------------------------------------------------
 # Preconditioned CG
 # ---------------------------------------------------------------------------
 
@@ -1541,7 +1073,7 @@ def _criterion_residual(r: torch.Tensor) -> torch.Tensor:
 def amg_pcg_solve(
     rhs: torch.Tensor,
     x: torch.Tensor,
-    hierarchy: AMGHierarchy | BatchedAMGHierarchy,
+    hierarchy: AMGHierarchy,
     *,
     tol: float | Sequence[float],
     max_iter: int,
@@ -1585,9 +1117,6 @@ def amg_pcg_solve(
     ValueError
         If the size of ``rhs`` is not a multiple of the matrix size.
     """
-    if isinstance(hierarchy, BatchedAMGHierarchy):
-        return _native_pcg_batched(rhs, x, hierarchy, tol, max_iter, return_best_result)
-
     A = hierarchy.levels[0].A
     n = A.shape[0]
 
@@ -1696,59 +1225,6 @@ def _native_pcg(
         for i, info in enumerate(infos):
             if not info.isFiniteResidual:
                 x_work.view(len(infos), -1)[i].zero_()
-    if not in_place:
-        with torch.no_grad():
-            x.copy_(x_work.view(x.shape))
-    return list(infos)
-
-
-def _native_pcg_batched(
-    rhs: torch.Tensor,
-    x: torch.Tensor,
-    hierarchy: BatchedAMGHierarchy,
-    tol: float | Sequence[float],
-    max_iter: int,
-    return_best_result: bool,
-) -> list[Any]:
-    """:func:`amg_pcg_solve` for batched environments (a hierarchy per environment)."""
-    from phipict import _C
-
-    if not (USE_NATIVE and rhs.is_cuda and native_amg_available()):
-        raise NotImplementedError(
-            "Batched AMG hierarchies need the native (CUDA) AMG solver."
-        )
-    dtype = rhs.dtype
-    pdtype = hierarchy.native_dtype or dtype
-    fine, levels, pinv = hierarchy.native_arguments(dtype, pdtype)
-    rhs_c = rhs.detach().reshape(-1).contiguous()
-    in_place = x.is_contiguous() and x.dtype == dtype
-    x_work = (
-        x.detach().view(-1)
-        if in_place
-        else x.detach().reshape(-1).to(dtype).contiguous()
-    )
-    infos = _C.AMGPCGSolve(
-        fine[0],
-        fine[1],
-        fine[2],
-        levels,
-        pinv,
-        rhs_c,
-        x_work,
-        int(max_iter),
-        float(max(tol)) if isinstance(tol, Sequence) else float(tol),
-        True,
-        bool(return_best_result),
-        bool(hierarchy.project_constant),
-        int(hierarchy.num_pre_smooth),
-        int(hierarchy.num_post_smooth),
-        float(_JACOBI_OMEGA),
-        [float(t) for t in tol] if isinstance(tol, Sequence) else [],
-    )
-    n = hierarchy.fine_crow.numel() - 1
-    for i, info in enumerate(infos):
-        if not info.isFiniteResidual:
-            x_work.view(-1, n)[i].zero_()
     if not in_place:
         with torch.no_grad():
             x.copy_(x_work.view(x.shape))

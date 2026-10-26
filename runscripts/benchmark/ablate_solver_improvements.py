@@ -33,7 +33,6 @@ from fluidgym import DEFAULT_PALETTE
 from fluidgym.envs.mhd.mhd_env import MHDEnv
 from fluidgym.registry import registry
 from phipict import _C
-from phipict.core.piso_simulation import Simulation as PISOSimulation
 from phipict.solvers import amg
 from phipict.solvers.amg import is_pyamg_available
 from phipict.solvers.stats import SolverStatsRecorder
@@ -78,10 +77,8 @@ SWITCHES = [
     "cg_preconditioner",
     "bicg_preconditioner",
     "native_amg",
-    "pressure_amg",
     "share_amg_interpolation",
     "amg_fp32_vcycle",
-    "coarse_refresh_interval",
     "intermediate_tol",
     "pressure_warm_start",
     "potential_amg",
@@ -239,15 +236,6 @@ def apply_sim_settings(cfg: DictConfig, sim: Any, variant: DictConfig) -> None:
     else:
         sim.pressure_tol_intermediate = None
     sim.pressure_warm_start = bool(variant.pressure_warm_start)
-    sim.pressure_use_amg = (
-        None if variant.pressure_amg is None else bool(variant.pressure_amg)
-    )
-    sim._pressure_amg_options = {
-        **amg_options(variant),
-        "coarse_refresh_interval": int(variant.coarse_refresh_interval),
-    }
-    sim._pressure_amg_hierarchy = None
-    sim._pressure_amg_fingerprint = None
     if hasattr(sim, "_potential_use_preconditioner"):  # MHD
         sim._potential_use_preconditioner = bool(variant.potential_amg)
         sim._potential_reuse_result = bool(variant.potential_reuse_result)
@@ -261,23 +249,14 @@ def make_env(
 ):
     """Create the benchmark environment for one variant, with its switches applied."""
     apply_global_settings(variant)
-    # reset() builds the simulation and runs its first steps before the variant's
-    # switches can be set on it; without this, the automatic pressure AMG would run
-    # a host-side AMG setup for variants that do not use it
-    auto_min_rows = PISOSimulation.PRESSURE_AMG_AUTO_MIN_ROWS
-    if variant.pressure_amg is not None and not bool(variant.pressure_amg):
-        PISOSimulation.PRESSURE_AMG_AUTO_MIN_ROWS = 2**62
-    try:
-        env = fluidgym.make(
-            cfg.env_id,
-            **env_kwargs,
-            step_length=step_length,
-            differentiable=False,
-        )
-        env.seed(cfg.seed)
-        env.reset()
-    finally:
-        PISOSimulation.PRESSURE_AMG_AUTO_MIN_ROWS = auto_min_rows
+    env = fluidgym.make(
+        cfg.env_id,
+        **env_kwargs,
+        step_length=step_length,
+        differentiable=False,
+    )
+    env.seed(cfg.seed)
+    env.reset()
     logger.debug(
         "  initial domain: %s (mode %s)",
         env.initial_domain_id,
@@ -447,8 +426,7 @@ def variant_fields(variant: DictConfig) -> dict[str, Any]:
     return {
         "variant": str(variant.name),
         "label": str(variant.label),
-        # null (the automatic pressure AMG) is written as "auto"
-        **{k: "auto" if variant[k] is None else variant[k] for k in SWITCHES},
+        **{k: variant[k] for k in SWITCHES},
     }
 
 
@@ -629,10 +607,7 @@ def run_ablation(cfg: DictConfig) -> None:
             ", ".join(MHD_SWITCHES),
         )
 
-    uses_amg = any(
-        bool(v.potential_amg) and mhd or v.pressure_amg is None or bool(v.pressure_amg)
-        for v in variants
-    )
+    uses_amg = mhd and any(bool(v.potential_amg) for v in variants)
     if uses_amg and not is_pyamg_available():
         raise RuntimeError(
             "The AMG variants need the optional 'pyamg' package for the setup "

@@ -5,8 +5,7 @@ Port of ``runscripts/validation/validation.py`` (which still imports the removed
 setup and evaluation, plus a ``+solver_stack`` switch:
 
 - ``legacy``: legacy cuBLAS/cuSPARSE solvers, pure-torch AMG with its own setup,
-- ``new``: fused Krylov backend, native AMG (fp32 V-cycle), pressure AMG in auto mode,
-- ``new_amg``: as ``new`` with AMG forced on for the pressure solve.
+- ``new``: fused Krylov backend, native AMG (fp32 V-cycle).
 
 Usage (outputs under output/solver_perf/validation/):
     python runscripts/benchmark/solver_perf/validation_phipict.py case=hartmann_10 \
@@ -341,7 +340,6 @@ def make_simulation(
         non_orthogonal=False,
         hooks=hooks,
         pressure_warm_start=bool(cfg.get("pressure_warm_start", False)),
-        **stack_sim_kwargs(cfg),
         **tolerances,
     )
     sim.make_divergence_free()
@@ -600,7 +598,6 @@ def make_mhd_simulation(
         pressure_warm_start=bool(cfg.get("pressure_warm_start", False)),
         hooks=hooks,
         adaptive_CFL=cfg.sim.adaptive_cfl,
-        **stack_sim_kwargs(cfg),
         **build_tolerances(cfg),
     )
     sim.linear_solve_max_iterations = cfg.sim.pressure_solve_max_iter
@@ -625,20 +622,11 @@ def configure_solver_stack(cfg: DictConfig) -> None:
     if stack == "legacy":
         PISOtorch.SetKrylovSettings(enabled=False)
         amg.USE_NATIVE = False
-    elif stack in ("new", "new_amg"):
+    elif stack == "new":
         PISOtorch.SetKrylovSettings(enabled=True)
         amg.USE_NATIVE = True
     else:
         raise ValueError(f"unknown solver_stack {stack!r}")
-
-
-def stack_sim_kwargs(cfg: DictConfig) -> dict[str, Any]:
-    stack = str(cfg.get("solver_stack", "new"))
-    if stack == "legacy":
-        return {"pressure_use_amg": False}
-    if stack == "new_amg":
-        return {"pressure_use_amg": True}
-    return {}
 
 
 def run_validation(cfg: DictConfig):

@@ -23,7 +23,6 @@ from omegaconf import DictConfig, OmegaConf
 
 import fluidgym
 from phipict import _C
-from phipict.core.piso_simulation import Simulation as PISOSimulation
 from phipict.solvers import amg
 from phipict.solvers.stats import SolverStatsRecorder
 
@@ -71,13 +70,6 @@ def amg_options(variant: DictConfig) -> dict[str, Any]:
 def apply_sim_settings(sim: Any, variant: DictConfig) -> None:
     """Per-simulation switches, set on the simulation the environment built."""
     sim.pressure_warm_start = bool(variant.pressure_warm_start)
-    sim.pressure_use_amg = variant.pressure_amg if variant.pressure_amg is None else bool(variant.pressure_amg)
-    sim._pressure_amg_options = {
-        **amg_options(variant),
-        "coarse_refresh_interval": int(variant.coarse_refresh_interval),
-    }
-    sim._pressure_amg_hierarchy = None
-    sim._pressure_amg_fingerprint = None
     if hasattr(sim, "_potential_use_preconditioner"):  # MHD
         sim._potential_use_preconditioner = bool(variant.potential_amg)
         sim._potential_reuse_result = bool(variant.potential_reuse_result)
@@ -90,18 +82,9 @@ def make_env(cfg: DictConfig, variant: DictConfig):
     """Build the environment for one variant, with its switches applied."""
     kwargs = OmegaConf.to_container(cfg.env_kwargs, resolve=True)
     assert isinstance(kwargs, dict)
-    # reset() builds the simulation and runs its first pressure solve before the
-    # variant's switches can be set on it; without this, the automatic pressure AMG
-    # would run a host-side AMG setup for variants that do not use it
-    auto_min_rows = PISOSimulation.PRESSURE_AMG_AUTO_MIN_ROWS
-    if variant.pressure_amg is not None and not bool(variant.pressure_amg):
-        PISOSimulation.PRESSURE_AMG_AUTO_MIN_ROWS = 2**62
-    try:
-        env = fluidgym.make(cfg.env_id, **kwargs, step_length=float(cfg.step_length), differentiable=False)
-        env.seed(int(cfg.seed))
-        env.reset()
-    finally:
-        PISOSimulation.PRESSURE_AMG_AUTO_MIN_ROWS = auto_min_rows
+    env = fluidgym.make(cfg.env_id, **kwargs, step_length=float(cfg.step_length), differentiable=False)
+    env.seed(int(cfg.seed))
+    env.reset()
     apply_sim_settings(env._sim, variant)
     if cfg.fixed_substeps:
         env._sim.substeps = 1
