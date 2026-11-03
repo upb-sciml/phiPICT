@@ -29,7 +29,7 @@ CSRC = os.path.join(ROOT, "csrc", "phipict")
 # Base URL for files referenced by the README on PyPI (needs a public repo)
 RAW_URL = "https://raw.githubusercontent.com/safe-autonomous-systems/phiPICT/main/"
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 
 
 def _get_version() -> str:

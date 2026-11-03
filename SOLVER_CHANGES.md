@@ -28,14 +28,7 @@ The existing torch AMG-PCG, used for the electric potential, is replaced by a CU
 
 The potential solve becomes about 3–4× faster at the same iteration count.
 
-## AMG for the pressure solve
-
-The pressure matrix changes every step, so PICT solves it with plain CG, which needs 1000–2600 iterations on the 3D ducts.
-
-- phiPICT keeps the AMG interpolation (P, R) of the grid frozen and recomputes only the coarse operators `R A P` on the GPU (Galerkin refresh), fully every few steps. This works because the pressure matrix keeps the sparsity pattern of the potential matrix.
-- The interpolation is set up once per sparsity pattern with pyamg. The pressure and potential solves and every env reset on the same grid share it, and it can also be cached on disk (`PHIPICT_AMG_CACHE_DIR`).
-- The pressure then needs 6–22 iterations per solve.
-- It is on automatically for large systems (≥ 200k unknowns).
+- The AMG interpolation (P, R) is set up once per sparsity pattern with pyamg. Every env reset on the same grid shares it: only the coarse operators `R A P` are recomputed on the GPU (Galerkin refresh). It can also be cached on disk (`PHIPICT_AMG_CACHE_DIR`).
 - Memory stays bounded: only P/R are cached, indices are int32 and shared, and the Galerkin products run in chunks.
 
 ## Smaller features
@@ -56,7 +49,6 @@ The pressure matrix changes every step, so PICT solves it with plain CG, which n
 - **Solves.**
   - Batched solves iterate until every environment has converged.
   - Relative tolerances are resolved per environment, exactly as in independent runs.
-  - The pressure AMG refreshes the coarse operators of all environments with one sparse product per level.
 - **Differentiable path.** Batching works there too: each environment has its own gradients, and shared parameters get the sum over the environments.
 - **Adaptive substeps.** Each environment splits the time step by its own CFL condition (`adaptive_CFL_per_env`, on by default), so it takes the substeps it would take on its own.
   - The time step is stored in each environment's device domain, so every kernel reads its environment's step.
@@ -81,7 +73,7 @@ python runscripts/benchmark/eval_solver_ablation.py --env-id <env id>
 - **Outputs:** `output/solver_ablation/<env_id>/`.
 - **Protocol:** 25 timed env steps with seeded random actions per variant; reset not timed.
 
-Results (A100-40GB, fp64, 5 PISO steps per env step; `output/solver_ablation/<env_id>/`):
+Results (A100-40GB, fp64, 5 PISO steps per env step; `output/solver_ablation/<env_id>/`). They predate the removal of the pressure AMG (2026-10-26) and have to be measured again:
 
 | Environment | PICT | phiPICT | Speedup | Peak memory (PICT / phiPICT) |
 |---|---|---|---|---|
@@ -89,7 +81,7 @@ Results (A100-40GB, fp64, 5 PISO steps per env step; `output/solver_ablation/<en
 | `CylinderJet3D-hard-v0` (2.5M cells) | 1.87 ± 0.12 s | 0.61 ± 0.01 s | 3.1× | 2.0 / 3.2 GiB |
 
 - **Hartmann:** PICT's pressure CG needs ~1700 iterations per solve and its unpreconditioned potential solve ~9800 (cap 10,000); phiPICT needs 8.7 and 19.
-- **Cylinder** (2.5M cells, no MHD): pressure AMG (on automatically at this size), warm start and intermediate tolerance bring the pressure solves from 73 to 0.55 iterations on average: most of them converge immediately.
+- **Cylinder** (2.5M cells, no MHD): warm start and intermediate tolerance bring the pressure solves from 73 to 0.55 iterations on average: most of them converge immediately.
 - **Convergence:** all solves of both variants reach their tolerance.
 - **Medium 3D duct** (10M cells, earlier version of the ablation, 5 steps): 140 s vs. 3.7 s (38×). There PICT's potential solve hits the iteration cap, so its time is a lower bound.
 
