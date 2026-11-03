@@ -103,8 +103,7 @@ Batched linear solves iterate until every environment has converged. Relative
 tolerances (:class:`~phipict.SolverTolerance`) are resolved per environment, so
 each environment is solved to the same accuracy as in a separate run, even if
 their right-hand sides differ by orders of magnitude. The potential matrix and
-its AMG hierarchy are shared by all environments; the pressure AMG shares its
-interpolation and refreshes the coarse operators of all environments together.
+its AMG hierarchy are shared by all environments.
 
 Adaptive substeps
 -----------------

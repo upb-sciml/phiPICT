@@ -141,7 +141,7 @@ writes every n-th step during a simulation:
         .append(Hook.PRE, mesh.outflow_hook(domain, velocity=1.0))
         .append(Hook.POST, series.hook(every=5))
     )
-    sim = phipict.Simulation(domain=domain, dt=0.05, hooks=hooks, pressure_use_amg=True)
+    sim = phipict.Simulation(domain=domain, dt=0.05, hooks=hooks)
     for _ in range(10):
         sim.single_step()
 
