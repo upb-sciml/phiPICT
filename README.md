@@ -17,9 +17,16 @@
 
 </div>
 
-# $\phi$-PICT: Differentiable multi-block PISO MHD fluid solver, based on PICT.
+# $\phi$-PICT: Differentiable GPU-Accelerated Solver for Hydrodynamic & MHD Flows
 
 ---
+
+## Key Features
+
+- **Differentiable Physics:** Fully end-to-end differentiable solver supporting Backpropagation Through Time (BPTT/APG), Short-Horizon Actor-Critic (SHAC) and more.
+- **Massively Batched Execution:** Efficiently parallelize over 100 of independent fluid environments on a single GPU.
+- **MHD & Standard Hydrodynamics:** Simulates both magnetohydrodynamic (MHD) flows and standard hydrodynamic fluid mechanics.
+- **RL Framework Integration:** Seamlessly integrated into [FluidGym](https://github.com/upb-sciml/fluidgym) for plug-and-play benchmarking of control algorithms.
 
 ## Installation
 
