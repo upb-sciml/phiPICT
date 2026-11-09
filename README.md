@@ -13,6 +13,7 @@
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.10-EE4C2C?logo=pytorch&logoColor=white)
 ![CUDA](https://img.shields.io/badge/CUDA-12.8-%2376B900)
 ![License](https://img.shields.io/badge/License-Apache--2.0-orange)
+[![Release](https://github.com/upb-sciml/phiPICT/actions/workflows/release.yml/badge.svg)](https://github.com/upb-sciml/phiPICT/actions/workflows/release.yml)
 
 </div>
 
