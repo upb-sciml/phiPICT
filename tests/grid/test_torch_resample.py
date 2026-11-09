@@ -14,13 +14,6 @@
 
 """Tests for the differentiable pure-torch multi-block resampling.
 
-The compiled ``_C.SampleTransformedGridLocalToGlobalMulti`` kernel is a
-raw pybind binding with no autograd wrapper, so it detaches every resampled
-observation from the simulation graph.
-``sample_multi_coords_to_uniform_grid_diff`` reimplements it in torch, and
-``MultiblockResampler`` adds cached geometry plus optional restriction to
-the output cells an observation actually reads.
-
 These tests cover
 * the multi-block, curvilinear cylinder environment, and
 * a synthetic two-block grid with a gap, which forces many
