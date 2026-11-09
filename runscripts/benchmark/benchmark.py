@@ -1,13 +1,5 @@
 """Env steps per second of PICT vs. phiPICT: each improvement ablated, plus batching.
 
-Per env, one CSV row per mode in the order PICT, phiPICT w/o batching, one row
-per swept batch size of phiPICT, then phiPICT w/o <improvement>, ... at the best
-batch size of phiPICT (PICT and w/o batching run unbatched). Every row records
-its peak GPU memory; the best batch size is the fastest one that stays within
-``max_memory_pct`` of the device memory, and the phiPICT bar is that size.
-After every run, the speedups over PICT of all envs in ``results_root`` are
-collected into one table and plot, with the modes sorted by their speedup.
-
 Usage:
     python runscripts/benchmark/benchmark.py env=cylinder_jet_2d_easy
     python runscripts/benchmark/benchmark.py -m "env=glob(*)"
@@ -46,6 +38,32 @@ RESULTS_FILE = "benchmark.csv"
 PLOT_FILE = "benchmark.pdf"
 BATCHED = "phipict"  # mode of the batch size rows
 
+FULL_WIDTH = 6.0
+FIGHEIGHT = 1.5
+PANE_COLOR = "#F2F4F7"
+
+sns.set_style(style="darkgrid", rc={"axes.facecolor": PANE_COLOR})
+
+plt.rcParams.update(
+    {
+        "text.usetex": True,
+        "text.latex.preamble": (
+            r"\usepackage{amsmath}\usepackage{amssymb}\usepackage{times}"
+        ),
+        "font.family": "serif",
+        "font.serif": ["Computer Modern Roman"],
+        "pdf.fonttype": 42,
+        "ps.fonttype": 42,
+        "font.size": 9,
+        "axes.labelsize": 9,
+        "axes.titlesize": 9,
+        "figure.titlesize": 9,
+        "xtick.labelsize": 8,
+        "ytick.labelsize": 8,
+        "legend.fontsize": 8,
+    }
+)
+
 
 def load_variant(name: str) -> DictConfig:
     """A variant from ``configs/solver_ablation``."""
@@ -54,12 +72,17 @@ def load_variant(name: str) -> DictConfig:
     return variant
 
 
+def ablation_label(ablation: DictConfig) -> str:
+    """The plot label of an ablation."""
+    return rf"$\phi$-PICT {ablation.label}"
+
+
 def make_variants(cfg: DictConfig) -> tuple[list[DictConfig], DictConfig]:
     """PICT and the leave-one-out ablations, and the full phiPICT."""
     phipict = load_variant("phipict")
     variants = [load_variant("pict")]
     for name, ablation in cfg.ablations.items():
-        label = rf"$\phi$-PICT {ablation.label}"
+        label = ablation_label(ablation)
         variants.append(
             OmegaConf.merge(phipict, ablation.switches, {"name": name, "label": label})
         )
@@ -301,15 +324,32 @@ def geomean(values: pd.Series) -> float:
     return float(np.exp(np.log(values).mean())) if len(values) else float("nan")
 
 
-def aggregate(root: Path, max_memory_pct: float) -> None:
-    """Speedup over PICT per env and mode, plus the mean over envs."""
-    summaries = [
-        summarize(pd.read_csv(path), max_memory_pct).assign(env_id=path.parent.name)
-        for path in sorted(root.glob(f"*/{RESULTS_FILE}"))
-    ]
+def aggregate(root: Path, max_memory_pct: float, ablations: DictConfig) -> None:
+    """Speedup over PICT per env and mode, plus the mean over envs.
+
+    Only the configured modes count, with their configured labels, so results
+    from before a change of ``ablations`` can be reused. Envs missing one of them
+    (an unfinished run) are skipped, so that every mean covers the same envs.
+    """
+    configured = {name: ablation_label(a) for name, a in ablations.items()}
+    required = {"pict", "no_batching", BATCHED, *configured}
+    summaries = []
+    for path in sorted(root.glob(f"*/{RESULTS_FILE}")):
+        results = pd.read_csv(path)
+        missing = required - set(results["mode"])
+        if missing:
+            logger.warning(
+                "Skipping %s: no results for %s.", path.parent.name, sorted(missing)
+            )
+            continue
+        summaries.append(
+            summarize(results, max_memory_pct).assign(env_id=path.parent.name)
+        )
     if not summaries:
         return
     df = pd.concat(summaries)
+    df = df[df["mode"].isin(required)]
+    df = df.assign(label=df["mode"].map(configured).fillna(df["label"]))
     modes = list(dict.fromkeys(df["mode"]))
     labels = dict(zip(df["mode"], df["label"], strict=True))
     colors = mode_colors(modes)
@@ -364,20 +404,32 @@ def plot_overall(
 ) -> None:
     """Mean speedup per mode (bars) and per env (dots)."""
     x = np.arange(len(modes))
-    fig, ax = plt.subplots(figsize=(7, 3.5))
+    fig, ax = plt.subplots(figsize=(0.49 * FULL_WIDTH, FIGHEIGHT))
     ax.bar(x, mean[modes], 0.7, color=[colors[m] for m in modes], zorder=2)
     for i, mode in enumerate(modes):
         speedups = df.loc[df["mode"] == mode, "speedup"]
         ax.scatter(
             np.full(len(speedups), i), speedups, s=8, color="black", alpha=0.5, zorder=3
         )
-    annotate_speedups(ax, mean[modes], mean[modes])
+    # Above the highest dot, which would cover a number at the top of the bar
+    tops = df.groupby("mode")["speedup"].max()
+    annotate_speedups(ax, mean[modes], tops[modes])
     ax.axhline(1.0, color="black", linewidth=0.8, zorder=1)
     ax.set_yscale("log")
-    ax.set_ylabel("Speedup over PICT")
+    ax.margins(y=0.25)
+    ax.set_ylabel("Speedup")
     ax.set_xticks(x)
-    ax.set_xticklabels([labels[m] for m in modes], rotation=30, ha="right", fontsize=7)
-    fig.tight_layout()
+    # The full labels would take most of the height of the narrow figure
+    ax.set_xticklabels(
+        [
+            labels[m] if m == BATCHED else labels[m].removeprefix(r"$\phi$-PICT ")
+            for m in modes
+        ],
+        rotation=30,
+        ha="right",
+        fontsize=7,
+    )
+    fig.tight_layout(pad=0.2)
     fig.savefig(out_path, format="pdf")
     plt.close(fig)
 
@@ -394,7 +446,7 @@ def main(cfg: DictConfig) -> None:
     if not cfg.aggregate_only:
         assert torch.cuda.is_available(), "The benchmark requires a CUDA device."
         run(cfg)
-    aggregate(root / cfg.results_root, cfg.max_memory_pct)
+    aggregate(root / cfg.results_root, cfg.max_memory_pct, cfg.ablations)
 
 
 if __name__ == "__main__":

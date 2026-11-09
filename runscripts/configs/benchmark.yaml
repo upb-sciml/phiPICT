@@ -13,20 +13,15 @@ pressure_tol_intermediate: auto
 # phiPICT with one improvement switched off each (switches: solver_ablation/phipict.yaml)
 ablations:
   no_fused_krylov:
-    label: w/o fused Krylov
+    label: w/o CUDA-CG
     switches: {fused_krylov: false, krylov_graphs: false}
-  no_krylov_graphs:
-    label: w/o CUDA graphs
-    switches: {krylov_graphs: false}
-  no_jacobi:
-    label: w/o Jacobi PC
-    switches: {cg_preconditioner: none}
   no_intermediate_tol:
     label: w/o interm. tol.
     switches: {intermediate_tol: false}
   no_warm_start:
     label: w/o warm start
-    switches: {pressure_warm_start: false}
+    # potential_reuse_result is the warm start of the MHD potential solve
+    switches: {pressure_warm_start: false, potential_reuse_result: false}
 
 # swept until OOM, a peak above `max_memory_pct`, or `patience` sizes in a row
 # without a new best
