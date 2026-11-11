@@ -218,3 +218,5 @@ data/
 # Sphinx autosummary output
 docs/source/api/generated/
 wheelhouse/
+
+local_data/

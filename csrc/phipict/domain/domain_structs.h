@@ -112,8 +112,11 @@ protected:
 struct Boundary{
 	Boundary(const BoundaryType type, const std::shared_ptr<const Domain> p_parentDomain) : type(type), wp_parentDomain(p_parentDomain) {};
 	virtual ~Boundary() = default;
-	virtual std::shared_ptr<Boundary> Copy() const = 0; // {TORCH_CHECK(false, "This boundary can't be copied");};
-	virtual std::shared_ptr<Boundary> Clone() const = 0;
+	/** Copy/Clone the boundary. p_newParent is the domain the copy belongs to; null keeps
+	 * the parent of this boundary. A domain copy must pass itself, or the copy's parent
+	 * expires with the original domain. */
+	virtual std::shared_ptr<Boundary> Copy(const std::shared_ptr<const Domain> &p_newParent = nullptr) const = 0;
+	virtual std::shared_ptr<Boundary> Clone(const std::shared_ptr<const Domain> &p_newParent = nullptr) const = 0;
 	const BoundaryType type;
 	virtual std::string ToString() const;
 	
@@ -227,8 +230,9 @@ public:
 	bool hasPotentialTypes() const { return m_potentialTypes.has_value(); }
 	void clearPotentialTypes() { m_potentialTypes = nullopt; isTensorChanged=true; }
 	GET_OPTIONAL_DATA_PRT(PotentialTypes, m_potentialTypes);
-	// Prescribed φ of the DIRICHLET cells, shape [1 or batch,1,(D),H,W] like the types (read
-	// only at DIRICHLET cells; nullopt: φ = 0). Enters the Poisson RHS and the current density
+	// Values of the DIRICHLET and CURRENT cells, shape [1 or batch,1,(D),H,W] like the types:
+	// the prescribed φ of a DIRICHLET cell, the current into the fluid through a CURRENT cell
+	// (read only at those cells; nullopt: 0). Enters the Poisson RHS and the current density
 	// only, never the matrix, so it can change every step (e.g. wall electrodes as actuators)
 	// and differ between batched environments while the matrix stays shared.
 	optional<torch::Tensor> m_potentialValues = nullopt;
@@ -237,6 +241,8 @@ public:
 	void clearPotentialValues() { m_potentialValues = nullopt; isTensorChanged=true; }
 	/** True if any cell of the face is φ Dirichlet, i.e. the face anchors the Epot matrix. */
 	bool hasPotentialDirichlet() const;
+	/** True if any cell of the face has a prescribed current (CURRENT). */
+	bool hasPotentialCurrent() const;
 	bool hasPotentialThinWall() const;
 
 	// Legacy flag interface, kept as thin wrappers over the PotentialBC above.
@@ -274,8 +280,8 @@ public:
 	//torch::Device getDevice() const;
 
 	// copies structures, but keeps the tensor references
-	std::shared_ptr<Boundary> Copy() const;
-	std::shared_ptr<Boundary> Clone() const;
+	std::shared_ptr<Boundary> Copy(const std::shared_ptr<const Domain> &p_newParent = nullptr) const override;
+	std::shared_ptr<Boundary> Clone(const std::shared_ptr<const Domain> &p_newParent = nullptr) const override;
 	
 	//dim_t m_numDims;
 	//index_t getSpatialDims() const { return m_spatialDims; };
@@ -330,8 +336,8 @@ struct StaticDirichletBoundary : Boundary{
 	torch::Dtype getDtype() const {return boundaryVelocity.scalar_type();};
 	//torch::Device getDevice() const {return boundaryVelocity.device();};
 	// copies structures, but keeps the tensor references
-	std::shared_ptr<Boundary> Copy() const;
-	std::shared_ptr<Boundary> Clone() const;
+	std::shared_ptr<Boundary> Copy(const std::shared_ptr<const Domain> &p_newParent = nullptr) const override;
+	std::shared_ptr<Boundary> Clone(const std::shared_ptr<const Domain> &p_newParent = nullptr) const override;
 	//torch::Tensor getMaxVelocity() const;
 	//torch::Tensor getFlux() const;
 	index_t getSpatialDims() const;
@@ -368,8 +374,8 @@ struct VaryingDirichletBoundary : Boundary{
 	//torch::Tensor getFlux() const;
 
 	// copies structures, but keeps the tensor references
-	std::shared_ptr<Boundary> Copy() const;
-	std::shared_ptr<Boundary> Clone() const;
+	std::shared_ptr<Boundary> Copy(const std::shared_ptr<const Domain> &p_newParent = nullptr) const override;
+	std::shared_ptr<Boundary> Clone(const std::shared_ptr<const Domain> &p_newParent = nullptr) const override;
 	
 	//dim_t numDims;
 	index_t getSpatialDims() const;
@@ -403,8 +409,8 @@ struct ConnectedBoundary : Boundary{
 	// Alternative: connections for each axis, the other block's connected face is the connection given by the entry for the axis this boundary is attached to.
 	//I4 connections;
 	//I4 getConnectionVector();
-	std::shared_ptr<Boundary> Copy() const {TORCH_CHECK(false, "ConnectedBoundary can't be copied");};
-	std::shared_ptr<Boundary> Clone() const {TORCH_CHECK(false, "ConnectedBoundary can't be cloned");};
+	std::shared_ptr<Boundary> Copy(const std::shared_ptr<const Domain> &p_newParent = nullptr) const override {TORCH_CHECK(false, "ConnectedBoundary can't be copied");};
+	std::shared_ptr<Boundary> Clone(const std::shared_ptr<const Domain> &p_newParent = nullptr) const override {TORCH_CHECK(false, "ConnectedBoundary can't be cloned");};
 	
 	//torch::Dtype getDtype() const;
 	//index_t getSpatialDims() const;
@@ -416,8 +422,8 @@ private:
 
 struct PeriodicBoundary : Boundary{
 	PeriodicBoundary(const std::shared_ptr<const Domain> p_parentDomain) : Boundary(BoundaryType::PERIODIC, p_parentDomain) {};
-	std::shared_ptr<Boundary> Copy() const {return std::make_shared<PeriodicBoundary>(getParentDomain());};
-	std::shared_ptr<Boundary> Clone() const {return std::make_shared<PeriodicBoundary>(getParentDomain());};
+	std::shared_ptr<Boundary> Copy(const std::shared_ptr<const Domain> &p_newParent = nullptr) const override {return std::make_shared<PeriodicBoundary>(p_newParent ? p_newParent : getParentDomain());};
+	std::shared_ptr<Boundary> Clone(const std::shared_ptr<const Domain> &p_newParent = nullptr) const override {return std::make_shared<PeriodicBoundary>(p_newParent ? p_newParent : getParentDomain());};
 };
 
 struct Block : public std::enable_shared_from_this<Block>{
@@ -434,8 +440,9 @@ public:
 	~Block();
 #endif
 	// copies structures, but keeps the tensor references. does not copy connected boundaries
-	std::shared_ptr<Block> Copy() const;
-	std::shared_ptr<Block> Clone() const;
+	/** Copy/Clone the block into the domain p_newParent; null keeps the current parent. */
+	std::shared_ptr<Block> Copy(const std::shared_ptr<const Domain> &p_newParent = nullptr) const;
+	std::shared_ptr<Block> Clone(const std::shared_ptr<const Domain> &p_newParent = nullptr) const;
 	
 	std::shared_ptr<const Domain> getParentDomain() const;
 	

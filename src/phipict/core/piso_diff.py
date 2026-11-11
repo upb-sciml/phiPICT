@@ -25,6 +25,7 @@ Each wrapper runs a CUDA kernel of :mod:`phipict._C` inside a
 domain fields it reads and writes.
 """
 
+import functools
 import logging
 import math
 from collections.abc import Callable, Collection, Sequence
@@ -35,7 +36,7 @@ import torch
 from phipict import _C
 from phipict.io.output import StringWriter
 from phipict.solvers import stats as solver_stats
-from phipict.solvers.amg import AMGHierarchy, BatchedAMGHierarchy, amg_pcg_solve
+from phipict.solvers.amg import AMGHierarchy, amg_pcg_solve
 from phipict.solvers.tolerance import (
     ADJOINT_RTOL_FALLBACK,
     PRECISION_FLOOR_FACTOR,
@@ -378,6 +379,81 @@ def set_domain_tensors_from_flat(
                 )
 
 
+def _tensor_names(domain_dict: dict[str, Any]) -> set[str]:
+    """Names of the tensors a :func:`flatten_domain` description indexes."""
+    names = set()
+    for key, value in domain_dict.items():
+        if key == "BLOCKS":
+            for block_dict in value:
+                names |= _tensor_names(block_dict)
+        elif key == "BOUNDARIES":
+            for bound_dict in value:
+                if bound_dict is not None:
+                    names |= _tensor_names(bound_dict)
+        else:
+            names.add(key)
+    return names
+
+
+def _keeps_live_tensors(
+    domain: _C.Domain,
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    """Decorate a ``backward`` so that it leaves the live domain tensors in place.
+
+    A backward runs its kernels on the forward tensors its node saved
+    (``ctx.saved_tensors_domain_dict``), which it writes into the domain with
+    :func:`set_domain_tensors_from_flat`. Left there, they would replace the state
+    the forward has reached since, and a forward that continues after the
+    backward (truncated BPTT without checkpoints) would resume from it: the
+    advective outflow, for one, would restart from an old boundary velocity. The
+    decorated backward puts the tensors it found back when it is done.
+
+    Parameters
+    ----------
+    domain : phipict._C.Domain
+        The domain the backward writes to.
+
+    Returns
+    -------
+    Callable
+        The decorator.
+    """
+
+    def decorator(backward: Callable[..., Any]) -> Callable[..., Any]:
+        @functools.wraps(backward)
+        def wrapper(ctx: Any, *grads: Any) -> Any:
+            saved_dict = getattr(ctx, "saved_tensors_domain_dict", None)
+            if saved_dict is None:
+                return backward(ctx, *grads)
+            live_dict, live_tensors = flatten_domain(domain, _tensor_names(saved_dict))
+            try:
+                return backward(ctx, *grads)
+            finally:
+                set_domain_tensors_from_flat(domain, live_dict, live_tensors)
+                domain.UpdateDomainData()
+
+        return wrapper
+
+    return decorator
+
+
+def _upwind_backward_tensors(domain: _C.Domain, *names: str) -> list[str]:
+    """``names`` if the domain uses LINEAR_UPWIND advection, else none.
+
+    LINEAR_UPWIND keeps first-order upwind in the advection matrix and the
+    high-order rest as a deferred correction on the right-hand sides of the
+    velocity, passive-scalar and pressure systems, evaluated from the block
+    fields (``F * 0.5 * (phi_U - phi_UU)``, with the face fluxes ``F`` from the
+    block velocity). Its adjoint kernels read the same block fields, and the
+    upwind matrix the sign of the same fluxes, so the backward has to run on the
+    fields of the forward, not on the ones the domain holds by then. CENTRAL
+    assembles everything into the matrix, whose adjoint needs none of them.
+    """
+    if domain.getAdvectionScheme() == _C.AdvectionScheme.LINEAR_UPWIND:
+        return list(names)
+    return []
+
+
 @overload
 def _get_solver_tolerance(tol: float, dtype: torch.dtype = ...) -> float: ...
 
@@ -486,6 +562,39 @@ def _tol_value(tol: float | torch.Tensor) -> float:
     return float(tol)
 
 
+def _achieved_rtol(
+    solver_infos: Sequence[Any] | None, rhs: torch.Tensor, n_rows: int
+) -> list[float] | None:
+    """Return the relative residual each right-hand side of a solve reached.
+
+    Parameters
+    ----------
+    solver_infos : Sequence of result infos or None
+        One info per right-hand side, as returned by the solver, or None if no
+        solve was run.
+    rhs : torch.Tensor
+        Right-hand side(s) of the solve.
+    n_rows : int
+        Number of matrix rows, the length of one right-hand side.
+
+    Returns
+    -------
+    list of float or None
+        ``finalResidual / rhs_scale`` per right-hand side, or None if unknown.
+    """
+    if solver_infos is None or n_rows <= 0 or rhs.numel() % n_rows != 0:
+        return None
+    scales = torch.linalg.vector_norm(
+        rhs.detach().reshape(-1, n_rows).to(torch.float64), dim=1
+    ) / math.sqrt(n_rows)
+    if len(solver_infos) != scales.numel():
+        return None
+    return [
+        float(info.finalResidual) / s if s > 0 else 0.0
+        for info, s in zip(solver_infos, scales.cpu().tolist(), strict=True)
+    ]
+
+
 @overload
 def _rescaled_bwd_tolerance(
     tol_torch: torch.Tensor,
@@ -493,6 +602,7 @@ def _rescaled_bwd_tolerance(
     n_rows: int | None = None,
     fwd_rtol: float | None = None,
     env_batch: int = 1,
+    fwd_achieved: Sequence[float] | None = None,
 ) -> torch.Tensor: ...
 
 
@@ -503,6 +613,7 @@ def _rescaled_bwd_tolerance(
     n_rows: int | None = None,
     fwd_rtol: float | None = None,
     env_batch: int = 1,
+    fwd_achieved: Sequence[float] | None = None,
 ) -> float: ...
 
 
@@ -512,6 +623,7 @@ def _rescaled_bwd_tolerance(
     n_rows: int | None = None,
     fwd_rtol: float | None = None,
     env_batch: int = 1,
+    fwd_achieved: Sequence[float] | None = None,
 ) -> float | torch.Tensor:
     """The absolute tolerance holding the adjoint solve to a *relative* residual.
 
@@ -525,9 +637,13 @@ def _rescaled_bwd_tolerance(
     order: the override of :func:`~phipict.solvers.tolerance.set_adjoint_rtol`,
     the forward solve's own ``fwd_rtol``, or
     :data:`~phipict.solvers.tolerance.ADJOINT_RTOL_FALLBACK` for a forward solve
-    with an absolute tolerance. It is strictly proportional to ``grad_x``, so
-    scaling the loss scales every adjoint iterate and leaves the iteration count
-    unchanged: the gradient is invariant to the loss scale.
+    with an absolute tolerance. Without the override, ``rtol`` is never tighter
+    than the relative residual the forward solve actually reached: the forward
+    map is that inexact solve, and an adjoint pushed beyond its accuracy only
+    stalls and injects noise into the operator's worst-conditioned modes. It is
+    strictly proportional to ``grad_x``, so scaling the loss scales every adjoint
+    iterate and leaves the iteration count unchanged: the gradient is invariant to
+    the loss scale.
 
     Parameters
     ----------
@@ -548,6 +664,9 @@ def _rescaled_bwd_tolerance(
         ``grad_x`` holds. With more than one, every environment gets the
         tolerance of its own part of ``grad_x`` (a tensor with one tolerance per
         right-hand side). Default is 1.
+    fwd_achieved : Sequence of float or None, optional
+        Relative residual the forward solve reached, per right-hand side, or None
+        if unknown. Default is None.
 
     Returns
     -------
@@ -557,9 +676,9 @@ def _rescaled_bwd_tolerance(
     """
     if env_batch > 1:
         return _rescaled_bwd_tolerance_batched(
-            tol_torch, grad_x, n_rows, fwd_rtol, env_batch
+            tol_torch, grad_x, n_rows, fwd_rtol, env_batch, fwd_achieved
         )
-    bwd = float(grad_x.detach().norm())
+    bwd = float(torch.linalg.vector_norm(grad_x.detach().to(torch.float64)))
     if not math.isfinite(bwd) or bwd <= 0:
         return tol_torch
 
@@ -570,6 +689,9 @@ def _rescaled_bwd_tolerance(
     rtol = get_adjoint_rtol()
     if rtol is None:
         rtol = fwd_rtol if fwd_rtol is not None else ADJOINT_RTOL_FALLBACK
+        achieved = [a for a in fwd_achieved or () if math.isfinite(a)]
+        if achieved:
+            rtol = max(rtol, max(achieved))
 
     # Strictly proportional to the adjoint RHS, and so to the loss: a Krylov solve
     # from the zero iterate is then homogeneous in its RHS, and the whole backward
@@ -589,6 +711,7 @@ def _rescaled_bwd_tolerance_batched(
     n_rows: int | None,
     fwd_rtol: float | None,
     env_batch: int,
+    fwd_achieved: Sequence[float] | None = None,
 ) -> torch.Tensor:
     """:func:`_rescaled_bwd_tolerance` for batched environments.
 
@@ -604,12 +727,22 @@ def _rescaled_bwd_tolerance_batched(
     n = int(n_rows) if n_rows else grad_x.numel() // env_batch
     per_env = grad_x.detach().reshape(env_batch, -1)
     rows_per_env = per_env.shape[1] // n
-    rtol = get_adjoint_rtol()
+    override = get_adjoint_rtol()
+    rtol = override
     if rtol is None:
         rtol = fwd_rtol if fwd_rtol is not None else ADJOINT_RTOL_FALLBACK
     rtol = max(rtol, PRECISION_FLOOR_FACTOR * torch.finfo(grad_x.dtype).eps)
+    rtols = torch.full((env_batch,), rtol, dtype=torch.float64)
+    if (
+        override is None
+        and fwd_achieved is not None
+        and len(fwd_achieved) == env_batch * rows_per_env
+    ):
+        achieved = torch.tensor(fwd_achieved, dtype=torch.float64)
+        achieved = torch.nan_to_num(achieved, nan=0.0, posinf=0.0)
+        rtols = torch.maximum(rtols, achieved.reshape(env_batch, -1).amax(dim=1))
     norms = torch.linalg.vector_norm(per_env.to(torch.float64), dim=1).cpu()
-    values = rtol * norms / math.sqrt(max(n, 1))
+    values = rtols * norms / math.sqrt(max(n, 1))
     # environments with a zero or non-finite adjoint RHS keep the forward tolerance
     fallback = (
         tol_torch.detach().cpu().to(torch.float64).reshape(-1)
@@ -810,7 +943,7 @@ def _linear_solve_wrapper(
     BiCG_with_preconditioner: bool = True,
     BiCG_precondition_fallback: bool = False,
     tag: str = "unknown",
-) -> None:
+) -> Sequence[Any] | None:
     """Run one linear solve through the CUDA kernels, writing into ``result``.
 
     A zero right-hand side is short-circuited: ``result`` is zeroed and no solve
@@ -858,6 +991,12 @@ def _linear_solve_wrapper(
     tag : str, optional
         Name the solve is recorded under in :mod:`phipict.solvers.stats`.
         Default is ``"unknown"``.
+
+    Returns
+    -------
+    Sequence of phipict._C.LinearSolverResultInfo or None
+        One result info per right-hand side, or None if the right-hand side is
+        zero and no solve was run.
 
     Raises
     ------
@@ -936,7 +1075,7 @@ def _linear_solve_wrapper(
                 return_best_result,
                 BiCGwithPreconditioner=BiCG_with_preconditioner,
             )
-            result = result_dp.to(result.dtype)
+            result.copy_(result_dp)
         # elif not double_fallback:
         #    raise RuntimeWarning("double_fallback is off!")
 
@@ -992,9 +1131,10 @@ def _linear_solve_wrapper(
             is_FWD=is_FWD,
             debug_out=debug_out,
         )
+        return solver_infos
 
-    else:
-        result.zero_()
+    result.zero_()
+    return None
 
 
 def _project_out_constant(v: torch.Tensor, n_rows: int) -> torch.Tensor:
@@ -1040,7 +1180,7 @@ def linear_solve_GPU(
     adjoint_rank_deficient: bool = False,
     tag: str = "unknown",
     x0: torch.Tensor | None = None,
-    amg_hierarchy: AMGHierarchy | BatchedAMGHierarchy | None = None,
+    amg_hierarchy: AMGHierarchy | None = None,
     matrix_rank_deficient: bool = False,
     residual_reset_step: int = 0,
     fwd_rtol: float | None = None,
@@ -1112,7 +1252,7 @@ def linear_solve_GPU(
     # The matrix is *not* cloned into this closure: a deep copy (value + index
     # + row) per solve is retained for the whole graph and, living in a Python
     # closure, is invisible to torch.autograd.graph hooks. Only the integer
-    # sparsity pattern is captured -- it is never differentiated and is the same
+    # sparsity pattern is captured. It is never differentiated and is the same
     # object on every step, so it costs one pattern rather than one per solve.
     # The values travel through save_for_backward instead, which keeps a single
     # copy.
@@ -1136,14 +1276,6 @@ def linear_solve_GPU(
     # what makes the same hierarchy valid for the adjoint solve.
     use_amg = amg_hierarchy is not None and not use_BiCG
 
-    # `adjoint_rank_deficient` says the operator has the constant nullspace. It
-    # deliberately does *not* touch the forward solve -- neither the kernel flag
-    # above nor the RHS -- so forward trajectories stay bit-identical and this
-    # change is confined to the gradient. The forward is well posed as it stands
-    # because its RHS is compatible by construction (for the pressure Poisson,
-    # `balance_boundary_fluxes` enforces zero net boundary flux). The adjoint RHS
-    # is an incoming gradient with no such guarantee, which is what makes the
-    # backward solve ill-posed on a duct where every boundary prescribes velocity.
     A_rows = csrMat.getRows()
 
     tol_torch = _get_solver_tolerance_torch(
@@ -1228,7 +1360,7 @@ def linear_solve_GPU(
                     # retained, via save_for_backward below.
                     A_fwd = _make_matrix(A_val)
 
-                    _linear_solve_wrapper(
+                    solver_infos = _linear_solve_wrapper(
                         A_fwd,
                         b,
                         x,
@@ -1251,6 +1383,7 @@ def linear_solve_GPU(
 
                     del A_fwd
 
+                ctx.fwd_achieved = _achieved_rtol(solver_infos, b, A_rows)
                 # ctx.save_for_backward(A_val, b, x)
                 ctx.save_for_backward(A_val, x)
 
@@ -1294,8 +1427,7 @@ def linear_solve_GPU(
                         # component along null(A^T) that no iterate can reduce,
                         # so CG cannot converge and returns a vector whose scale
                         # is set by the residual floor rather than by the
-                        # gradient -- the mechanism behind the momentum adjoint
-                        # gaining ~1e10 per step on the MHD duct.
+                        # gradient
                         if adjoint_rank_deficient:
                             grad_x = _project_out_constant(grad_x, A_rows)
 
@@ -1305,25 +1437,19 @@ def linear_solve_GPU(
                         # unreachable when ||grad_x|| >> ||b||, and already met at
                         # the zero iterate when ||grad_x|| << ||b||, which returns
                         # a zero adjoint and severs the chain. Rescaling holds it
-                        # to a relative residual, the forward's rtol by default.
-                        #
-                        # After the projection above, so the norm is the one the
-                        # solve actually starts from
+                        # to a relative residual, the forward's rtol by default
                         bwd_tol = _rescaled_bwd_tolerance(
                             tol_torch,
                             grad_x,
                             n_rows=A_rows,
                             fwd_rtol=fwd_rtol,
                             env_batch=env_batch,
+                            fwd_achieved=ctx.fwd_achieved,
                         )
 
-                        # if not grad_x.eq(0).all(): # will not converge if all 0, but grad should be 0 anyways in that case
-                        # solver_info = _C.SolveLinear(A, grad_x, grad_b, maxit_torch, tol_torch, conv, use_BiCG, False, 0, not transpose, False, return_best_result)
-
-                        # _check_solver_return_infos(solver_info, not transpose, use_BiCG, tol, max_iter, return_best_result, is_FWD=False, debug_out=False)
                         if use_amg:
                             # A^T == A, so the same hierarchy preconditions the
-                            # adjoint solve; grad_b is already a zero iterate.
+                            # adjoint solve; grad_b is already a zero iterate
                             probe = (
                                 solver_stats.Probe(grad_x, tag)
                                 if solver_stats.is_active()
@@ -1456,7 +1582,9 @@ def SetupAdvectionMatrix(
     Notes
     -----
     Tracked inputs: block.velocity, boundary.velocity, domain.viscosity and
-    block.viscosity (or the passive scalar viscosity).
+    block.viscosity (or the passive scalar viscosity). With LINEAR_UPWIND the
+    velocities are also saved for the backward, which needs the signs of their
+    face fluxes.
     """
     # input tensors that need to be tracked by pytorch
     tracked_tensor_filter = ["VELOCITY", "BOUNDARY_VELOCITY", "VISCOSITY"]
@@ -1471,7 +1599,9 @@ def SetupAdvectionMatrix(
     domain_dict, tracked_tensors = flatten_domain(domain, tracked_tensor_filter)
 
     # filter for any forward tensors that need to be saved for backwards
-    backwards_tensor_filter: list[str] = []
+    backwards_tensor_filter = _upwind_backward_tensors(
+        domain, "VELOCITY", "BOUNDARY_VELOCITY"
+    )
 
     class SetupAdvectionMatrixFunction(torch.autograd.Function):
         """Autograd node of :func:`SetupAdvectionMatrix`.
@@ -1516,13 +1646,21 @@ def SetupAdvectionMatrix(
                     passiveScalarChannel=passiveScalarChannel,
                 )
 
-                saved_tensors = []
+                if backwards_tensor_filter:
+                    domain_dict, saved_tensors = flatten_domain(
+                        domain, backwards_tensor_filter
+                    )
+                    ctx.saved_tensors_domain_dict = domain_dict
+                else:
+                    ctx.saved_tensors_domain_dict = None
+                    saved_tensors = []
                 saved_tensors.append(time_step)
                 ctx.save_for_backward(*saved_tensors)
 
             return domain.A, domain.C.value  # .clone()
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, A_grad: torch.Tensor, C_val_grad: torch.Tensor
@@ -1550,6 +1688,10 @@ def SetupAdvectionMatrix(
                     if _LOG_DEBUG:
                         _LOG.debug("SetupAdvectionMatrix backward")
                     time_step = ctx.saved_tensors[-1]
+                    if ctx.saved_tensors_domain_dict is not None:
+                        set_domain_tensors_from_flat(
+                            domain, ctx.saved_tensors_domain_dict, ctx.saved_tensors
+                        )
                     # domain.setAGrad(A_grad)
                     _set_gradient_input(
                         A_grad, domain.setAGrad, "SetupAdvectionMatrix", "A_GRAD"
@@ -1617,7 +1759,9 @@ def SetupAdvectionScalar(
     -----
     Inputs:
 
-    - block.passiveScalar (not needed for backwards)
+    - block.passiveScalar (needed for backwards with LINEAR_UPWIND only)
+    - block.velocity (LINEAR_UPWIND only: the face fluxes of the deferred
+      correction)
     - domain.scalarResult (if non-orthogonal)
     - block.transform (must be static, not differentiable)
     - domain.viscosity
@@ -1638,6 +1782,9 @@ def SetupAdvectionScalar(
     ]
     if is_non_ortho:
         tracked_tensor_filter.append("PASSIVE_SCALAR_RESULT")
+    # The deferred correction of LINEAR_UPWIND makes the right-hand side depend on
+    # the block velocity, through its face fluxes
+    tracked_tensor_filter += _upwind_backward_tensors(domain, "VELOCITY")
 
     grad_tensor_filter = [s + "_GRAD" for s in tracked_tensor_filter]
 
@@ -1651,6 +1798,9 @@ def SetupAdvectionScalar(
     ]
     if is_non_ortho:
         backwards_tensor_filter.append("PASSIVE_SCALAR_RESULT")
+    backwards_tensor_filter += _upwind_backward_tensors(
+        domain, "VELOCITY", "PASSIVE_SCALAR"
+    )
 
     class SetupAdvectionScalarFunction(torch.autograd.Function):
         """Autograd node of :func:`SetupAdvectionScalar`.
@@ -1699,6 +1849,7 @@ def SetupAdvectionScalar(
             return domain.scalarRHS  # .clone()
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, grad_rhs: torch.Tensor
@@ -1742,6 +1893,10 @@ def SetupAdvectionScalar(
                         domain.CreatePassiveScalarGradOnBlocks()
                         domain.CreatePassiveScalarGradOnBoundaries()
                         domain.CreateVelocityGradOnBoundaries()
+                        if "VELOCITY" in tracked_tensor_filter:
+                            # A fresh buffer: the flux scatter of the deferred
+                            # correction adds into it
+                            domain.CreateVelocityGradOnBlocks()
                         if is_non_ortho:
                             domain.CreateScalarResultGrad()
                         domain.UpdateDomainData()
@@ -1823,6 +1978,7 @@ def SetupAdvectionVelocity(
     domain_dict, tracked_tensors = flatten_domain(domain, tracked_tensor_filter)
 
     backwards_tensor_filter = ["BOUNDARY_VELOCITY", "VISCOSITY", "VISCOSITY_BLOCK"]
+    backwards_tensor_filter += _upwind_backward_tensors(domain, "VELOCITY")
     backwards_tensor_filter.append(
         "VELOCITY_SOURCE"
     )  # DEBUG: value not needed but needs to be set to receive gradients
@@ -1878,6 +2034,7 @@ def SetupAdvectionVelocity(
             return domain.velocityRHS  # .clone()
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, grad_rhs: torch.Tensor
@@ -2455,8 +2612,8 @@ def _potential_value_bounds(domain: _C.Domain) -> list[_C.FixedBoundary]:
     """FIXED faces whose prescribed potential values reach the potential kernels.
 
     The values enter :func:`ComputeEpotRHS` and :func:`ComputeCurrentDensityFaceBased`
-    at the face's Dirichlet cells, linearly and never through the matrix, so they
-    are tracked inputs of both.
+    at the face's Dirichlet (prescribed phi) and Current (prescribed current) cells,
+    linearly and never through the matrix, so they are tracked inputs of both.
     """
     bounds = []
     for block in domain.getBlocks():
@@ -2465,7 +2622,7 @@ def _potential_value_bounds(domain: _C.Domain) -> list[_C.FixedBoundary]:
             if (
                 isinstance(bound, _C.FixedBoundary)
                 and bound.hasPotentialValues()
-                and bound.hasPotentialDirichlet()
+                and (bound.hasPotentialDirichlet() or bound.hasPotentialCurrent())
             ):
                 bounds.append(bound)
     return bounds
@@ -2797,6 +2954,8 @@ def SetupPressureCorrection(
     backwards_tensor_filter.append(
         "VELOCITY_SOURCE"
     )  # DEBUG: value not needed but needs to be set to receive gradients
+    # hbyA repeats the predictor's deferred correction
+    backwards_tensor_filter += _upwind_backward_tensors(domain, "VELOCITY")
     if is_non_ortho:
         tracked_tensor_filter.append("PRESSURE_RESULT")
 
@@ -2861,6 +3020,7 @@ def SetupPressureCorrection(
             return domain.P.value, domain.pressureRHS, domain.pressureRHSdiv
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any,
@@ -3047,6 +3207,7 @@ def SetupPressureMatrix(
             return domain.P.value
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, P_value_grad: torch.Tensor
@@ -3184,6 +3345,8 @@ def SetupPressureRHS(
     backwards_tensor_filter.append(
         "VELOCITY_SOURCE"
     )  # DEBUG: value not needed but needs to be set to receive gradients
+    # hbyA repeats the predictor's deferred correction
+    backwards_tensor_filter += _upwind_backward_tensors(domain, "VELOCITY")
     # if is_non_ortho:
     #    tracked_tensor_filter.append("PRESSURE_RESULT")
 
@@ -3245,6 +3408,7 @@ def SetupPressureRHS(
             return domain.pressureRHS, domain.pressureRHSdiv
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, pressureRHS_grad: torch.Tensor, pressureRHSdiv_grad: torch.Tensor
@@ -3444,6 +3608,7 @@ def SetupPressureRHSdiv(
             return domain.pressureRHSdiv
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, pressureRHSdiv_grad: torch.Tensor
@@ -3618,6 +3783,7 @@ def CorrectVelocity(
             return domain.velocityResult
 
         @staticmethod
+        @_keeps_live_tensors(domain)
         @torch.autograd.function.once_differentiable
         def backward(
             ctx: Any, velocity_result_grad: torch.Tensor

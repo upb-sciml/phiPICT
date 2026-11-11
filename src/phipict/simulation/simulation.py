@@ -108,16 +108,6 @@ class Simulation(PisoSimulation):
         corrector index instead of with zero. An initial guess cannot change the
         converged answer, only the iteration count. Defaults to False.
 
-    pressure_use_amg: bool | None
-        Whether to solve the pressure equation with AMG-preconditioned CG
-        (frozen interpolation + GPU Galerkin refresh). None enables it
-        automatically for large systems if pyamg is installed, see
-        :class:`phipict.core.piso_simulation.PISOSimulation`. Defaults to None.
-
-    pressure_amg_options: dict | None
-        Options of the pressure AMG, see
-        :class:`phipict.core.piso_simulation.PISOSimulation`. Defaults to None.
-
     flux_balance_tol: float
         Tolerance for flux balance check before each step. Defaults to 1e-5.
 
@@ -188,8 +178,6 @@ class Simulation(PisoSimulation):
         pressure_tol: float | SolverTolerance | None = None,
         pressure_tol_intermediate: float | SolverTolerance | None = None,
         pressure_warm_start: bool = False,
-        pressure_use_amg: bool | None = None,
-        pressure_amg_options: dict | None = None,
         flux_balance_tol: float = 1e-5,
         convergence_tol: float | None = None,
         solver_double_fallback: bool = False,
@@ -228,8 +216,6 @@ class Simulation(PisoSimulation):
             pressure_tol=pressure_tol,  # type: ignore
             pressure_tol_intermediate=pressure_tol_intermediate,  # type: ignore
             pressure_warm_start=pressure_warm_start,
-            pressure_use_amg=pressure_use_amg,
-            pressure_amg_options=pressure_amg_options,
             convergence_tol=convergence_tol,  # type: ignore
             solver_double_fallback=solver_double_fallback,
             advect_non_ortho_steps=advect_non_ortho_steps,

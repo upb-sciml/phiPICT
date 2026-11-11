@@ -1200,13 +1200,12 @@ struct AMGOptions {
 	int preSweeps;
 	int postSweeps;
 	double omega;         // Jacobi damping
-	bool batchedCoarse = false; // one coarse pseudo-inverse per environment
 };
 
 /* --- AMG V-cycle kernels ---
- * Level vectors are [B, n_l]; level matrices are shared by all batches or strided by
- * valStride (batched environments with the same sparsity pattern). The finest level reads
- * the CG residual (type T) directly, optionally shifted by its mean (singular systems). */
+ * Level vectors are [B, n_l]; the level matrices are shared by all batches. The finest
+ * level reads the CG residual (type T) directly, optionally shifted by its mean (singular
+ * systems). */
 
 // load b_i of the current batch, converted to the hierarchy type, minus the optional shift
 template <typename TB, typename H>
@@ -1250,8 +1249,8 @@ __global__ void kPresmoothResidual(const CsrView<H> A, const H *__restrict__ din
 	if (st[blockIdx.y].done != RUNNING) return;
 	const index_t n = A.n;
 	const int batch = blockIdx.y;
-	const H *val = A.val + batch * A.valStride;
-	const H *dv = dinv + (A.valStride ? batch * n : 0);
+	const H *val = A.val;
+	const H *dv = dinv;
 	const index_t off = batch * n;
 	GROUP_ROW_LOOP(W, n) {
 		const index_t i = base + groupInWarp;
@@ -1273,8 +1272,8 @@ __global__ void kJacobiSweep(const CsrView<H> A, const H *__restrict__ dinv, con
 	if (st[blockIdx.y].done != RUNNING) return;
 	const index_t n = A.n;
 	const int batch = blockIdx.y;
-	const H *val = A.val + batch * A.valStride;
-	const H *dv = dinv + (A.valStride ? batch * n : 0);
+	const H *val = A.val;
+	const H *dv = dinv;
 	const index_t off = batch * n;
 	GROUP_ROW_LOOP(W, n) {
 		const index_t i = base + groupInWarp;
@@ -1293,7 +1292,7 @@ __global__ void kLevelResidual(const CsrView<H> A, const TB *__restrict__ b, con
 	if (st[blockIdx.y].done != RUNNING) return;
 	const index_t n = A.n;
 	const int batch = blockIdx.y;
-	const H *val = A.val + batch * A.valStride;
+	const H *val = A.val;
 	const index_t off = batch * n;
 	GROUP_ROW_LOOP(W, n) {
 		const index_t i = base + groupInWarp;
@@ -1309,7 +1308,7 @@ __global__ void kSpmvRect(const CsrView<H> M, const H *__restrict__ in, const in
 	if (st[blockIdx.y].done != RUNNING) return;
 	const index_t n = M.n;
 	const int batch = blockIdx.y;
-	const H *val = M.val + batch * M.valStride;
+	const H *val = M.val;
 	const H *vin = in + batch * nIn;
 	const index_t off = batch * n;
 	GROUP_ROW_LOOP(W, n) {
@@ -1347,11 +1346,9 @@ static int rowGroupWidth(const double nnzPerRow) {
 
 // coarsest level: x = pinv b (dense, nc x nc, row-major)
 template <typename H>
-__global__ void kCoarseSolve(const H *__restrict__ pinv, const index_t nc, const H *__restrict__ b, H *__restrict__ x, const BatchState *__restrict__ st,
-		const bool batchedPinv) {
+__global__ void kCoarseSolve(const H *__restrict__ pinv, const index_t nc, const H *__restrict__ b, H *__restrict__ x, const BatchState *__restrict__ st) {
 	if (st[blockIdx.y].done != RUNNING) return;
 	const int batch = blockIdx.y;
-	if (batchedPinv) pinv += int64_t(batch) * nc * nc; // one coarse operator per environment
 	for (index_t i = blockIdx.x * blockDim.x + threadIdx.x; i < nc; i += gridDim.x * blockDim.x) {
 		double sum = 0;
 		for (index_t j = 0; j < nc; ++j) sum += double(pinv[i * nc + j]) * double(b[batch * nc + j]);
@@ -1485,7 +1482,7 @@ solverReturn_t amgPcgSolve(const CsrView<T> Afine, const std::vector<AMGLevel<H>
 			);
 		}
 		// coarsest level
-		kCoarseSolve<H><<<dim3((nc + 127) / 128, B), 128, 0, strm>>>(coarsePinv, nc, lb(L), cx, st, amgOpt.batchedCoarse);
+		kCoarseSolve<H><<<dim3((nc + 127) / 128, B), 128, 0, strm>>>(coarsePinv, nc, lb(L), cx, st);
 		// upward: prolongate the correction, post-smooth
 		for (int l = L - 1; l >= 0; --l) {
 			const AMGLevel<H> &lv = levels[l];
@@ -1526,7 +1523,7 @@ solverReturn_t amgPcgSolve(const CsrView<T> Afine, const std::vector<AMGLevel<H>
 		}
 	};
 	const char *rowWidthEnv = std::getenv("PHIPICT_AMG_ROW_WIDTH");
-	std::vector<unsigned long long> key = {2ull, (unsigned long long)amgOpt.batchedCoarse, (unsigned long long)Afine.valStride, sizeof(T), sizeof(H), (unsigned long long)(rowWidthEnv ? std::atoi(rowWidthEnv) : 0), (unsigned long long)Afine.val, (unsigned long long)Afine.col,
+	std::vector<unsigned long long> key = {2ull, sizeof(T), sizeof(H), (unsigned long long)(rowWidthEnv ? std::atoi(rowWidthEnv) : 0), (unsigned long long)Afine.val, (unsigned long long)Afine.col,
 		(unsigned long long)Afine.row, (unsigned long long)n, (unsigned long long)B, (unsigned long long)project, (unsigned long long)pre,
 		(unsigned long long)post, (unsigned long long)std::llround(amgOpt.omega * 1e12), (unsigned long long)opt.returnBest,
 		(unsigned long long)coarsePinv, (unsigned long long)nc, (unsigned long long)std::llround(normScale * 1e15)};
@@ -1535,7 +1532,6 @@ solverReturn_t amgPcgSolve(const CsrView<T> Afine, const std::vector<AMGLevel<H>
 				(const void *)lv.R.val, (const void *)lv.R.col, (const void *)lv.R.row, (const void *)lv.P.val, (const void *)lv.P.col, (const void *)lv.P.row})
 			key.push_back((unsigned long long)ptr);
 		key.push_back((unsigned long long)lv.A.n);
-		key.push_back((unsigned long long)lv.A.valStride);
 	}
 	runLoop(ws, key, stream, maxLoops, body);
 	KRYLOV_CHECK(cudaGetLastError());
@@ -1548,18 +1544,11 @@ solverReturn_t amgPcgSolve(const CsrView<T> Afine, const std::vector<AMGLevel<H>
 /* --- torch entry point for the AMG solver --- */
 
 template <typename H>
-static CsrView<H> csrFromTensors(const at::Tensor &row, const at::Tensor &col, const at::Tensor &val, const index_t valStride) {
+static CsrView<H> csrFromTensors(const at::Tensor &row, const at::Tensor &col, const at::Tensor &val) {
 	TORCH_CHECK(row.is_cuda() && col.is_cuda() && val.is_cuda(), "AMG tensors must be on the GPU");
 	TORCH_CHECK(row.scalar_type() == at::kInt && col.scalar_type() == at::kInt, "AMG index tensors must be int32");
 	TORCH_CHECK(row.is_contiguous() && col.is_contiguous() && val.is_contiguous(), "AMG tensors must be contiguous");
-	return CsrView<H>{val.data_ptr<H>(), col.data_ptr<index_t>(), row.data_ptr<index_t>(), index_t(row.numel() - 1), valStride, 1};
-}
-// values of one matrix per environment (batched environments, shared pattern), or one shared matrix
-template <typename H>
-static CsrView<H> csrFromTensorsBatched(const at::Tensor &row, const at::Tensor &col, const at::Tensor &val, const index_t B, const std::string &name) {
-	const index_t nnz = col.numel();
-	TORCH_CHECK(val.numel() == nnz || val.numel() == int64_t(nnz) * B, name + ": values must hold one matrix or one per right-hand side.");
-	return csrFromTensors<H>(row, col, val, val.numel() == nnz ? 0 : nnz);
+	return CsrView<H>{val.data_ptr<H>(), col.data_ptr<index_t>(), row.data_ptr<index_t>(), index_t(row.numel() - 1), 0, 1};
 }
 
 solverReturn_t amgPcgSolveTorch(const at::Tensor &aRow, const at::Tensor &aCol, const at::Tensor &aVal,
@@ -1585,23 +1574,24 @@ solverReturn_t amgPcgSolveTorch(const at::Tensor &aRow, const at::Tensor &aCol, 
 	solverReturn_t ret;
 	AT_DISPATCH_FLOATING_TYPES(aVal.scalar_type(), "amgPcgSolve", ([&] {
 		using T = scalar_t;
-		const CsrView<T> Afine = csrFromTensorsBatched<T>(aRow, aCol, aVal, B, "system matrix");
+		TORCH_CHECK(aVal.numel() == aCol.numel(), "the system matrix must be shared by all right-hand sides");
+		const CsrView<T> Afine = csrFromTensors<T>(aRow, aCol, aVal);
 		auto run = [&](auto hTag) {
 			using H = decltype(hTag);
 			std::vector<AMGLevel<H>> lv;
 			for (const auto &t : levels) {
 				TORCH_CHECK(t[2].scalar_type() == htype && t[3].scalar_type() == htype && t[6].scalar_type() == htype && t[9].scalar_type() == htype,
 					"all hierarchy values must have the dtype of the coarse pseudo-inverse");
-				const CsrView<H> Al = csrFromTensorsBatched<H>(t[0], t[1], t[2], B, "level operator");
-				TORCH_CHECK(t[3].numel() == (Al.valStride ? int64_t(Al.n) * B : Al.n), "inverse diagonal must match the level operator(s)");
+				TORCH_CHECK(t[2].numel() == t[1].numel(), "level operator values must match its pattern");
+				const CsrView<H> Al = csrFromTensors<H>(t[0], t[1], t[2]);
+				TORCH_CHECK(t[3].numel() == Al.n, "inverse diagonal must match the level operator");
 				lv.push_back(AMGLevel<H>{Al, t[3].data_ptr<H>(),
-					csrFromTensors<H>(t[4], t[5], t[6], 0), csrFromTensors<H>(t[7], t[8], t[9], 0),
+					csrFromTensors<H>(t[4], t[5], t[6]), csrFromTensors<H>(t[7], t[8], t[9]),
 					index_t(t[1].numel()), index_t(t[5].numel()), index_t(t[8].numel())});
 			}
-			// coarsest level: [nc, nc] shared or [B, nc, nc] per environment
+			// coarsest level: [nc, nc]
 			const index_t nc = index_t(coarsePinv.size(-1));
-			amgOpt.batchedCoarse = coarsePinv.dim() == 3 && B > 1;
-			TORCH_CHECK(coarsePinv.numel() == (amgOpt.batchedCoarse ? int64_t(nc) * nc * B : int64_t(nc) * nc), "coarse pseudo-inverse has the wrong size");
+			TORCH_CHECK(coarsePinv.numel() == int64_t(nc) * nc, "coarse pseudo-inverse has the wrong size");
 			ret = amgPcgSolve<T, H>(Afine, lv, coarsePinv.contiguous().data_ptr<H>(), nc, rhs.data_ptr<T>(), x.data_ptr<T>(), B, opt, amgOpt);
 		};
 		if (htype == at::kFloat) run(float{});

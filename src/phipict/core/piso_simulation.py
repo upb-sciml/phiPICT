@@ -38,7 +38,9 @@ from scipy.sparse.linalg import spsolve
 from phipict import _C
 from phipict.batching import EnvStateSnapshot
 from phipict.core import piso_diff
+from phipict.core.fields import Fields, domain_field
 from phipict.core.hooks import Hook, Hooks
+from phipict.grid.resample import MultiblockResampler
 from phipict.io.domain_io import save_domain
 from phipict.io.output import (
     ResamplingShape,
@@ -48,17 +50,12 @@ from phipict.io.output import (
 )
 from phipict.logging import get_logger
 from phipict.solvers import stats as solver_stats
-from phipict.solvers.amg import (
-    AMGHierarchy,
-    BatchedAMGHierarchy,
-    amg_pcg_solve,
-    batched_hierarchy_for,
-    galerkin_refresh,
-    hierarchy_for,
-    is_pyamg_available,
-    values_fingerprint,
+from phipict.solvers.amg import AMGHierarchy, amg_pcg_solve
+from phipict.solvers.tolerance import (
+    PRECISION_FLOOR_FACTOR,
+    SolverTolerance,
+    resolve_tolerance,
 )
-from phipict.solvers.tolerance import SolverTolerance, resolve_tolerance
 from phipict.utils.profiling import SAMPLE
 
 cpu_device = torch.device("cpu")
@@ -311,7 +308,8 @@ def get_fixed_boundary_flux(bound: _C.Boundary, bound_idx: int) -> torch.Tensor:
     Parameters
     ----------
     bound : phipict._C.Boundary
-        A :class:`phipict._C.FixedBoundary` with Dirichlet velocity.
+        A :class:`phipict._C.FixedBoundary` with Dirichlet velocity, or with
+        Neumann (free-slip) velocity, whose flux is zero.
     bound_idx : int
         Face index of the boundary.
 
@@ -326,9 +324,13 @@ def get_fixed_boundary_flux(bound: _C.Boundary, bound_idx: int) -> torch.Tensor:
     Raises
     ------
     ValueError
-        If the velocity is not a Dirichlet condition.
+        If the velocity is neither a Dirichlet nor a Neumann condition.
     """
     assert isinstance(bound, _C.FixedBoundary)
+    if bound.velocityType == _C.BoundaryConditionType.NEUMANN:
+        # free-slip (OpenBoundary): the normal velocity is zero, so is the flux
+        domain = bound.getParentDomain()
+        return torch.zeros([1], dtype=domain.getDtype(), device=domain.getDevice())
     if bound.velocityType != _C.BoundaryConditionType.DIRICHLET:
         raise ValueError("Only DIRICHLET boundaries are supportet")
 
@@ -643,30 +645,6 @@ def update_advective_boundaries(
     ValueError
         If a boundary is not part of the domain or not varying.
     """
-    # bounds: list of boundaries that can be updated
-    # velms: velocity tensors to advect the boundary with. one for each boundary or a global value
-    # _LOG.info("adective bound update: %d boundaries", len(bounds))
-    #
-    # `differentiable` keeps this update in the autograd graph. The update itself
-    # is `vel_bound - t*(vel_bound - vel_slice)` -- elementwise torch ops with no
-    # kernel call -- so recording it changes no forward arithmetic whatsoever;
-    # torch.no_grad() controls only whether a graph is built, and trajectories are
-    # bit-identical either way.
-    #
-    # It matters because the outflow velocity is *not* an independent input: in a
-    # duct where every boundary carries a velocity condition, it is what keeps the
-    # pressure problem solvable, and it responds to the inflow. Detaching it makes
-    # the adjoint linearise about a perturbation that does not conserve mass, which
-    # the singular pressure operator's nullspace then absorbs. Measured on the MHD
-    # duct: the integral of the adjoint over a in [0, 0.5] came to -1.17e-03
-    # against a true dJ of +8.70e-03 -- wrong sign, 7x too small -- and the ratio
-    # did not improve from a 4-step to a 24-step horizon.
-    #
-    # Default False so every other environment keeps its current behaviour; the
-    # caller opts in. Note the boundary update is recursive across steps, so a
-    # caller that enables this must detach the domain at chunk boundaries or the
-    # graph will chain into the previous chunk. The flux balance at the end follows
-    # the same flag; see `balance_boundary_fluxes` for what detaching it costs.
     with (
         torch.no_grad() if not differentiable else nullcontext(),
         SAMPLE("advect bounds"),
@@ -1026,24 +1004,6 @@ class Simulation:
     pressure_warm_start : bool, optional
         Whether to start pressure solves from the previous substep's result.
         Default is False.
-    pressure_use_amg : bool or None, optional
-        Whether to solve the pressure equation with AMG-preconditioned CG. The
-        interpolation of the hierarchy is set up once per sparsity pattern (on
-        the host, with pyamg) and cached; whenever the pressure matrix values
-        change, only the coarse operators are recomputed on the GPU (Galerkin
-        products with the frozen interpolation). Requires pyamg and a symmetric
-        pressure matrix (``pressure_use_BiCG=False``). None (the default)
-        enables it automatically when pyamg is installed and the pressure system
-        has at least :attr:`PRESSURE_AMG_AUTO_MIN_ROWS` unknowns; below that,
-        the (Jacobi-preconditioned) CG is faster than the V-cycle overhead.
-    pressure_amg_options : dict or None, optional
-        Keyword arguments of :func:`phipict.solvers.amg.hierarchy_for`, e.g.
-        ``{"method": "ruge_stuben", "native_dtype": torch.float32}``, plus
-        ``coarse_refresh_interval`` (default 4): recompute the coarse operators
-        only on every n-th change of the pressure matrix; in between only the
-        finest level follows the matrix. A full refresh is forced earlier when
-        a solve needs more than twice the iterations of the first solve after
-        the last full refresh. Default is None.
     convergence_tol : float or None, optional
         Stop when the maximum velocity change of a step is below this value.
         Default is None.
@@ -1115,12 +1075,6 @@ class Simulation:
     NON_ORTHO_DIAGONAL_RHS = 8
     NON_ORTHO_CENTER_MATRIX = 16
 
-    # pressure systems at least this large use AMG when pressure_use_amg is None
-    PRESSURE_AMG_AUTO_MIN_ROWS = 200_000
-    # batched environments: total unknowns of all environments (the batched V-cycle
-    # pays off later, see SOLVER_CHANGES.md, batched environments)
-    PRESSURE_AMG_AUTO_MIN_ROWS_BATCHED = 400_000
-
     __NON_ORTHO_MODE = (
         NON_ORTHO_CENTER_MATRIX | NON_ORTHO_DIRECT_MATRIX | NON_ORTHO_DIAGONAL_RHS
     )  # Bit flags
@@ -1146,8 +1100,6 @@ class Simulation:
         pressure_tol: float | SolverTolerance | None = None,
         pressure_tol_intermediate: float | SolverTolerance | None = None,
         pressure_warm_start: bool = False,
-        pressure_use_amg: bool | None = None,
-        pressure_amg_options: dict[str, Any] | None = None,
         convergence_tol: float | None = None,
         solver_double_fallback: bool = False,
         advect_non_ortho_steps: int = 1,
@@ -1205,18 +1157,6 @@ class Simulation:
         self.pressure_tol = pressure_tol
         self.pressure_tol_intermediate = pressure_tol_intermediate
         self.pressure_warm_start = pressure_warm_start
-        self.pressure_use_amg = pressure_use_amg
-        self._pressure_amg_options = dict(pressure_amg_options or {})
-        # hierarchy of the current pressure matrix and the fingerprint of the
-        # matrix values it was built for
-        self._pressure_amg_hierarchy: AMGHierarchy | BatchedAMGHierarchy | None = None
-        self._pressure_amg_fingerprint: tuple | None = None
-        # refreshes since the last full (Galerkin) refresh, the largest iteration
-        # count of the solves right after it, and whether the coarse levels are
-        # considered stale (see _note_pressure_amg_iterations)
-        self._pressure_amg_refreshes: int = 0
-        self._pressure_amg_baseline_iters: int | None = None
-        self._pressure_amg_stale: bool = False
         # Per-corrector cache of the last converged pressure, used as the initial
         # guess for the same corrector index at the next sub-step. Keyed on the
         # corrector index rather than being a single field on purpose: corrector 0
@@ -1245,6 +1185,8 @@ class Simulation:
 
         self.output_mode3D = output_mode3D
         self.log_fn = log_fn
+        # cached resamplers of `resample`, see `_output_resampler`
+        self._output_resamplers: dict[tuple, tuple[list, MultiblockResampler]] = {}
         self.output_resampling_coords = output_resampling_coords
         self.output_resampling_shape = output_resampling_shape
         self.output_resampling_fill_max_steps = output_resampling_fill_max_steps
@@ -1421,6 +1363,125 @@ class Simulation:
             Vertex coordinates for resampled images, defaulting to the domain's.
         """
         self.__output_resampling_coords = output_resampling_coords
+
+    def resample(
+        self,
+        field: Fields | Sequence[torch.Tensor],
+        out_indices: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        """Resample a field of all blocks onto the uniform output grid.
+
+        The grid is given by :attr:`output_resampling_coords`,
+        ``output_resampling_shape`` and ``output_resampling_fill_max_steps``.
+        The resample is a linear map that depends only on the geometry; it is
+        built once per geometry, ``out_indices`` and dtype, and cached.
+
+        With ``out_indices`` only those output cells are computed: same values
+        as indexing the full grid, at a fraction of the cost and memory. Use this
+        for point sensors.
+
+        The result is differentiable with respect to the block data, and memory
+        apart from the result itself does not grow with the batch size, see
+        :class:`~phipict.grid.resample.MultiblockResampler`.
+
+        Parameters
+        ----------
+        field : Fields or Sequence of torch.Tensor
+            A single field of the blocks (e.g. ``Fields.VELOCITY``), or per-block
+            data ``[B, C, *spatial]`` (or ``[1, C, *spatial]``, shared by the
+            batch) in block order, for derived quantities such as vorticity.
+        out_indices : torch.Tensor or None, optional
+            Output cells to compute: a 1D tensor of flat indices into the output
+            grid (``(z, y, x)`` layout), or a ``[dims, R]`` integer tensor of
+            per-axis ``(x, y[, z])`` indices. None (the default) for the full grid.
+
+        Returns
+        -------
+        torch.Tensor
+            ``[B, C, *out_spatial]`` (``out_spatial`` in ``(z, y, x)`` order) for
+            the full grid, or ``[B, C, R]`` in the order of ``out_indices``.
+
+        Raises
+        ------
+        RuntimeError
+            If no output resampling shape is set.
+        """
+        if self.output_resampling_shape is None:
+            raise RuntimeError("No output_resampling_shape set.")
+        data_list = (
+            domain_field(self.domain, field)
+            if isinstance(field, Fields)
+            else list(field)
+        )
+        resampler = self._output_resampler(data_list[0].dtype, out_indices)
+        return resampler(data_list)
+
+    def _output_resampler(
+        self, dtype: torch.dtype, out_indices: torch.Tensor | None
+    ) -> MultiblockResampler:
+        """The cached resampler of :meth:`resample`.
+
+        Parameters
+        ----------
+        dtype : torch.dtype
+            Dtype of the data to resample.
+        out_indices : torch.Tensor or None
+            See :meth:`resample`.
+
+        Returns
+        -------
+        MultiblockResampler
+            The resampler for the current output grid.
+        """
+        coords = self.output_resampling_coords
+        if coords is None:
+            raise RuntimeError("No output resampling coordinates.")
+        # `domain.getVertexCoordinates()` returns fresh tensor objects on every
+        # call, so the key is the storage, not `id()`. The entry keeps the
+        # coordinates alive, so an address cannot be reused by other data while
+        # an entry names it, and `_version` catches in-place updates.
+        grid_key = tuple(
+            (t.data_ptr(), tuple(t.shape), t.dtype, t._version) for t in coords
+        )
+        # Sensor indices are small: key them by value, so callers need not keep
+        # the same tensor around
+        out_key = (
+            None
+            if out_indices is None
+            else (
+                tuple(out_indices.shape),
+                out_indices.detach().cpu().numpy().tobytes(),
+            )
+        )
+        shape = self.output_resampling_shape
+        shape_key = (
+            tuple(shape.tolist())
+            if isinstance(shape, torch.Tensor)
+            else tuple(shape)
+            if isinstance(shape, Sequence)
+            else shape
+        )
+        fill = self.output_resampling_fill_max_steps
+        key = (grid_key, out_key, shape_key, fill, dtype)
+
+        cached = self._output_resamplers.get(key)
+        if cached is not None:
+            return cached[1]
+
+        resampler = MultiblockResampler(
+            coords_list=coords,
+            out_shape=shape,
+            dtype=dtype,
+            fill_max_steps=fill,
+            out_indices=out_indices,
+        )
+        # Keep only the resamplers of the current grid, so changing the grid
+        # does not accumulate them (or keep the old coordinates alive)
+        self._output_resamplers = {
+            k: v for k, v in self._output_resamplers.items() if k[0] == grid_key
+        }
+        self._output_resamplers[key] = (list(coords), resampler)
+        return resampler
 
     @property
     def density_viscosity(self) -> float | None:
@@ -1984,9 +2045,7 @@ class Simulation:
 
         ``None`` (the default) means every corrector uses ``pressure_tol``, i.e.
         the historical behaviour. Only the last corrector's pressure survives into
-        the solution -- the earlier ones are intermediate fields that the next
-        corrector overwrites -- so solving them to the final accuracy is wasted
-        work. This is the ``p`` / ``pFinal`` split OpenFOAM makes.
+        the solution.
 
         Returns
         -------
@@ -2024,14 +2083,7 @@ class Simulation:
     def pressure_warm_start(self) -> bool:
         """Seed each pressure solve with the previous sub-step's result.
 
-        Off by default. ``pressure_non_ortho_steps`` is 1 in every current
-        configuration, so the existing ``pstep > 0`` reuse never triggers and every
-        pressure solve starts from zero -- discarding a field that is nearly
-        identical to the one converged one sub-step (dt) earlier.
-
-        An initial guess cannot change the converged answer, only the iteration
-        count, so this is safe by construction. The guesses are detached, so no
-        gradient path is created across sub-steps.
+        Off by default.
 
         Returns
         -------
@@ -2060,13 +2112,6 @@ class Simulation:
 
     def _solve_is_differentiated(self) -> bool:
         """Whether a linear solve issued right now would record a graph.
-
-        ``differentiable`` picks the autograd backend once, at construction, but
-        individual solves opt out of the graph by running under ``torch.no_grad()``
-        (see the ``exclude_*_solve_gradients`` flags). Only a solve that is both
-        needs the autograd backend; the rest can take the in-place path, which is
-        numerically identical -- both end in ``_C.SolveLinear`` -- and does
-        support an initial guess.
 
         Returns
         -------
@@ -2106,14 +2151,6 @@ class Simulation:
     @staticmethod
     def _as_guess(t: torch.Tensor | None) -> torch.Tensor | None:
         """A detached, finite initial iterate for a linear solve, or ``None``.
-
-        An initial guess is a *constant* of the solve: the map being
-        differentiated is ``b -> A^-1 b``, whose Jacobian does not depend on the
-        starting iterate, so detaching here is exact rather than an
-        approximation (see the long comment in
-        ``piso_diff.linear_solve_GPU``). The finiteness guard mirrors the
-        one ``MHDSimulation._epot_initial_guess`` already applies -- a NaN guess
-        would poison a solve that would otherwise have converged from zero.
 
         Parameters
         ----------
@@ -2165,21 +2202,6 @@ class Simulation:
     def _pressure_rank_deficient(self, P: _C.CSRmatrix | None) -> bool:
         """Check whether the pressure Poisson operator has the constant nullspace.
 
-        True when the matrix is pure Neumann, i.e. no boundary prescribes a
-        pressure value. That is the case for the MHD duct, where every face
-        carries a velocity condition (Dirichlet inflow, varying outflow, walls):
-        the row sums are then exactly zero and ``1`` spans both ``null(A)`` and
-        ``null(A^T)``.
-
-        Decided from the assembled matrix rather than from the boundary flags so
-        it cannot drift out of sync with how the kernel actually builds the rows.
-        The row-sum reduction runs once per matrix object -- ``PrepareSolve``
-        allocates it once and only rebinds ``.value`` afterwards -- and the answer
-        is cached against that object's identity.
-
-        Only the *adjoint* solve uses this (``adjoint_rank_deficient``); the
-        forward is left exactly as it was.
-
         Parameters
         ----------
         P : phipict._C.CSRmatrix or None
@@ -2207,9 +2229,13 @@ class Simulation:
         row_sum = torch.zeros(n, dtype=value.dtype, device=value.device).index_add_(
             0, segment, value
         )
-        # Scale-relative: the Laplacian's entries carry the cell metric, so an
-        # absolute threshold would be meaningless across resolutions.
-        deficient = bool((row_sum.abs() > 1e-10 * value.abs().max()).sum().item() == 0)
+        row_abs = torch.zeros(n, dtype=value.dtype, device=value.device).index_add_(
+            0, segment, value.abs()
+        )
+        # Relative to each row's magnitude and the dtype's round-off, so a pure
+        # Neumann matrix assembled in float32 is still recognised
+        floor = PRECISION_FLOOR_FACTOR * torch.finfo(value.dtype).eps
+        deficient = bool((row_sum.abs() <= floor * row_abs).all().item())
         self._pressure_rank_deficient_cache = (P, deficient)
         self.__LOG.debug(
             "Pressure matrix is %s; the adjoint solve %s project out the "
@@ -2218,178 +2244,6 @@ class Simulation:
             "will" if deficient else "will not",
         )
         return deficient
-
-    def _get_pressure_amg_hierarchy(
-        self, P: _C.CSRmatrix
-    ) -> AMGHierarchy | BatchedAMGHierarchy | None:
-        """AMG hierarchy of the current pressure matrix, or None if AMG is off.
-
-        The hierarchy is refreshed (Galerkin products with the cached
-        interpolation) whenever the values of ``P`` changed, which is detected
-        from a fingerprint of the values. Within a PISO step the correctors
-        re-assemble identical matrices, so there is one refresh per step.
-
-        Parameters
-        ----------
-        P : phipict._C.CSRmatrix
-            Assembled pressure matrix.
-
-        Returns
-        -------
-        AMGHierarchy or None
-            Hierarchy whose finest level equals ``P``, or None if
-            ``pressure_use_amg`` is off or not applicable.
-        """
-        if self.pressure_use_BiCG or self.scipy_solve_pressure:
-            return None
-        use_amg = self.pressure_use_amg
-        batch = P.getBatchSize()
-        if batch > 1:
-            return self._get_batched_pressure_amg_hierarchy(P, use_amg)
-        if use_amg is None:
-            if not (
-                P.getRows() >= self.PRESSURE_AMG_AUTO_MIN_ROWS and is_pyamg_available()
-            ):
-                return None
-        elif not use_amg:
-            return None
-        elif not is_pyamg_available():
-            raise ImportError(
-                "pressure_use_amg needs the 'pyamg' package for the AMG setup. "
-                "Install it with `pip install pyamg`."
-            )
-        fingerprint = (P.getRows(), P.getSize(), *values_fingerprint(P.value))
-        if (
-            self._pressure_amg_hierarchy is not None
-            and self._pressure_amg_fingerprint == fingerprint
-        ):
-            return self._pressure_amg_hierarchy
-        options = dict(self._pressure_amg_options)
-        interval = int(options.pop("coarse_refresh_interval", 4))
-        refreshes = self._pressure_amg_refreshes
-        stale = self._pressure_amg_stale
-        with SAMPLE("pressure AMG refresh"):
-            previous = self._pressure_amg_hierarchy
-            if (
-                isinstance(previous, AMGHierarchy)
-                and interval > 1
-                and refreshes % interval != 0
-                and not stale
-                and previous.levels[0].A.shape[0] == P.getRows()
-            ):
-                # only the finest level follows the new operator; the coarse
-                # operators of the last full refresh are kept
-                self._pressure_amg_hierarchy = galerkin_refresh(
-                    previous, P, coarse=False
-                )
-            else:
-                # free the old operators first: the full refresh does not need them
-                previous = self._pressure_amg_hierarchy = None
-                self._pressure_amg_hierarchy = hierarchy_for(
-                    P,
-                    project_constant=self._pressure_rank_deficient(P),
-                    **options,
-                )
-                self._pressure_amg_refreshes = 0
-                self._pressure_amg_stale = False
-                self._pressure_amg_baseline_iters = None
-                refreshes = 0
-        self._pressure_amg_refreshes = refreshes + 1
-        self._pressure_amg_fingerprint = fingerprint
-        return self._pressure_amg_hierarchy
-
-    def _get_batched_pressure_amg_hierarchy(
-        self, P: _C.CSRmatrix, use_amg: bool | None
-    ) -> BatchedAMGHierarchy | None:
-        """Batched counterpart of :meth:`_get_pressure_amg_hierarchy`.
-
-        All environments share the interpolation; their coarse operators are
-        refreshed together (one sparse-dense product per level). In auto mode
-        (``use_amg is None``) the AMG is used when the pressure systems of all
-        environments together have at least
-        :attr:`PRESSURE_AMG_AUTO_MIN_ROWS_BATCHED` unknowns.
-
-        Parameters
-        ----------
-        P : phipict._C.CSRmatrix
-            Batched pressure matrix.
-        use_amg : bool or None
-            ``pressure_use_amg``.
-
-        Returns
-        -------
-        BatchedAMGHierarchy or None
-            The refreshed hierarchy, or None if AMG is not used.
-        """
-        batch = P.getBatchSize()
-        if use_amg is None:
-            use_amg = (
-                P.getRows() * batch >= self.PRESSURE_AMG_AUTO_MIN_ROWS_BATCHED
-                and is_pyamg_available()
-            )
-        if not use_amg:
-            return None
-        if not is_pyamg_available():
-            raise ImportError(
-                "pressure_use_amg needs the 'pyamg' package for the AMG setup. "
-                "Install it with `pip install pyamg`."
-            )
-        fingerprint = (P.getRows(), P.getSize(), *values_fingerprint(P.value))
-        previous = self._pressure_amg_hierarchy
-        if (
-            isinstance(previous, BatchedAMGHierarchy)
-            and self._pressure_amg_fingerprint == fingerprint
-        ):
-            return previous
-        options = dict(self._pressure_amg_options)
-        interval = int(options.pop("coarse_refresh_interval", 4))
-        coarse = (
-            not isinstance(previous, BatchedAMGHierarchy)
-            or interval <= 1
-            or self._pressure_amg_refreshes % interval == 0
-            or self._pressure_amg_stale
-        )
-        with SAMPLE("pressure AMG refresh"):
-            hierarchy = batched_hierarchy_for(
-                P,
-                batch,
-                project_constant=self._pressure_rank_deficient(P),
-                previous=previous
-                if isinstance(previous, BatchedAMGHierarchy)
-                else None,
-                coarse=coarse,
-                **options,
-            )
-        if coarse:
-            self._pressure_amg_refreshes = 0
-            self._pressure_amg_stale = False
-            self._pressure_amg_baseline_iters = None
-        self._pressure_amg_refreshes += 1
-        self._pressure_amg_hierarchy = hierarchy
-        self._pressure_amg_fingerprint = fingerprint
-        return hierarchy
-
-    def _note_pressure_amg_iterations(self, infos: Sequence[Any]) -> None:
-        """Track pressure AMG iteration counts to detect stale coarse operators.
-
-        The solves after a full refresh (all correctors of that step) set the
-        baseline as their largest iteration count. A later solve
-        that needs more than twice the baseline (plus a small margin) forces a
-        full Galerkin refresh at the next change of the pressure matrix.
-
-        Parameters
-        ----------
-        infos : sequence of LinearSolverResultInfo
-            Result infos of a pressure solve.
-        """
-        iters = max(int(i.usedIterations) for i in infos)
-        baseline = self._pressure_amg_baseline_iters
-        if baseline is None or self._pressure_amg_refreshes <= 1:
-            self._pressure_amg_baseline_iters = (
-                iters if baseline is None else max(baseline, iters)
-            )
-        elif iters > 2 * baseline + 5:
-            self._pressure_amg_stale = True
 
     def _store_pressure_guess(self, cstep: int, result: torch.Tensor) -> None:
         """Cache a corrector's pressure result as the next step's warm start.
@@ -2847,7 +2701,7 @@ class Simulation:
         BiCG_precondition_fallback: bool = False,
         adjoint_rank_deficient: bool = False,
         tag: str = "unknown",
-        amg_hierarchy: AMGHierarchy | BatchedAMGHierarchy | None = None,
+        amg_hierarchy: AMGHierarchy | None = None,
         fwd_rtol: float | None = None,
     ) -> tuple[torch.Tensor, bool]:
         """Solve ``A x = b`` with the CUDA solvers.
@@ -2978,7 +2832,7 @@ class Simulation:
         self,
         rhs: torch.Tensor,
         x: torch.Tensor | None,
-        amg_hierarchy: AMGHierarchy | BatchedAMGHierarchy,
+        amg_hierarchy: AMGHierarchy,
         tol: float | torch.Tensor,
         max_iter: int,
         return_best_result: bool = False,
@@ -3047,8 +2901,6 @@ class Simulation:
                 max_iter=max_iter,
                 return_best_result=return_best_result,
             )
-        if amg_hierarchy is self._pressure_amg_hierarchy:
-            self._note_pressure_amg_iterations(solver_infos)
 
         if probe is not None:
             probe.stop(
@@ -3083,7 +2935,7 @@ class Simulation:
         residual_reset_step: int = 0,
         use_scipy: bool = False,
         return_best_result: bool = False,
-        amg_hierarchy: AMGHierarchy | BatchedAMGHierarchy | None = None,
+        amg_hierarchy: AMGHierarchy | None = None,
         adjoint_rank_deficient: bool = False,
         tag: str = "unknown",
     ) -> tuple[torch.Tensor, bool]:
@@ -3137,11 +2989,13 @@ class Simulation:
         else:
             if max_iter == None:  # noqa: E711
                 max_iter = self.linear_solve_max_iterations
+
             # Single choke point for every solve in the codebase: a relative
             # SolverTolerance is turned into the absolute number the kernels
             # expect here, against this solve's own RHS. Floats pass through
-            # untouched, so absolute tolerances keep their exact behaviour.
+            # untouched, so absolute tolerances keep their exact behaviour
             batch = self.domain.getBatchSize() if self.domain is not None else 1
+            
             # batched environments share the tolerance settings, but a relative
             # tolerance is resolved against each environment's own RHS
             abs_tol: Any = resolve_tolerance(tol, rhs, batch_size=batch)
@@ -3152,20 +3006,7 @@ class Simulation:
                 abs_tol = torch.tensor(abs_tol, dtype=torch.float64).repeat_interleave(
                     rows // batch
                 )
-            # AMG is *outside-an-autograd.Function-only*, not forward-only.
-            # `linear_solve_AMG` is plain tensor ops -- no autograd.Function, no
-            # no_grad -- so calling it here on a differentiated solve would trace
-            # every CG iteration and every V-cycle of the preconditioner. That is
-            # wrong twice over: it yields the gradient of a truncated iteration
-            # rather than the adjoint of the solve, and it retains the whole
-            # hierarchy per iteration (the potential solve's 10-level hierarchy has
-            # ~108M nnz; the run is killed by the host OOM killer inside
-            # amg_pcg_solve).
-            #
-            # A differentiated solve still gets AMG, just from inside
-            # `piso_diff.LinearSolveFunction`, whose forward and backward both
-            # run with grad disabled -- so the hierarchy is threaded through
-            # `linear_solve_GPU` below rather than used here.
+
             if amg_hierarchy is not None and not self._solve_is_differentiated():
                 assert abs_tol is not None
                 return self.linear_solve_AMG(
@@ -3479,9 +3320,6 @@ class Simulation:
                                     return_best_result=self.pressure_return_best_result,
                                     max_iter=max_iter,
                                     adjoint_rank_deficient=self._pressure_rank_deficient(
-                                        domain.P
-                                    ),
-                                    amg_hierarchy=self._get_pressure_amg_hierarchy(
                                         domain.P
                                     ),
                                     tag="pressure",
@@ -3949,9 +3787,6 @@ class Simulation:
                                     adjoint_rank_deficient=self._pressure_rank_deficient(
                                         domain.P
                                     ),
-                                    amg_hierarchy=self._get_pressure_amg_hierarchy(
-                                        domain.P
-                                    ),
                                     tag="pressure",
                                 )
 
@@ -4070,9 +3905,6 @@ class Simulation:
                                             tol=p_tol,
                                             return_best_result=self.pressure_return_best_result,
                                             adjoint_rank_deficient=self._pressure_rank_deficient(
-                                                domain.P
-                                            ),
-                                            amg_hierarchy=self._get_pressure_amg_hierarchy(
                                                 domain.P
                                             ),
                                             tag="pressure",

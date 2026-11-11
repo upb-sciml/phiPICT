@@ -118,14 +118,14 @@ Block::~Block(){
 }
 #endif
 
-std::shared_ptr<Block> Block::Copy() const {
+std::shared_ptr<Block> Block::Copy(const std::shared_ptr<const Domain> &p_newParent) const {
 	torch::Tensor v = velocity;
 	torch::Tensor p = pressure;
 	optional<torch::Tensor> s = passiveScalar;
 	optional<torch::Tensor> c = m_vertexCoordinates;
 	const bool hasOnlyTransform = !m_vertexCoordinates && m_transform;
 	std::string n = name+"_copy";
-	std::shared_ptr<Block> cBlock = std::make_shared<Block>(v, p, s, c, n, getParentDomain());
+	std::shared_ptr<Block> cBlock = std::make_shared<Block>(v, p, s, c, n, p_newParent ? p_newParent : getParentDomain());
 	if(hasOnlyTransform){
 		// cBlock boundaries are default periodic here, so no boundary transform update happens.
 		torch::Tensor t = m_transform.value();
@@ -143,19 +143,19 @@ std::shared_ptr<Block> Block::Copy() const {
 	for(index_t i=0;i<static_cast<index_t>(boundaries.size());++i){
 		BoundaryType bt = boundaries[i]->type;
 		if(bt==BoundaryType::DIRICHLET || bt==BoundaryType::DIRICHLET_VARYING || bt==BoundaryType::FIXED){
-			cBlock->setBoundary(i, boundaries[i]->Copy());
+			cBlock->setBoundary(i, boundaries[i]->Copy(p_newParent));
 		}
 	}
 	return cBlock;
 }
-std::shared_ptr<Block> Block::Clone() const {
+std::shared_ptr<Block> Block::Clone(const std::shared_ptr<const Domain> &p_newParent) const {
 	torch::Tensor v = velocity.clone();
 	torch::Tensor p = pressure.clone();
 	optional<torch::Tensor> s = cloneOptionalTensor(passiveScalar);
 	optional<torch::Tensor> c = cloneOptionalTensor(m_vertexCoordinates);
 	const bool hasOnlyTransform = !m_vertexCoordinates && m_transform;
 	std::string n = name+"_clone";
-	std::shared_ptr<Block> cBlock = std::make_shared<Block>(v, p, s, c, n, getParentDomain());
+	std::shared_ptr<Block> cBlock = std::make_shared<Block>(v, p, s, c, n, p_newParent ? p_newParent : getParentDomain());
 	if(hasOnlyTransform){
 		// cBlock boundaries are default periodic here, so no boundary transform update happens.
 		torch::Tensor t = m_transform.value().clone();
@@ -173,7 +173,7 @@ std::shared_ptr<Block> Block::Clone() const {
 	for(index_t i=0;i<static_cast<index_t>(boundaries.size());++i){
 		BoundaryType bt = boundaries[i]->type;
 		if(bt==BoundaryType::DIRICHLET || bt==BoundaryType::DIRICHLET_VARYING || bt==BoundaryType::FIXED){
-			cBlock->setBoundary(i, boundaries[i]->Clone());
+			cBlock->setBoundary(i, boundaries[i]->Clone(p_newParent));
 		}
 	}
 	return cBlock;
@@ -289,11 +289,14 @@ void Block::setVelocitySource(torch::Tensor &t){
 	velocitySource = t;
 	velocitySourceStatic = t.dim()==2; //velocityStatic;
 	
-	// keep gradient coherent
+	// keep gradient coherent. The grad is only scratch space of the backward pass (every
+	// backward recreates it with zeros_like(velocitySource) before its kernel and reads it out
+	// right after), so a stale one of the other shape is dropped. That happens when a hook
+	// switches between a static and a varying source within a step (e.g. the channel forcing
+	// and the MHD Lorentz force) and a checkpoint replays the forward during backward.
 	if(velocitySource_grad){
 		if(!(velocitySource_grad.value().dim()==t.dim())){
-			// TODO if grad is static: broadcast to varying, else: sum to static
-			TORCH_CHECK(false, "New velocity source does not match existing gradient tensor.");
+			velocitySource_grad = nullopt;
 		}
 	}
 
@@ -970,7 +973,8 @@ void Block::OpenBoundary(const index_t bound, optional<torch::Tensor> passiveSca
 	CheckFaceIndex(bound);
 	CloseConnectedBoudary(bound, true);
 	optional<std::vector<BoundaryConditionType>> scalarType = nullopt;
-	if(!passiveScalar.has_value()){
+	// without a passive scalar there is no scalar condition to set
+	if(!passiveScalar.has_value() && hasPassiveScalar()){
 		scalarType = std::vector<BoundaryConditionType>{BoundaryConditionType::NEUMANN};
 	}
 	MakeFixedBoundary(bound, nullopt, BoundaryConditionType::NEUMANN, passiveScalar, scalarType);

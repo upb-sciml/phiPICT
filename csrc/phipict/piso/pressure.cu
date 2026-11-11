@@ -678,9 +678,12 @@ __global__ void PISO_build_pressure_rhs_GRAD(DomainGPU<scalar_t> *p_domain,
  * rDiag_grad from the stored forward pressureRHS, which already contains the
  * correction.
  *
- * The branches (sign of the face flux, hasFarUpwindCell, and the flat-face skip)
- * are frozen, i.e. treated as constant w.r.t. the solution. That is exact except
- * on the measure-zero sets where they switch. */
+ * The branches (sign of the face flux and hasFarUpwindCell) are frozen, i.e.
+ * treated as constant w.r.t. the solution. That is exact except on the
+ * measure-zero sets where they switch. The flat-face skip is not frozen: a flat
+ * face is not a measure-zero set (a uniform inflow region is flat throughout), and
+ * the forward is linear in the field on both sides of it, so its field derivative
+ * is kept and only its flux derivative, which is zero, is dropped. */
 template <typename scalar_t>
 __global__ void PISO_build_pressure_rhs_deferred_GRAD(DomainGPU<scalar_t> *p_domain,
 		const index_t *p_blockIdxByThreadBlock, const index_t *p_threadBlockOffsetInBlock, const index_t numThreadBlocks){
@@ -732,16 +735,20 @@ __global__ void PISO_build_pressure_rhs_deferred_GRAD(DomainGPU<scalar_t> *p_dom
 				const scalar_t phiD = outflow ? phiN : phiP;
 				const scalar_t dD = phiD - phiU;
 				const scalar_t absDD = dD < 0 ? -dD : dD;
-				// Mirror the forward flat-face skip exactly: this is the adjoint of the
-				// code as written, not of the idealized formula (for LINEAR_UPWIND the
-				// term is 0.5*(phi_U - phi_UU) and does not actually vanish at dD == 0).
-				if(absDD < static_cast<scalar_t>(1e-20)){ continue; }
+				// Flat face (the forward skips it): the correction is 0 for any flux, so
+				// d/dF = 0, but a field perturbation unflattens the face and the forward
+				// then adds F*0.5*(phi_U - phi_UU), linear in the field. Its derivative,
+				// the field scatter below, is the one-sided limit that exists whenever the
+				// forward is continuous there (phi_U == phi_UU, e.g. a uniform inflow
+				// region); skipping it would drop the field derivative of whole uniform
+				// regions.
+				const bool flatFace = absDD < static_cast<scalar_t>(1e-20);
 
 				const index_t idxU = outflow ? idxP : idxN;
 				const scalar_t half_RHSgrad = static_cast<scalar_t>(0.5) * RHSgrad;
 				atomicAdd(s_block.velocity_grad + idxU,  -faceFluxOut * half_RHSgrad);
 				atomicAdd(s_block.velocity_grad + idxUU,  faceFluxOut * half_RHSgrad);
-				fluxesGrad[bound] -= faceSign * (phiU - phiUU) * half_RHSgrad;
+				if(!flatFace){ fluxesGrad[bound] -= faceSign * (phiU - phiUU) * half_RHSgrad; }
 			}
 		}
 

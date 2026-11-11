@@ -15,15 +15,21 @@
 """Setup script for the phipict package with CUDA extensions."""
 
 import os
+import re
 
 import torch
 from setuptools import find_packages, setup
 from torch.utils import cpp_extension
 
-# include root of the C++/CUDA sources (absolute: the compiler does not run in the repo root)
-CSRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "csrc", "phipict")
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
-VERSION = "0.1.0"
+# include root of the C++/CUDA sources (absolute: the compiler does not run in the repo root)
+CSRC = os.path.join(ROOT, "csrc", "phipict")
+
+# Base URL for files referenced by the README on PyPI (needs a public repo)
+RAW_URL = "https://raw.githubusercontent.com/safe-autonomous-systems/phiPICT/main/"
+
+VERSION = "0.1.1"
 
 
 def _get_version() -> str:
@@ -42,6 +48,20 @@ def _get_version() -> str:
     return f"{VERSION}+pt{major}{minor}cu{cuda}"
 
 
+def _get_long_description() -> str:
+    """Return the README as the PyPI description.
+
+    PyPI resolves no relative links and ignores GitHub's ``#gh-*-mode-only``
+    switch (both logos would show), so only the light-mode logo is kept and
+    relative ``src``/``href`` paths point to the files on GitHub.
+    """
+    with open(os.path.join(ROOT, "README.md"), encoding="utf-8") as f:
+        text = f.read()
+    text = re.sub(r"\s*<a href=\"[^\"]*#gh-dark-mode-only\">.*?</a>", "", text, flags=re.S)
+    text = text.replace("#gh-light-mode-only", "")
+    return re.sub(r'(src|href)="\./', rf'\1="{RAW_URL}', text)
+
+
 def _get_install_requires() -> list[str]:
     """Return the runtime dependencies.
 
@@ -57,7 +77,17 @@ def _get_install_requires() -> list[str]:
     ):
         major, minor = torch.__version__.split("+")[0].split(".")[:2]
         torch_req = f"torch=={major}.{minor}.*"
-    return [torch_req, "numpy", "scipy"]
+    # pyamg: the AMG pressure solver is used automatically for large systems
+    # matplotlib/imageio: grid plots and image output; psutil: phipict.utils
+    return [
+        torch_req,
+        "numpy",
+        "scipy",
+        "pyamg>=4.0",
+        "matplotlib>=3.9",
+        "imageio",
+        "psutil",
+    ]
 
 
 def _get_extensions():
@@ -142,6 +172,8 @@ def _get_extensions():
 setup(
     version=_get_version(),
     install_requires=_get_install_requires(),
+    long_description=_get_long_description(),
+    long_description_content_type="text/markdown",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     ext_modules=_get_extensions(),
