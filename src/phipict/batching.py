@@ -8,6 +8,7 @@ fields). See ``Domain.setBatchSize``.
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
+from functools import partial
 
 import torch
 
@@ -55,7 +56,12 @@ def copy_env_state(dst: _C.Domain, env_idx: int, src: _C.Domain) -> None:
             fields = [(dst_block.velocity, src_block.velocity)]
             fields.append((dst_block.pressure, src_block.pressure))
             if dst_block.hasPassiveScalar() and src_block.hasPassiveScalar():
-                fields.append((dst_block.passiveScalar, src_block.passiveScalar))
+                dst_scalar, src_scalar = (
+                    dst_block.passiveScalar,
+                    src_block.passiveScalar,
+                )
+                assert dst_scalar is not None and src_scalar is not None
+                fields.append((dst_scalar, src_scalar))
             if dst_block.epot is not None and src_block.epot is not None:
                 fields.append((dst_block.epot, src_block.epot))
             for dst_field, src_field in fields:
@@ -82,9 +88,14 @@ def copy_env_state(dst: _C.Domain, env_idx: int, src: _C.Domain) -> None:
                     dst_bound.setVelocity,
                 )
                 if dst_bound.hasPassiveScalar() and src_bound.hasPassiveScalar():
-                    _copy_boundary_data(
+                    dst_scalar, src_scalar = (
                         dst_bound.passiveScalar,
                         src_bound.passiveScalar,
+                    )
+                    assert dst_scalar is not None and src_scalar is not None
+                    _copy_boundary_data(
+                        dst_scalar,
+                        src_scalar,
                         env_idx,
                         dst.getBatchSize(),
                         dst_bound.setPassiveScalar,
@@ -212,10 +223,8 @@ class EnvStateSnapshot:
         getters: list[Callable[[], torch.Tensor | None]] = []
         for block in domain.getBlocks():
             getters += [
-                lambda block=block: block.velocity,
-                lambda block=block: block.pressure,
-                lambda block=block: block.passiveScalar,
-                lambda block=block: block.epot,
+                partial(getattr, block, name)
+                for name in ("velocity", "pressure", "passiveScalar", "epot")
             ]
         getters += [
             lambda: domain.velocityResult,
@@ -252,7 +261,7 @@ class EnvStateSnapshot:
                 source = block.velocitySource
                 self._bounds.append(
                     (
-                        lambda block=block: block.velocitySource,
+                        partial(getattr, block, "velocitySource"),
                         block.setVelocitySource,
                         0 if source is None else source.data_ptr(),
                         0 if source is None else source._version,

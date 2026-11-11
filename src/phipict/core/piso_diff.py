@@ -1318,6 +1318,8 @@ def linear_solve_GPU(
                 else:
                     x = x0_const.to(dtype=b.dtype, device=b.device).clone()
 
+                # AMG returns its own infos, the linear solve wrapper may return None
+                solver_infos: Sequence[Any] | None
                 if use_amg:
                     # Probed like every other solve, or an AMG solve would be
                     # invisible to solver_stats and its cost unattributable.

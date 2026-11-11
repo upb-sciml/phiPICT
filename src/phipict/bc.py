@@ -275,7 +275,6 @@ ScalarSpec: TypeAlias = Scalar.Dirichlet | Scalar.Neumann
 Spec: TypeAlias = PotentialSpec | VelocitySpec | ScalarSpec
 
 
-
 def _fixed_boundary(block: _C.Block, face: Face) -> _C.FixedBoundary:
     bound = block.getBoundary(int(face))
     if bound.type != _C.BoundaryType.FIXED:

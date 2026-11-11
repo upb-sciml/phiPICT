@@ -199,7 +199,7 @@ class Profiler:
             float
                 Mean of the recorded durations, in seconds.
             """
-            return np.mean(self.samples)
+            return float(np.mean(self.samples))
 
         @property
         def var(self) -> float:
@@ -210,7 +210,7 @@ class Profiler:
             float
                 Variance of the recorded durations, in seconds squared.
             """
-            return np.var(self.samples)
+            return float(np.var(self.samples))
 
         @property
         def std(self) -> float:
@@ -221,7 +221,7 @@ class Profiler:
             float
                 Standard deviation of the recorded durations, in seconds.
             """
-            return np.std(self.samples)
+            return float(np.std(self.samples))
 
         @property
         def sum(self) -> float:

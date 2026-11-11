@@ -8,13 +8,15 @@ repos:
         files: ^(src|tests)/
         args: [ --fix ]
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+  # mypy from the active environment (repo: local), not an isolated one: the
+  # package is typed against torch, numpy and scipy, which must be installed.
+  # Checks the whole package as configured in [tool.mypy] of pyproject.toml.
+  - repo: local
     hooks:
       - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        types: [python]
         files: ^src/
-        exclude: ^src/phipict/.*\.pyi$
-        additional_dependencies:
-          - types-setuptools
-          - types-psutil
-          - scipy-stubs
+        pass_filenames: false

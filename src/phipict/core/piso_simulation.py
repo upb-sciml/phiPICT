@@ -23,10 +23,10 @@
 
 import numbers
 import os
-from pathlib import Path
 import warnings
 from collections.abc import Callable, Mapping, Sequence
 from contextlib import nullcontext
+from pathlib import Path
 from types import ModuleType
 from typing import Any, Literal, cast
 
@@ -606,7 +606,7 @@ def balance_boundary_fluxes(
                 # TODO: non-ortho transform
                 vel_comps = list(torch.split(bound_vel, domain.getSpatialDims(), dim=1))
                 vel_comps[boundIdx // 2] = vel_comps[boundIdx // 2] * env_scale
-                bound.setVelocity(torch.cat(vel_comps, axis=1))  # type: ignore[call-overload]
+                bound.setVelocity(torch.cat(vel_comps, dim=1))
     # _LOG.info("Boundary flux balance %s", domain.GetBoundaryFluxBalance().cpu().numpy())
 
 
@@ -1454,6 +1454,8 @@ class Simulation:
             )
         )
         shape = self.output_resampling_shape
+        if shape is None:
+            raise RuntimeError("No output_resampling_shape set.")
         shape_key = (
             tuple(shape.tolist())
             if isinstance(shape, torch.Tensor)
@@ -2995,7 +2997,7 @@ class Simulation:
             # expect here, against this solve's own RHS. Floats pass through
             # untouched, so absolute tolerances keep their exact behaviour
             batch = self.domain.getBatchSize() if self.domain is not None else 1
-            
+
             # batched environments share the tolerance settings, but a relative
             # tolerance is resolved against each environment's own RHS
             abs_tol: Any = resolve_tolerance(tol, rhs, batch_size=batch)

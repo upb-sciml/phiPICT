@@ -151,7 +151,9 @@ def test_interpolation_cache_keeps_no_operators() -> None:
     l1, _ = first.native_levels(torch.float32)
     l2, _ = second.native_levels(torch.float32)
     for a, b in zip(l1, l2, strict=True):
-        assert all(x.data_ptr() == y.data_ptr() for x, y in zip(a[4:], b[4:]))
+        assert all(
+            x.data_ptr() == y.data_ptr() for x, y in zip(a[4:], b[4:], strict=True)
+        )
         assert a[0].dtype == torch.int32
     amg.clear_interpolation_cache()
 
