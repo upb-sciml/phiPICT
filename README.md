@@ -19,6 +19,25 @@
 
 <h1 align="center">φ-PICT: Differentiable GPU-Accelerated Solver for Hydrodynamic &amp; Magnetohydrodynamic Flows</h1>
 
+<table align="center">
+  <tr>
+    <th width="70%">Fusion Reactor Blanket Cooling</th>
+    <th width="30%">MHD Rayleigh-Bénard Convection</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="./docs/source/_static/example_fields/blanket.png" alt="Temperature in a fusion reactor blanket cooling duct"/>
+    </td>
+    <td align="center">
+      <img src="./docs/source/_static/example_fields/rbc_medium.png" alt="Temperature in Rayleigh-Bénard magnetoconvection"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><a href="examples/mhd/blanket_cooling.py"><code>examples/mhd/blanket_cooling.py</code></a></td>
+    <td align="center"><a href="examples/mhd/rbc_mhd.py"><code>examples/mhd/rbc_mhd.py</code></a></td>
+  </tr>
+</table>
+
 ---
 
 ## Key Features
