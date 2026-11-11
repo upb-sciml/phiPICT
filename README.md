@@ -20,6 +20,19 @@
 
 <h1 align="center">φ-PICT: Differentiable GPU-Accelerated Solver for Hydrodynamic &amp; Magnetohydrodynamic Flows</h1>
 
+--
+
+<div align="center">
+    <h3>
+      <a href="#-installation">Installation</a> |
+      <a href="#-getting-started">Getting Started</a> |
+      <a href="https://upb-sciml.github.io/phiPICT/index.html">Documentation</a> | 
+      <a href="#-license">License</a>
+    </h3>
+</div>
+
+--
+
 <table align="center">
   <tr>
     <th width="30%">Flow Past a Cylinder</th>
