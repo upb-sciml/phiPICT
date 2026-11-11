@@ -17,7 +17,7 @@
 
 </div>
 
-# $\phi$-PICT: Differentiable GPU-Accelerated Solver for Hydrodynamic & MHD Flows
+<h1 align="center">φ-PICT: Differentiable GPU-Accelerated Solver for Hydrodynamic &amp; MHD Flows</h1>
 
 ---
 
