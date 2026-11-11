@@ -57,8 +57,8 @@ import torch
 import phipict
 import phipict.meshing as pm
 from phipict import Hook, Hooks, bc
-from phipict.grid.helpers import get_cell_size
 from phipict.io import export
+from phipict.meshing.quality import cell_volumes
 
 T_HOT, T_COLD = 1.0, 0.0
 T_REF = 0.5 * (T_HOT + T_COLD)
@@ -203,7 +203,7 @@ def main() -> None:
     sim.make_divergence_free()
 
     # Volume-weighted Nusselt number Nu = 1 + sqrt(Ra Pr) <u_y (T - T_ref)>
-    volume = get_cell_size(block)[0, 0]  # [nz, ny, nx]
+    volume = cell_volumes(mesh.blocks[0].coords).to(device, dtype)  # [nz, ny, nx]
 
     def nusselt() -> float:
         T = block.passiveScalar

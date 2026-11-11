@@ -21,20 +21,24 @@
 
 <table align="center">
   <tr>
-    <th width="70%">Fusion Reactor Blanket Cooling</th>
-    <th width="30%">MHD Rayleigh-Bénard Convection</th>
+    <th width="30%">Flow Past a Cylinder</th>
+    <th width="20%">Rayleigh-Bénard Convection</th>
+    <th width="28%">Airfoil</th>
+    <th width="22%">Turbulent Channel Flow</th>
   </tr>
   <tr>
-    <td align="center">
-      <img src="./docs/source/_static/example_fields/blanket.png" alt="Temperature in a fusion reactor blanket cooling duct"/>
-    </td>
-    <td align="center">
-      <img src="./docs/source/_static/example_fields/rbc_medium.png" alt="Temperature in Rayleigh-Bénard magnetoconvection"/>
-    </td>
+    <td align="center"><img src="./docs/source/_static/example_fields/cylinder.png" alt="Vortex structures in the wake of a cylinder"/></td>
+    <td align="center"><img src="./docs/source/_static/example_fields/rbc.png" alt="Temperature in 3D Rayleigh-Bénard convection"/></td>
+    <td align="center"><img src="./docs/source/_static/example_fields/airfoil.png" alt="Vortex structures behind an airfoil"/></td>
+    <td align="center"><img src="./docs/source/_static/example_fields/tcf.png" alt="Vortex structures in turbulent channel flow"/></td>
   </tr>
   <tr>
-    <td align="center"><a href="examples/mhd/blanket_cooling.py"><code>examples/mhd/blanket_cooling.py</code></a></td>
-    <td align="center"><a href="examples/mhd/rbc_mhd.py"><code>examples/mhd/rbc_mhd.py</code></a></td>
+    <th colspan="3">Fusion Reactor Blanket Cooling (MHD)</th>
+    <th>MHD Rayleigh-Bénard Convection</th>
+  </tr>
+  <tr>
+    <td align="center" colspan="3"><img src="./docs/source/_static/example_fields/blanket.png" alt="Temperature in a fusion reactor blanket cooling duct"/></td>
+    <td align="center"><img src="./docs/source/_static/example_fields/rbc_medium.png" alt="Temperature in Rayleigh-Bénard magnetoconvection"/></td>
   </tr>
 </table>
 
