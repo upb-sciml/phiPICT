@@ -9,6 +9,9 @@ name: Release
 # PyPI are separate registries, so the exact release version can be tested on
 # TestPyPI first. A file name can only be uploaded once; to retry on TestPyPI,
 # set build_number (phipict-0.1.0-1-cp312-...whl); never used for PyPI.
+#
+# After a successful upload to PyPI, a GitHub release is created for the tag,
+# with generated release notes and the wheels attached.
 on:
   workflow_dispatch:
     inputs:
@@ -106,7 +109,7 @@ jobs:
     timeout-minutes: 10
     # Trusted publishing: this repo/workflow/environment is registered as a
     # publisher on test.pypi.org (environment testpypi) and pypi.org
-    # (environment pypi), see CI.md; no token needed.
+    # (environment pypi); no token needed.
     environment:
       name: ${{ inputs.target }}
       url: https://${{ inputs.target == 'testpypi' && 'test.' || '' }}pypi.org/p/phipict
@@ -138,3 +141,23 @@ jobs:
           repository-url: ${{ inputs.target == 'testpypi' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
           # a file name can only be uploaded once; re-runs skip the uploaded ones
           skip-existing: true
+
+  github-release:
+    if: inputs.target == 'pypi'
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: pypi-wheel-*
+          path: dist
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: phiPICT ${{ github.ref_name }}
+          generate_release_notes: true
+          files: dist/*.whl
