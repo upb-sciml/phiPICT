@@ -27,25 +27,9 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 CSRC = os.path.join(ROOT, "csrc", "phipict")
 
 # Base URL for files referenced by the README on PyPI (needs a public repo)
-RAW_URL = "https://raw.githubusercontent.com/safe-autonomous-systems/phiPICT/main/"
+RAW_URL = "https://raw.githubusercontent.com/upb-sciml/phiPICT/main/"
 
-VERSION = "0.1.1"
-
-
-def _get_version() -> str:
-    """Return the package version, optionally with a torch/CUDA local tag.
-
-    With PHIPICT_LOCAL_VERSION=1 the version gets a local tag such as
-    ``+pt29cu128`` (see CI.md), because the extension is ABI-bound to the torch
-    minor version and CUDA version it was built against.
-    """
-    if os.environ.get("PHIPICT_LOCAL_VERSION", "0") != "1":
-        return VERSION
-    major, minor = torch.__version__.split("+")[0].split(".")[:2]
-    if torch.version.cuda is None:
-        raise RuntimeError("PHIPICT_LOCAL_VERSION=1 requires a CUDA build of torch")
-    cuda = torch.version.cuda.replace(".", "")
-    return f"{VERSION}+pt{major}{minor}cu{cuda}"
+VERSION = "0.1.0"
 
 
 def _get_long_description() -> str:
@@ -66,15 +50,11 @@ def _get_install_requires() -> list[str]:
     """Return the runtime dependencies.
 
     Binary wheels only work with the torch minor version they were built
-    against, so with PHIPICT_PIN_TORCH=1 (implied by PHIPICT_LOCAL_VERSION=1)
-    they pin it (e.g. ``torch==2.14.*``). The PyPI wheels use PHIPICT_PIN_TORCH=1
-    alone, since PyPI rejects local version tags.
+    against, so the PyPI wheels are built with PHIPICT_PIN_TORCH=1, which pins
+    it (e.g. ``torch==2.10.*``). Source builds accept any torch >= 2.9.
     """
     torch_req = "torch>=2.9"
-    if "1" in (
-        os.environ.get("PHIPICT_LOCAL_VERSION", "0"),
-        os.environ.get("PHIPICT_PIN_TORCH", "0"),
-    ):
+    if os.environ.get("PHIPICT_PIN_TORCH", "0") == "1":
         major, minor = torch.__version__.split("+")[0].split(".")[:2]
         torch_req = f"torch=={major}.{minor}.*"
     # pyamg: the AMG pressure solver is used automatically for large systems
@@ -170,7 +150,7 @@ def _get_extensions():
 
 
 setup(
-    version=_get_version(),
+    version=VERSION,
     install_requires=_get_install_requires(),
     long_description=_get_long_description(),
     long_description_content_type="text/markdown",

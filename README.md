@@ -66,8 +66,7 @@ This also installs the matching PyTorch (2.10, built with CUDA 12.8), pyamg, and
 the remaining runtime dependencies (NumPy, SciPy, matplotlib, imageio, psutil).
 There is no need to install PyTorch first: the compiled extension only works with
 the PyTorch version it was built against, so pip replaces any other version.
-Wheels for other PyTorch/CUDA versions are listed in the
-[installation docs](https://safe-autonomous-systems.github.io/phiPICT/installation.html).
+To use another PyTorch or CUDA version, build from source (see below).
 
 Optional extras:
 

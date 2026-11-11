@@ -17,16 +17,16 @@ the AMG pressure solver, is installed as well.
 
 There is no need to install PyTorch first. If a different PyTorch version is
 installed, pip replaces it with 2.10, because the extension only works with the
-PyTorch version it was built against (see below). To keep another PyTorch
-version, use a wheel from section 2 or build from source.
+PyTorch version it was built against (see below). To use another PyTorch or
+CUDA version, build from source (section 2).
 
 Two optional extras exist, mainly for contributors: ``dev`` (linters, type
 checking, tests) and ``docs`` (Sphinx), e.g. ``pip install "phipict[dev]"``.
 Reading VTK formats other than ``.vts``/``.vtm`` needs pyvista
 (``pip install pyvista``).
 
-Which wheel do I need?
-----------------------
+Why PyTorch 2.10?
+-----------------
 
 The extension is bound to two versions it was built against:
 
@@ -34,34 +34,19 @@ The extension is bound to two versions it was built against:
 - the **CUDA major version** (cu12x or cu13x). A build for CUDA 13.0 also works
   with PyTorch built for CUDA 13.2.
 
+The PyPI wheel is built for PyTorch 2.10 with CUDA 12.8, the newest combination
+that runs on NVIDIA drivers ≥ 570. For any other combination, build from source.
 Check your installed PyTorch with:
 
 .. code-block:: bash
 
     python -c "import torch; print(torch.__version__, torch.version.cuda)"
 
-2. Wheels for other PyTorch/CUDA versions
------------------------------------------
-
-Besides the default build on PyPI, wheels are built for newer PyTorch versions
-with CUDA 13 (NVIDIA driver ≥ 580). They carry the combination as a local version
-tag, e.g. ``phipict-0.1.0+pt212cu130``, which PyPI does not accept, so they are
-hosted on GitHub Releases and listed in a wheel index with one page per PyTorch
-minor x CUDA major. Install PyTorch first, then point ``pip`` to the matching page:
-
-.. code-block:: bash
-
-    pip install "torch==2.12.*" --index-url https://download.pytorch.org/whl/cu130
-    pip install phipict -f https://safe-autonomous-systems.github.io/phiPICT/whl/torch-2.12+cu13.html
-
-The available combinations are listed on the
-`wheel index <https://safe-autonomous-systems.github.io/phiPICT/whl/>`_.
-
-3. Building from source
+2. Building from source
 -----------------------
 
-For combinations without a prebuilt wheel, phiPICT builds against the PyTorch
-already installed in your environment. This requires a CUDA toolkit whose major
+phiPICT builds against the PyTorch already installed in your environment, so
+any PyTorch ≥ 2.9 with a CUDA build works. This requires a CUDA toolkit whose major
 version matches ``torch.version.cuda`` (``nvcc`` on the ``PATH`` or
 ``CUDA_HOME`` set) and ``setuptools>=77``, since the build uses the environment's
 PyTorch and setuptools. With conda, ``conda install -c conda-forge cuda-toolkit
@@ -69,7 +54,7 @@ cuda-version=12.8`` also installs a gcc/g++ that this nvcc supports.
 
 .. code-block:: bash
 
-    git clone https://github.com/safe-autonomous-systems/phiPICT.git
+    git clone https://github.com/upb-sciml/phiPICT.git
     cd phiPICT
     make install        # builds and installs the package
     make install-dev    # editable install with development tools
@@ -88,5 +73,5 @@ Troubleshooting
 
 An ``ImportError: ... undefined symbol`` when importing ``phipict`` means that the
 installed wheel was built for a different PyTorch version, e.g. because PyTorch
-was upgraded after installing phipict. Reinstall the wheel matching your
-PyTorch/CUDA combination, or build from source.
+was upgraded after installing phipict. Reinstall phipict from PyPI (which
+reinstalls PyTorch 2.10), or build it from source against your PyTorch.

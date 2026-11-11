@@ -2,8 +2,7 @@ name: Docs
 
 # Manual only (Actions -> Docs -> Run workflow). Builds the Sphinx docs of the
 # selected branch/tag; with `deploy`, publishes them to the gh-pages branch
-# (GitHub Pages source: gh-pages / root). The wheel index (whl/, maintained by
-# wheel-index.yml) is kept.
+# (GitHub Pages source: gh-pages / root).
 #
 # No GPU build is needed: without the compiled extension, conf.py mocks
 # phipict._C, so only the signatures of the pybind11 classes are missing.
@@ -47,7 +46,6 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
-    # shared with wheel-index.yml, which also pushes to gh-pages
     concurrency:
       group: gh-pages
       cancel-in-progress: false
@@ -68,9 +66,9 @@ jobs:
           name: docs-html
           path: html
 
-      - name: Replace the docs, keep the wheel index
+      - name: Replace the docs
         run: |
-          find pages -mindepth 1 -maxdepth 1 ! -name .git ! -name whl -exec rm -rf {} +
+          find pages -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -r html/. pages/
           touch pages/.nojekyll
 

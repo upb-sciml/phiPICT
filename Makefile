@@ -36,8 +36,6 @@ docs:
 
 .PHONY: upload-docs
 upload-docs: docs
-	# keep the wheel index (whl/) that CI maintains on gh-pages
-	git fetch origin gh-pages && git archive origin/gh-pages whl | tar -x -C docs/build/html || :
 	ghp-import -n -p -f docs/build/html
 
 .PHONY: pre-commit

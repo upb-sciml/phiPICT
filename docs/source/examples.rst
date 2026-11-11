@@ -1,10 +1,6 @@
 Examples
 ========
 
-The scripts in ``examples/`` are self-contained: each builds its mesh with
-:mod:`phipict.meshing`, sets the boundary conditions and runs the simulation.
-All of them need a CUDA GPU. Most take ``--out`` to write the solution as a VTK
-time series for ParaView.
 
 Validation cases
 ----------------
