@@ -20,8 +20,6 @@
 
 <h1 align="center">φ-PICT: Differentiable GPU-Accelerated Solver for Hydrodynamic &amp; Magnetohydrodynamic Flows</h1>
 
----
-
 <div align="center">
     <h3>
       <a href="#installation">Installation</a> |
@@ -30,8 +28,6 @@
       <a href="#license">License</a>
     </h3>
 </div>
-
----
 
 <table align="center">
   <tr>
