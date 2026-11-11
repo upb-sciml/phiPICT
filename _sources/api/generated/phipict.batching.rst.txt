@@ -1,0 +1,19 @@
+﻿phipict.batching
+================
+
+.. automodule:: phipict.batching
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      copy_env_state
+      stack_domains
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      EnvStateSnapshot
+   

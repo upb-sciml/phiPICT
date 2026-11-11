@@ -1,0 +1,365 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mesh quality &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reading and writing meshes" href="io.html" />
+    <link rel="prev" title="Curved edges" href="edges.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Meshing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edges.html">Curved edges</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Meshing</a></li>
+      <li class="breadcrumb-item active">Mesh quality</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/upb-sciml/phiPICT/blob/main/docs/source/meshing/quality.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mesh-quality">
+<h1>Mesh quality<a class="headerlink" href="#mesh-quality" title="Link to this heading"></a></h1>
+<p>Check a mesh before running it: <code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.check()</span></code> finds the problems that stop
+a simulation (inverted cells, faces without a patch or connection, patches without
+a condition) and summarises the cell quality that affects accuracy and solver
+convergence. <code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.get_domain()</span></code> runs the same checks and refuses a mesh with
+errors.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">phipict.meshing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
+
+<span class="n">walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"walls"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">())</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Mesh</span><span class="p">([</span><span class="n">pm</span><span class="o">.</span><span class="n">make_quad</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+                        <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span> <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span><span class="p">))])</span>
+<span class="n">report</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+<span class="c1"># 1 blocks, 128 cells</span>
+<span class="c1"># min volume 0.01562, min scaled Jacobian 0.894</span>
+<span class="c1"># max aspect ratio 1.12, max non-orthogonality 26.6 deg</span>
+<span class="c1"># ERROR: faces without patch or connection: quad:X_MINUS, quad:X_PLUS</span>
+
+<span class="n">mesh</span><span class="o">.</span><span class="n">make_periodic</span><span class="p">(</span><span class="n">translation</span><span class="o">=</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+<span class="k">assert</span> <span class="n">mesh</span><span class="o">.</span><span class="n">check</span><span class="p">()</span><span class="o">.</span><span class="n">ok</span>
+</pre></div>
+</div>
+<section id="the-report">
+<h2>The report<a class="headerlink" href="#the-report" title="Link to this heading"></a></h2>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshReport</span></code> has the size of the mesh, four quality measures, a list of
+<code class="docutils literal notranslate"><span class="pre">errors</span></code> and a list of <code class="docutils literal notranslate"><span class="pre">warnings</span></code>. <code class="docutils literal notranslate"><span class="pre">report.ok</span></code> is true without errors, and
+<code class="docutils literal notranslate"><span class="pre">report.raise_if_invalid()</span></code> raises a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> listing them.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.0%" />
+<col style="width: 72.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Measure</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_volume</span></code></p></td>
+<td><p>smallest cell volume (area in 2D); negative for inverted cells</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">min_scaled_jacobian</span></code></p></td>
+<td><p>smallest normalised corner Jacobian, 1 for rectangular cells; at or below 0
+a cell is degenerate or inverted</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max_aspect_ratio</span></code></p></td>
+<td><p>longest over shortest cell edge; large values are normal in boundary layers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max_non_orthogonality</span></code></p></td>
+<td><p>largest angle between a face normal and the line between the two cell
+centres, in degrees; the pressure solves converge more slowly as it grows,
+above about 70 degrees a warning is issued</p></td>
+</tr>
+</tbody>
+</table>
+<p>A block whose cells are all inverted is left-handed: its axes are ordered the
+wrong way round. Flip one axis (<code class="xref py py-meth docutils literal notranslate"><span class="pre">MeshBlock.flip()</span></code>).</p>
+</section>
+<section id="per-cell-values">
+<h2>Per-cell values<a class="headerlink" href="#per-cell-values" title="Link to this heading"></a></h2>
+<p>The measures are also available per cell, e.g. to find where a mesh is poor or to
+plot them (<code class="xref py py-func docutils literal notranslate"><span class="pre">phipict.io.export.write_vtk()</span></code> writes volume and scaled Jacobian
+of a mesh as cell data):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">phipict.meshing.quality</span><span class="w"> </span><span class="kn">import</span> <span class="n">non_orthogonality</span><span class="p">,</span> <span class="n">scaled_jacobian</span>
+
+<span class="n">block</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">non_orthogonality</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>    <span class="c1"># [ny, nx], degrees</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">angles</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+</pre></div>
+</div>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">MeshReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cells</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_scaled_jacobian</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_aspect_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_non_orthogonality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warnings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/quality.html#MeshReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Quality summary of a mesh, from <code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.check</span></code>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">n_blocks,</span> <span class="pre">n_cells</span></span></dt>
+<dd><p>Size of the mesh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">min_volume</span></span></dt>
+<dd><p>Smallest cell volume (area in 2D).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">min_scaled_jacobian</span></span></dt>
+<dd><p>Smallest normalised corner Jacobian, 1 for rectangular cells.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">max_aspect_ratio</span></span></dt>
+<dd><p>Largest cell aspect ratio.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">max_non_orthogonality</span></span></dt>
+<dd><p>Largest non-orthogonality within the blocks, in degrees.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">errors</span></span></dt>
+<dd><p>Problems that make the mesh unusable for a domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)">list</a> of <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">warnings</span></span></dt>
+<dd><p>Problems that may hurt the solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)">list</a> of <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ok</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span></dt>
+<dd><p>Whether there are no errors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">raise_if_invalid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/quality.html#MeshReport.raise_if_invalid"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Raise a ValueError listing the errors, if any.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Cell quality measures of structured blocks.</p>
+<p>All functions take block vertices <code class="docutils literal notranslate"><span class="pre">[dims,</span> <span class="pre">(nz</span> <span class="pre">+</span> <span class="pre">1,)</span> <span class="pre">ny</span> <span class="pre">+</span> <span class="pre">1,</span> <span class="pre">nx</span> <span class="pre">+</span> <span class="pre">1]</span></code> and return
+one value per cell, <code class="docutils literal notranslate"><span class="pre">[(nz,)</span> <span class="pre">ny,</span> <span class="pre">nx]</span></code>.</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">phipict.meshing.quality.</span></span><span class="sig-name descname"><span class="pre">aspect_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/quality.html#aspect_ratio"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Longest over shortest mean edge length of each cell.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">phipict.meshing.quality.</span></span><span class="sig-name descname"><span class="pre">cell_volumes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/quality.html#cell_volumes"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Signed cell volumes (areas in 2D), from the Jacobian at the cell centre.</p>
+<p>Negative values mark inverted (left-handed) cells.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">phipict.meshing.quality.</span></span><span class="sig-name descname"><span class="pre">non_orthogonality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/quality.html#non_orthogonality"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Largest non-orthogonality angle of a cell’s inner faces, in degrees.</p>
+<p>The angle between the face normal and the line joining the two cell centres,
+for the faces between cells of the block (block interfaces are not included).
+Cells without an inner face get 0.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">phipict.meshing.quality.</span></span><span class="sig-name descname"><span class="pre">scaled_jacobian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/quality.html#scaled_jacobian"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Smallest normalised corner Jacobian of each cell, in [-1, 1].</p>
+<p>1 is a rectangular cell; values at or below 0 mark degenerate or inverted
+cells.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="edges.html" class="btn btn-neutral float-left" title="Curved edges" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="io.html" class="btn btn-neutral float-right" title="Reading and writing meshes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

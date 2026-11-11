@@ -1,0 +1,1242 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>phipict.simulation.mhd &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../../../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meshing/index.html">Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">phipict.simulation.mhd</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for phipict.simulation.mhd</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2026 Jannis Becktepe</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the "License");</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an "AS IS" BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">"""MHD simulation class extending the PISO solver with inductionless MHD.</span>
+
+<span class="sd">Implements the inductionless MHD approximation with a static magnetic field.</span>
+<span class="sd">The magnetic field is defined by the Hartmann number Ha, Reynolds number Re,</span>
+<span class="sd">and the field direction e_b. The electric potential is solved via a Poisson</span>
+<span class="sd">equation, and the Lorentz force is injected as a velocity source term.</span>
+
+<span class="sd">Governing equations (non-dimensional):</span>
+<span class="sd">    Current density:      j = -grad(phi) + u x e_b</span>
+<span class="sd">    Electric potential:   laplacian(phi) = div(u x e_b)</span>
+<span class="sd">    Lorentz force:        F_L = N * (j x e_b),  where N = Ha^2 / Re</span>
+
+<span class="sd">Each FIXED face carries a :class:`phipict.PotentialBC` (INSULATING by default,</span>
+<span class="sd">OPEN, DIRICHLET or THIN_WALL), optionally per face cell; see :mod:`phipict.bc`.</span>
+<span class="sd">Thin conducting walls (THIN_WALL) use the following BC:</span>
+<span class="sd">    dphi/dn|_w = Cw * nabla^2_tau(phi)|_w</span>
+<span class="sd">implemented as a fluid-domain-only correction in the Poisson matrix</span>
+<span class="sd">(tangential surface Laplacian terms added for wall-adjacent cells).</span>
+<span class="sd">No augmented system with wall-face unknowns is required. The correction is</span>
+<span class="sd">conservative (diagonal and tangential off-diagonal cancel), so it leaves the</span>
+<span class="sd">matrix singular just like an insulating wall.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">nullcontext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict</span><span class="w"> </span><span class="kn">import</span> <span class="n">_C</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">piso_diff</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hook</span><span class="p">,</span> <span class="n">Hooks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.core.piso_simulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">cpu_device</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.simulation.simulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Simulation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.solvers.amg</span><span class="w"> </span><span class="kn">import</span> <span class="n">AMGHierarchy</span><span class="p">,</span> <span class="n">hierarchy_for</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.solvers.tolerance</span><span class="w"> </span><span class="kn">import</span> <span class="n">SolverTolerance</span>
+
+<span class="n">_LOG</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">"MHDsim"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_epot_matrix_is_anchored</span><span class="p">(</span><span class="n">domain</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Domain</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return True if some boundary pins the electric potential (full-rank matrix).</span>
+
+<span class="sd">    Only a Dirichlet φ=0 face cell (e.g. an outflow) anchors the system: it is the sole</span>
+<span class="sd">    boundary treatment that leaves an unbalanced diagonal entry behind</span>
+<span class="sd">    (``rowValues[0] -= coef`` with no matching off-diagonal). Every other face</span>
+<span class="sd">    keeps the row sum at zero, so the constant vector stays in the nullspace and</span>
+<span class="sd">    the matrix is singular (pure Neumann), as in the all-insulating-wall</span>
+<span class="sd">    Shercliff duct.</span>
+
+<span class="sd">    A conducting thin wall (THIN_WALL) does *not* anchor it, despite touching</span>
+<span class="sd">    the diagonal: its Robin term is added conservatively (diagonal ``-=``,</span>
+<span class="sd">    tangential off-diagonal ``+=``), so the row sum is unchanged. That matches</span>
+<span class="sd">    the physics — ``dphi/dn|_w = Cw * nabla^2_tau(phi)|_w`` is invariant under</span>
+<span class="sd">    ``phi -&gt; phi + const``, so a thin-wall-only domain is as singular as an</span>
+<span class="sd">    insulating one.</span>
+
+<span class="sd">    A prescribed current (CURRENT) does not anchor it either: it is a Neumann face</span>
+<span class="sd">    of the matrix, its current entering the right-hand side only. The system then</span>
+<span class="sd">    stays singular, so the prescribed currents have to sum to zero (e.g. an</span>
+<span class="sd">    electrode pair), or the mean projection of the right-hand side spreads the</span>
+<span class="sd">    excess over the volume.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    domain : phipict._C.Domain</span>
+<span class="sd">        Domain whose boundaries are inspected.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if any boundary cell imposes a Dirichlet condition on the potential.</span>
+<span class="sd">    """</span>
+    <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">domain</span><span class="o">.</span><span class="n">getBlocks</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_idx</span><span class="p">,</span> <span class="n">bound</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">getFixedBoundaries</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">bound</span><span class="o">.</span><span class="n">hasPotentialDirichlet</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_flat_to_block</span><span class="p">(</span>
+    <span class="n">block</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Block</span><span class="p">,</span>
+    <span class="n">flat</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Extract a block's portion from a flat vector field.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    block: _C.Block</span>
+<span class="sd">        The block for which to extract the field portion.</span>
+
+<span class="sd">    flat: torch.Tensor</span>
+<span class="sd">        Flat vector field, shape [batch * dims * totalSize].</span>
+
+<span class="sd">    dims: int</span>
+<span class="sd">        Number of spatial dimensions (2 or 3).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        Block-shaped tensor [batch, dims, *spatial].</span>
+<span class="sd">    """</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">globalOffset</span>
+    <span class="n">n_cells</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">getStrides</span><span class="p">()</span><span class="o">.</span><span class="n">w</span>
+    <span class="n">spatial</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">velocity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">velocity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># [batch][dims][totalSize] layout of the flat solve vectors</span>
+    <span class="n">per_env</span> <span class="o">=</span> <span class="n">flat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">per_env</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">n_cells</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="o">*</span><span class="n">spatial</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_subtract_env_mean</span><span class="p">(</span><span class="n">flat</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Subtract the mean of every batched environment's slice of a flat vector.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flat : torch.Tensor</span>
+<span class="sd">        Flat vector holding ``batch`` equal, consecutive environment slices.</span>
+<span class="sd">    batch : int</span>
+<span class="sd">        Number of environments.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        ``flat`` with each environment's mean removed, same shape.</span>
+<span class="sd">    """</span>
+    <span class="n">per_env</span> <span class="o">=</span> <span class="n">flat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">per_env</span> <span class="o">-</span> <span class="n">per_env</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">flat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_lift_2d_to_3d</span><span class="p">(</span><span class="n">field_2d</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Lift a 2D block field [1, 2, *spatial] to 3D [1, 3, *spatial] with zeros.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field_2d : torch.Tensor</span>
+<span class="sd">        Block field of shape ``[1, 2, *spatial]``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        The field of shape ``[1, 3, *spatial]``, with a zero third component.</span>
+<span class="sd">    """</span>
+    <span class="n">zeros</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">field_2d</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">field_2d</span><span class="p">,</span> <span class="n">zeros</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_e_b</span><span class="p">(</span>
+    <span class="n">e_b</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Domain</span><span class="p">,</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Check a magnetic field spec against the domain, see :func:`_prepare_e_b`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    e_b : torch.Tensor</span>
+<span class="sd">        Magnetic field spec, of shape ``(3,)`` or ``(3, *spatial)``.</span>
+<span class="sd">    domain : phipict._C.Domain</span>
+<span class="sd">        Domain the field must be compatible with.</span>
+<span class="sd">    dims : int</span>
+<span class="sd">        Number of spatial dimensions (2 or 3).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``e_b`` is not a tensor, has an unsupported shape, is not</span>
+<span class="sd">        broadcastable to the domain grid, or is spatially varying on a</span>
+<span class="sd">        multi-block domain.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple[int, ...] | None</span>
+<span class="sd">        The domain's spatial cell shape for a spatially varying field, None for</span>
+<span class="sd">        a uniform one.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e_b</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"e_b must be a torch.Tensor."</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">e_b</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">e_b</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"A uniform e_b must have shape (3,), got </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">e_b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">e_b</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="n">dims</span> <span class="o">+</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">e_b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"A spatially varying e_b must have shape (3, *spatial) with </span><span class="si">{</span><span class="n">dims</span><span class="si">}</span><span class="s2"> "</span>
+            <span class="sa">f</span><span class="s2">"spatial dimensions, got </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">e_b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
+        <span class="p">)</span>
+
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">getBlocks</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"A spatially varying e_b is only supported on single-block domains, "</span>
+            <span class="sa">f</span><span class="s2">"got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span><span class="si">}</span><span class="s2"> blocks."</span>
+        <span class="p">)</span>
+    <span class="n">spatial</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">velocity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+
+    <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">grid_size</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">e_b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">spatial</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">grid_size</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"e_b of shape </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">e_b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2"> is not broadcastable to the "</span>
+                <span class="sa">f</span><span class="s2">"domain grid (3, </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">spatial</span><span class="p">)</span><span class="si">}</span><span class="s2">): spatial "</span>
+                <span class="sa">f</span><span class="s2">"axis </span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2"> has size </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">, expected 1 or </span><span class="si">{</span><span class="n">grid_size</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">spatial</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_e_b</span><span class="p">(</span>
+    <span class="n">e_b</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">domain</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Domain</span><span class="p">,</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Bring a magnetic field spec into the layout the per-cell cross products use.</span>
+
+<span class="sd">    Two forms are accepted:</span>
+
+<span class="sd">    * a uniform field of shape ``(3,)`` (a direction; its magnitude multiplies</span>
+<span class="sd">      the one folded into the Stuart number), and</span>
+<span class="sd">    * a spatially varying field of shape ``(3, *spatial)``, where ``spatial``</span>
+<span class="sd">      either matches the domain's cell grid (``(nz, ny, nx)`` in 3D,</span>
+<span class="sd">      ``(ny, nx)`` in 2D) or is broadcastable to it, so e.g. ``(3, 1, 1, nx)``</span>
+<span class="sd">      describes a field that only varies along the streamwise direction.</span>
+
+<span class="sd">    The field always has 3 components, also in 2D, since the cross products are</span>
+<span class="sd">    evaluated in 3D. A spatially varying field requires a single-block domain,</span>
+<span class="sd">    as the block-to-grid mapping is otherwise ambiguous.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    e_b : torch.Tensor</span>
+<span class="sd">        Magnetic field spec, of shape ``(3,)`` or ``(3, *spatial)``.</span>
+<span class="sd">    domain : phipict._C.Domain</span>
+<span class="sd">        Domain the field is prepared for.</span>
+<span class="sd">    dims : int</span>
+<span class="sd">        Number of spatial dimensions (2 or 3).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple[torch.Tensor, tuple[int, ...] | None]</span>
+<span class="sd">        The field, either ``(3,)`` for the uniform case or</span>
+<span class="sd">        ``(*spatial, 3)`` (spatial dims kept broadcastable, i.e. size 1 where</span>
+<span class="sd">        the input was 1) for a varying one, plus the domain's spatial cell</span>
+<span class="sd">        shape. ``None`` in the uniform case, where it is not needed.</span>
+<span class="sd">    """</span>
+    <span class="n">spatial</span> <span class="o">=</span> <span class="n">_validate_e_b</span><span class="p">(</span><span class="n">e_b</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
+
+    <span class="n">field</span> <span class="o">=</span> <span class="n">e_b</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="o">.</span><span class="n">is_floating_point</span><span class="p">():</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">spatial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">field</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="c1"># Move the component axis last so the cross products can broadcast against</span>
+    <span class="c1"># per-cell vectors, and keep the singleton spatial axes unexpanded. A</span>
+    <span class="c1"># (3, 1, 1, nx) field must not blow up to one vector per cell</span>
+    <span class="k">return</span> <span class="n">field</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(),</span> <span class="n">spatial</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_cross_with_e_b</span><span class="p">(</span>
+    <span class="n">v</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">e_b</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">spatial</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Cross a per-cell vector field ``v`` [total_size, 3] with the magnetic field.</span>
+
+<span class="sd">    ``e_b`` is either uniform (shape ``(3,)``) or a spatially varying field in</span>
+<span class="sd">    the ``(*spatial, 3)`` layout produced by :func:`_prepare_e_b`, in which case</span>
+<span class="sd">    ``v`` is viewed on the cell grid so the two broadcast against each other.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    v : torch.Tensor</span>
+<span class="sd">        Per-cell vectors of shape ``[total_size, 3]``.</span>
+<span class="sd">    e_b : torch.Tensor</span>
+<span class="sd">        Magnetic field, of shape ``(3,)`` or ``(*spatial, 3)``.</span>
+<span class="sd">    spatial : tuple of int or None</span>
+<span class="sd">        The domain's spatial cell shape. Required for a spatially varying</span>
+<span class="sd">        field, ignored for a uniform one.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        ``v x e_b``, of the same shape as ``v``.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">e_b</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">e_b</span><span class="o">.</span><span class="n">expand_as</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">spatial</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">spatial</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">e_b</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_u_cross_eb_flat</span><span class="p">(</span>
+    <span class="n">vel_flat</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">e_b</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">total_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">spatial</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Compute u x e_b for a flat velocity field, returning a flat 3-component field.</span>
+
+<span class="sd">    For 2D, lifts to 3D and crosses with e_b.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vel_flat : torch.Tensor</span>
+<span class="sd">        Flat velocity field of shape ``[batch * dims * total_size]``.</span>
+<span class="sd">    e_b : torch.Tensor</span>
+<span class="sd">        Magnetic field in the layout produced by :func:`_prepare_e_b`.</span>
+<span class="sd">    total_size : int</span>
+<span class="sd">        Number of cells in the domain.</span>
+<span class="sd">    dims : int</span>
+<span class="sd">        Number of spatial dimensions (2 or 3).</span>
+<span class="sd">    spatial : tuple of int or None, optional</span>
+<span class="sd">        The domain's spatial cell shape, needed for a spatially varying field.</span>
+<span class="sd">        Default is None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        Flat 3-component field ``u x e_b`` of shape ``[batch * 3 * total_size]``.</span>
+<span class="sd">    """</span>
+    <span class="n">eb</span> <span class="o">=</span> <span class="n">e_b</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">vel_flat</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">vel_flat</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="c1"># [batch, dims, totalSize] -&gt; per-cell vectors [batch, totalSize, 3]; 2D fields are</span>
+    <span class="c1"># lifted to 3D with a zero z component</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">vel_flat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">total_size</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">v</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">v</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">])],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">cross_3d</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">_cross_with_e_b</span><span class="p">(</span><span class="n">vb</span><span class="p">,</span> <span class="n">eb</span><span class="p">,</span> <span class="n">spatial</span><span class="p">)</span> <span class="k">for</span> <span class="n">vb</span> <span class="ow">in</span> <span class="n">v</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">eb</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span>
+        <span class="k">else</span> <span class="n">_cross_with_e_b</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">eb</span><span class="p">,</span> <span class="n">spatial</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># All 3 components: x, y (in-plane for the Poisson RHS) and z (out-of-plane current</span>
+    <span class="c1"># source needed when B has a component in the 2D plane, e.g. the Hartmann case).</span>
+    <span class="c1"># Layout [batch][3][totalSize]</span>
+    <span class="k">return</span> <span class="n">cross_3d</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MHDSimulation">
+<a class="viewcode-back" href="../../../api/generated/phipict.MHDSimulation.html#phipict.MHDSimulation">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MHDSimulation</span><span class="p">(</span><span class="n">Simulation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""MHD simulation using the inductionless approximation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    domain: _C.Domain</span>
+<span class="sd">        The simulation domain (must be initialized via PrepareSolve).</span>
+
+<span class="sd">    dt: float</span>
+<span class="sd">        Time step size.</span>
+
+<span class="sd">    stuart_number: torch.Tensor</span>
+<span class="sd">        Stuart number N = Ha^2 / Re as a scalar tensor (learnable).</span>
+
+<span class="sd">    e_b: torch.Tensor</span>
+<span class="sd">        Magnetic field. Either a uniform direction of shape ``(3,)``, or a</span>
+<span class="sd">        spatially varying field of shape ``(3, *spatial)``, i.e. ``(3, nz, ny, nx)``</span>
+<span class="sd">        in 3D and ``(3, ny, nx)`` in 2D, whose spatial axes may be 1 to</span>
+<span class="sd">        broadcast, e.g. ``(3, 1, 1, nx)`` for a field that only varies along the</span>
+<span class="sd">        streamwise direction. It always carries 3 components, also in 2D. A spatially</span>
+<span class="sd">        varying field requires a single-block domain.</span>
+
+<span class="sd">    potential_tol: float, SolverTolerance or None</span>
+<span class="sd">        Tolerance for the electric potential Poisson solve. A float is an</span>
+<span class="sd">        absolute tolerance on ``||r||_2/sqrt(n)``; a</span>
+<span class="sd">        :class:`~phipict.solvers.tolerance.SolverTolerance` specifies</span>
+<span class="sd">        it relative to the RHS instead, which keeps its meaning across domain</span>
+<span class="sd">        sizes. If None, falls back to the dtype default.</span>
+
+<span class="sd">    potential_use_BiCG: bool</span>
+<span class="sd">        Whether to use BiCGStab for the potential solve. Defaults to False (uses CG).</span>
+
+<span class="sd">    potential_normalize: bool</span>
+<span class="sd">        Whether to subtract the mean from the electric potential result</span>
+<span class="sd">        (analogous to normalize_pressure_result). Defaults to True. Ignored when</span>
+<span class="sd">        a Dirichlet φ boundary anchors the matrix, since φ is then unique.</span>
+
+<span class="sd">    potential_non_ortho_flags: int</span>
+<span class="sd">        Non-orthogonal correction flags for the epot matrix. Defaults to 0.</span>
+
+<span class="sd">    potential_use_face_transform: bool</span>
+<span class="sd">        Whether to use face transforms for the epot matrix. Defaults to False.</span>
+
+<span class="sd">    potential_solve_max_iter: int</span>
+<span class="sd">        Maximum iterations for the potential linear solver. Defaults to 5000.</span>
+
+<span class="sd">    potential_solve_dtype: torch.dtype or None</span>
+<span class="sd">        Data type to use for the electric potential linear solve. If set (e.g.</span>
+<span class="sd">        ``torch.float64``), the Poisson matrix and RHS are up-cast to this dtype</span>
+<span class="sd">        for the solve and the result is cast back to the domain's global dtype,</span>
+<span class="sd">        so the rest of the simulation keeps running at the global precision.</span>
+<span class="sd">        Unlike ``solver_double_fallback`` (which only retries in double after a</span>
+<span class="sd">        single-precision solve fails), this solves at the requested precision</span>
+<span class="sd">        straight away. If None (default), the solve uses the global dtype.</span>
+
+<span class="sd">    exclude_potential_solve_gradients: bool</span>
+<span class="sd">        Whether to exclude gradients from the electric potential Poisson solve</span>
+<span class="sd">        (analogous to ``exclude_pressure_solve_gradients`` in the base</span>
+<span class="sd">        Simulation). When True, the potential solve runs under ``torch.no_grad``</span>
+<span class="sd">        so no gradients flow through it. Defaults to False.</span>
+
+<span class="sd">    potential_reuse_result: bool</span>
+<span class="sd">        Whether to warm start the potential solve from the previous step's phi</span>
+<span class="sd">        instead of a zero initial guess. Defaults to True. Forced off in</span>
+<span class="sd">        differentiable mode, where the solver backend ignores an initial guess.</span>
+
+<span class="sd">    potential_use_preconditioner: bool</span>
+<span class="sd">        Whether to solve the potential Poisson equation with AMG-preconditioned</span>
+<span class="sd">        CG instead of unpreconditioned CG. Defaults to False.</span>
+
+<span class="sd">        The unpreconditioned solve dominates the runtime of an MHD run, so this</span>
+<span class="sd">        is the main lever on it. The hierarchy is built once (on the host, via</span>
+<span class="sd">        pyamg) and reused for every subsequent solve, which is only sound because</span>
+<span class="sd">        the epot matrix values are constant for a run (see</span>
+<span class="sd">        :mod:`phipict.solvers.amg`). The first solve therefore pays a</span>
+<span class="sd">        noticeable setup cost.</span>
+
+<span class="sd">    potential_amg_options: dict or None</span>
+<span class="sd">        Extra keyword arguments for :func:`phipict.solvers.amg.hierarchy_for`</span>
+<span class="sd">        (and :func:`phipict.solvers.amg.build_amg_hierarchy`), e.g.</span>
+<span class="sd">        ``{"method": "ruge_stuben", "strength": 0.5, "num_pre_smooth": 2}`` or</span>
+<span class="sd">        ``{"reuse_interpolation": False}`` for a dedicated setup.</span>
+
+<span class="sd">    potential_return_best_result: bool</span>
+<span class="sd">        Whether a potential solve that fails to reach ``potential_tol`` should</span>
+<span class="sd">        fall back to its best iterate (True, the default) or raise</span>
+<span class="sd">        ``LinsolveError`` (False).</span>
+
+<span class="sd">    **kwargs</span>
+<span class="sd">        Additional keyword arguments passed to the parent Simulation class.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="MHDSimulation.__init__">
+<a class="viewcode-back" href="../../../api/generated/phipict.MHDSimulation.html#phipict.MHDSimulation.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Domain</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">stuart_number</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">e_b</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">potential_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">SolverTolerance</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">potential_use_BiCG</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">potential_normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">potential_non_ortho_flags</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">potential_use_face_transform</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">potential_solve_max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span>
+        <span class="n">potential_solve_dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">exclude_potential_solve_gradients</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">potential_reuse_result</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">potential_return_best_result</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">potential_use_preconditioner</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">potential_amg_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># a copy: the callbacks added below must not leak into the caller's hooks</span>
+        <span class="n">hooks</span><span class="p">,</span> <span class="n">prep_fn</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"hooks"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"prep_fn"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hooks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">prep_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Pass hooks or its former name prep_fn, not both."</span><span class="p">)</span>
+        <span class="n">hooks</span> <span class="o">=</span> <span class="n">Hooks</span><span class="p">(</span><span class="n">hooks</span> <span class="k">if</span> <span class="n">hooks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">prep_fn</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stuart_number</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="ow">or</span> <span class="n">stuart_number</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"stuart_number must be a scalar tensor."</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stuart_number</span> <span class="o">=</span> <span class="n">stuart_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_spatial</span> <span class="o">=</span> <span class="n">_prepare_e_b</span><span class="p">(</span>
+            <span class="n">e_b</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">domain</span><span class="o">.</span><span class="n">getSpatialDims</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_tol</span> <span class="o">=</span> <span class="n">potential_tol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_use_BiCG</span> <span class="o">=</span> <span class="n">potential_use_BiCG</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_normalize</span> <span class="o">=</span> <span class="n">potential_normalize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_non_ortho_flags</span> <span class="o">=</span> <span class="n">potential_non_ortho_flags</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_use_face_transform</span> <span class="o">=</span> <span class="n">potential_use_face_transform</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_solve_max_iter</span> <span class="o">=</span> <span class="n">potential_solve_max_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_solve_dtype</span> <span class="o">=</span> <span class="n">potential_solve_dtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exclude_potential_solve_gradients</span> <span class="o">=</span> <span class="n">exclude_potential_solve_gradients</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_return_best_result</span> <span class="o">=</span> <span class="n">potential_return_best_result</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_use_preconditioner</span> <span class="o">=</span> <span class="n">potential_use_preconditioner</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_amg_options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">potential_amg_options</span> <span class="ow">or</span> <span class="p">{})</span>
+
+        <span class="c1"># Cached AMG hierarchy plus the matrix it was built from. The epot matrix</span>
+        <span class="c1"># is built once and its values never change during a run, so one setup</span>
+        <span class="c1"># serves every solve, but PrepareSolve() reallocates it and a</span>
+        <span class="c1"># potential_solve_dtype cast produces a new object each step, so the</span>
+        <span class="c1"># identity of the matrix actually handed to the solver is the cache key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epot_amg_hierarchy</span><span class="p">:</span> <span class="n">AMGHierarchy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epot_amg_matrix</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_reuse_result</span> <span class="o">=</span> <span class="n">potential_reuse_result</span>
+
+        <span class="n">dims</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">getSpatialDims</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">=</span> <span class="n">dims</span>
+
+        <span class="c1"># Allocate epot fields, build the Laplacian matrix, and store flags so</span>
+        <span class="c1"># that domain.Copy() + domain.PrepareSolve() auto-rebuilds epot on copies</span>
+        <span class="n">domain</span><span class="o">.</span><span class="n">SetupEpotOnDomain</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_potential_non_ortho_flags</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_potential_use_face_transform</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Detect whether the Epot Poisson matrix is singular (pure Neumann). It is</span>
+        <span class="c1"># rank deficient unless a Dirichlet φ=0 face (e.g. an outflow) anchors the</span>
+        <span class="c1"># potential; insulating and thin-wall (THIN_WALL) faces both leave the row</span>
+        <span class="c1"># sums at zero</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_rank_deficient</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">_epot_matrix_is_anchored</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+
+        <span class="c1"># e_b on the compute device (cached on first use)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Set by set_magnetic_field() when the field changed since the last</span>
+        <span class="c1"># potential solve; the next step re-solves before forming the force</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_stale</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Init u x e_b</span>
+        <span class="n">total_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">getTotalSize</span><span class="p">()</span>
+        <span class="n">vel</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">velocityResult</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span> <span class="o">=</span> <span class="n">_compute_u_cross_eb_flat</span><span class="p">(</span>
+            <span class="n">vel</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_for</span><span class="p">(</span><span class="n">vel</span><span class="p">),</span>
+            <span class="n">total_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_spatial</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Register the magnetic step to run after each complete PISO step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Hook</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_magnetic_step_callback</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">add_lorentz_force</span><span class="p">(</span>
+            <span class="n">domain</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Domain</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># A field changed since the last magnetic step would otherwise be</span>
+            <span class="c1"># crossed with a current of the old field, which is not</span>
+            <span class="c1"># divergence-free, so bring u x e_b and phi up to date first</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_stale</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_magnetic_step_callback</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_potential_stale</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Face-based current density: discretely divergence-free, shape</span>
+            <span class="c1"># [totalSize*3]</span>
+            <span class="n">epot_result</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">epotResult</span>
+            <span class="k">assert</span> <span class="n">epot_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">J_flat</span> <span class="o">=</span> <span class="n">piso_diff</span><span class="o">.</span><span class="n">ComputeCurrentDensityFaceBased</span><span class="p">(</span>
+                <span class="n">domain</span><span class="p">,</span>
+                <span class="n">epot_result</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">J_flat</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+
+            <span class="c1"># F_L = N * (J x e_b), computed in Python for differentiability</span>
+            <span class="n">total_size</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">getTotalSize</span><span class="p">()</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">getBatchSize</span><span class="p">()</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stuart_number</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
+                <span class="n">device</span><span class="o">=</span><span class="n">domain</span><span class="o">.</span><span class="n">getDevice</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">epot_result</span><span class="o">.</span><span class="n">dtype</span>
+            <span class="p">)</span>
+            <span class="n">eb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_for</span><span class="p">(</span><span class="n">epot_result</span><span class="p">)</span>
+            <span class="n">J</span> <span class="o">=</span> <span class="n">J_flat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">total_size</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
+                <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+            <span class="p">)</span>  <span class="c1"># [B, totalSize, 3]</span>
+            <span class="k">if</span> <span class="n">eb</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">F_L</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">_cross_with_e_b</span><span class="p">(</span><span class="n">Jb</span><span class="p">,</span> <span class="n">eb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_spatial</span><span class="p">)</span> <span class="k">for</span> <span class="n">Jb</span> <span class="ow">in</span> <span class="n">J</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">F_L</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">_cross_with_e_b</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">eb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_spatial</span><span class="p">)</span>  <span class="c1"># [B, totalSize, 3]</span>
+
+            <span class="c1"># Flatten as [B * dims * totalSize] to match velocityResult layout</span>
+            <span class="n">F_L_flat</span> <span class="o">=</span> <span class="n">F_L</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">]</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">domain</span><span class="o">.</span><span class="n">getBlocks</span><span class="p">():</span>
+                <span class="n">F_L_block</span> <span class="o">=</span> <span class="n">_flat_to_block</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">F_L_flat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">)</span>
+
+                <span class="c1"># Add to existing velocity source if present</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">S</span> <span class="o">:=</span> <span class="n">block</span><span class="o">.</span><span class="n">velocitySource</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">S</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="o">*</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">F_L_block</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">2</span><span class="p">))</span>
+                    <span class="n">F_L_block</span> <span class="o">=</span> <span class="n">F_L_block</span> <span class="o">+</span> <span class="n">S</span>
+
+                <span class="n">block</span><span class="o">.</span><span class="n">setVelocitySource</span><span class="p">(</span><span class="n">F_L_block</span><span class="p">)</span>
+            <span class="n">domain</span><span class="o">.</span><span class="n">UpdateDomainData</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Hook</span><span class="o">.</span><span class="n">PRE_VELOCITY_SETUP</span><span class="p">,</span> <span class="n">add_lorentz_force</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">detach</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Detach the cross-step state kept outside the ``Domain``."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+        <span class="c1"># A field set through set_magnetic_field() may carry the action's graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e_b</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_device</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The magnetic field in the internal layout, see :func:`_prepare_e_b`.</span>
+
+<span class="sd">        Assigning restores a value previously read from here (the BPTT</span>
+<span class="sd">        checkpoint carry) and, unlike :meth:`set_magnetic_field`, never</span>
+<span class="sd">        triggers a potential re-solve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        torch.Tensor</span>
+<span class="sd">            The field, of shape ``(3,)`` if uniform or ``(*spatial, 3)`` if</span>
+<span class="sd">            spatially varying.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e_b</span>
+
+    <span class="nd">@magnetic_field</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_b</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Restore a magnetic field previously read from :attr:`magnetic_field`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        e_b : torch.Tensor</span>
+<span class="sd">            Field in the internal layout, see :func:`_prepare_e_b`.</span>
+<span class="sd">        """</span>
+        <span class="c1"># The restored field comes with the phi and u x e_b it was solved with</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e_b</span> <span class="o">=</span> <span class="n">e_b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_device</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_stale</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_b</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Replace the magnetic field between steps, keeping its autograd graph.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        e_b: torch.Tensor</span>
+<span class="sd">            The new magnetic field, ``(3,)`` or ``(3, *spatial)``.</span>
+<span class="sd">        """</span>
+        <span class="n">domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain</span>
+        <span class="k">assert</span> <span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="n">spatial</span> <span class="o">=</span> <span class="n">_validate_e_b</span><span class="p">(</span><span class="n">e_b</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">spatial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e_b_spatial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"set_magnetic_field cannot switch between a uniform and a "</span>
+                <span class="s2">"spatially varying field; construct the simulation with the "</span>
+                <span class="s2">"kind of field it will be driven with."</span>
+            <span class="p">)</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="n">e_b</span> <span class="k">if</span> <span class="n">spatial</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">e_b</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">domain</span><span class="o">.</span><span class="n">getDevice</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">domain</span><span class="o">.</span><span class="n">getDtype</span><span class="p">())</span>
+
+        <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e_b</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">field</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">field</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">detach</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_potential_stale</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e_b</span> <span class="o">=</span> <span class="n">field</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_device</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_epot_amg_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epot_mat</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">CSRmatrix</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AMGHierarchy</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return the AMG hierarchy for ``epot_mat``, building it on first use.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        epot_mat : phipict._C.CSRmatrix</span>
+<span class="sd">            System matrix of the electric potential solve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AMGHierarchy</span>
+<span class="sd">            The cached hierarchy, rebuilt if ``epot_mat`` is a different object</span>
+<span class="sd">            than the one it was built for.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epot_amg_matrix</span> <span class="ow">is</span> <span class="n">epot_mat</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epot_amg_hierarchy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epot_amg_hierarchy</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epot_amg_hierarchy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Epot matrix changed; rebuilding the AMG hierarchy."</span><span class="p">)</span>
+
+        <span class="n">options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_potential_amg_options</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"project_constant"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_rank_deficient</span><span class="p">)</span>
+
+        <span class="n">_LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">"Setting up the AMG hierarchy for the electric potential solve "</span>
+            <span class="s2">"(</span><span class="si">%d</span><span class="s2"> unknowns). The interpolation is shared with every operator of "</span>
+            <span class="s2">"the same sparsity pattern (e.g. the pressure matrix), so a host-side "</span>
+            <span class="s2">"setup happens at most once per grid."</span><span class="p">,</span>
+            <span class="n">epot_mat</span><span class="o">.</span><span class="n">getRows</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epot_amg_hierarchy</span> <span class="o">=</span> <span class="n">hierarchy_for</span><span class="p">(</span><span class="n">epot_mat</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epot_amg_matrix</span> <span class="o">=</span> <span class="n">epot_mat</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epot_amg_hierarchy</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">potential_tol</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">SolverTolerance</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Tolerance of the electric potential Poisson solve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float or SolverTolerance or None</span>
+<span class="sd">            The configured tolerance, or None to use the solver default.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_tol</span>
+
+    <span class="nd">@potential_tol</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">potential_tol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">potential_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">SolverTolerance</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Set the tolerance of the electric potential Poisson solve.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        potential_tol : float or SolverTolerance or None</span>
+<span class="sd">            Positive absolute tolerance, a relative :class:`SolverTolerance`,</span>
+<span class="sd">            or None to use the solver default.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If ``potential_tol`` is of none of the accepted types.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a numeric tolerance is not positive.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">potential_tol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">potential_tol</span><span class="p">,</span> <span class="n">SolverTolerance</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">potential_tol</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"potential_tol must be float, SolverTolerance or None."</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">potential_tol</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"potential_tol must be positive."</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_tol</span> <span class="o">=</span> <span class="n">potential_tol</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">potential_solve_max_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Iteration limit of the electric potential Poisson solve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The configured maximum number of solver iterations.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_solve_max_iter</span>
+
+    <span class="nd">@potential_solve_max_iter</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">potential_solve_max_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Set the iteration limit of the electric potential Poisson solve.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        max_iter : int</span>
+<span class="sd">            Positive maximum number of solver iterations.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``max_iter`` is not a positive integer.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">)</span> <span class="ow">or</span> <span class="n">max_iter</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"potential_solve_max_iter must be a positive integer."</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_solve_max_iter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_iter</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_e_b_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return e_b on ``ref``'s device and dtype, cached across steps.</span>
+
+<span class="sd">        A spatially varying field is large enough that re-uploading it on every</span>
+<span class="sd">        substep would be wasteful, so the converted copy is kept around and only</span>
+<span class="sd">        rebuilt when the device or dtype changes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ref : torch.Tensor</span>
+<span class="sd">            Tensor whose device and dtype the field is matched to.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        torch.Tensor</span>
+<span class="sd">            The magnetic field on ``ref``'s device and in ``ref``'s dtype.</span>
+<span class="sd">        """</span>
+        <span class="n">cached</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_device</span>
+        <span class="k">if</span> <span class="n">cached</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">cached</span><span class="o">.</span><span class="n">device</span> <span class="o">!=</span> <span class="n">ref</span><span class="o">.</span><span class="n">device</span> <span class="ow">or</span> <span class="n">cached</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">ref</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+            <span class="n">cached</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e_b</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">ref</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ref</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_device</span> <span class="o">=</span> <span class="n">cached</span>
+        <span class="k">return</span> <span class="n">cached</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_epot_initial_guess</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Domain</span><span class="p">,</span>
+        <span class="n">epot_rhs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Build an initial guess for the potential solve from the previous phi.</span>
+
+<span class="sd">        Returns None whenever the previous result cannot be used safely, in</span>
+<span class="sd">        which case the solver falls back to a zero initial guess.</span>
+
+<span class="sd">        The guess is cloned because the solver writes its iterate into ``x``</span>
+<span class="sd">        in place. When the matrix is singular it is also mean-centred to match</span>
+<span class="sd">        the mean-centred RHS: the constant vector is then in the nullspace, so</span>
+<span class="sd">        keeping the initial guess in the zero-mean subspace stops the constant</span>
+<span class="sd">        mode from being carried across time steps. With an anchored (full-rank)</span>
+<span class="sd">        matrix phi is uniquely determined and the previous result is reused as-is.</span>
+
+<span class="sd">        Offered on the differentiable path too: guesses are detached, so this</span>
+<span class="sd">        changes how fast the solve converges, not what it converges to.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        domain : phipict._C.Domain</span>
+<span class="sd">            Domain holding the previous potential result.</span>
+<span class="sd">        epot_rhs : torch.Tensor</span>
+<span class="sd">            Right-hand side of the current potential solve, used to check that</span>
+<span class="sd">            the previous result is still compatible.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        torch.Tensor or None</span>
+<span class="sd">            A detached, cloned initial guess, or None to solve from zero.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_reuse_result</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">prev</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">epotResult</span>
+        <span class="k">if</span> <span class="n">prev</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Guard against a domain that changed shape underneath us (e.g. after a</span>
+        <span class="c1"># reset or a resize) and against a poisoned previous solve</span>
+        <span class="k">if</span> <span class="n">prev</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">!=</span> <span class="n">epot_rhs</span><span class="o">.</span><span class="n">numel</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">prev</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">_LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">"Previous epot result is not finite, falling back to a zero "</span>
+                <span class="s2">"initial guess for the potential solve."</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">prev</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">epot_rhs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">epot_rhs</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">epot_rhs</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="c1"># .to() is a no-op returning self when device+dtype already match, so</span>
+        <span class="c1"># clone unconditionally to keep the domain's tensor un-mutated</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_rank_deficient</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">_subtract_env_mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">domain</span><span class="o">.</span><span class="n">getBatchSize</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_env_state_extras</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Getters of per-environment state outside the domain.</span>
+
+<span class="sd">        Adds ``u x e_b`` of the last magnetic step, which the Lorentz force of the</span>
+<span class="sd">        next substep uses.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of Callable[[], torch.Tensor or None]</span>
+<span class="sd">            Getters of flat tensors holding one slice per environment.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">[</span><span class="o">*</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_env_state_extras</span><span class="p">(),</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_magnetic_step_callback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Domain</span><span class="p">,</span>
+        <span class="n">time_step</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Perform the magnetic step after each PISO substep.</span>
+
+<span class="sd">        Steps:</span>
+<span class="sd">        1. Compute u x e_b from the divergence-free velocity.</span>
+<span class="sd">        2. Solve ∇²φ = ∇·(u x e_b) for the electric potential.</span>
+<span class="sd">        3. Copy φ to blocks.</span>
+
+<span class="sd">        ``max_iter`` overrides :attr:`potential_solve_max_iter` for this solve</span>
+<span class="sd">        only.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        domain : phipict._C.Domain</span>
+<span class="sd">            Domain the substep was taken on.</span>
+<span class="sd">        time_step : torch.Tensor</span>
+<span class="sd">            Time step size of the substep.</span>
+<span class="sd">        max_iter : int or None, optional</span>
+<span class="sd">            Iteration limit for this solve, overriding</span>
+<span class="sd">            :attr:`potential_solve_max_iter`. Default is None.</span>
+<span class="sd">        **kwargs : Any</span>
+<span class="sd">            Ignored; accepted so the callback matches the PISO callback</span>
+<span class="sd">            signature.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Whether the potential solve converged.</span>
+<span class="sd">        """</span>
+        <span class="n">total_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">getTotalSize</span><span class="p">()</span>
+        <span class="n">vel</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">velocityResult</span>
+
+        <span class="n">u_cross_eb</span> <span class="o">=</span> <span class="n">_compute_u_cross_eb_flat</span><span class="p">(</span>
+            <span class="n">vel</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_for</span><span class="p">(</span><span class="n">vel</span><span class="p">),</span>
+            <span class="n">total_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_e_b_spatial</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span> <span class="o">=</span> <span class="n">u_cross_eb</span>  <span class="c1"># store for add_lorentz_force</span>
+
+        <span class="n">batch</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">getBatchSize</span><span class="p">()</span>
+        <span class="n">u_cross_eb_inplane</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">total_size</span><span class="p">)[:,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">epot_rhs</span> <span class="o">=</span> <span class="n">piso_diff</span><span class="o">.</span><span class="n">ComputeEpotRHS</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">u_cross_eb_inplane</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">epot_rhs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+
+        <span class="n">domain</span><span class="o">.</span><span class="n">setEpotRHS</span><span class="p">(</span><span class="n">epot_rhs</span><span class="p">)</span>
+        <span class="n">domain</span><span class="o">.</span><span class="n">UpdateDomainData</span><span class="p">()</span>
+
+        <span class="c1"># Optionally solve the Poisson system at a higher precision than the</span>
+        <span class="c1"># global dtype: up-cast the matrix + RHS, solve, then cast back</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">domain</span><span class="o">.</span><span class="n">epotRHS</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">domain</span><span class="o">.</span><span class="n">Epot</span><span class="p">,</span> <span class="n">_C</span><span class="o">.</span><span class="n">CSRmatrix</span><span class="p">)</span>
+
+        <span class="n">global_dtype</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">epotRHS</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="n">epot_mat</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">Epot</span>
+        <span class="n">epot_rhs</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">epotRHS</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_potential_solve_dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_solve_dtype</span> <span class="o">!=</span> <span class="n">global_dtype</span>
+        <span class="p">):</span>
+            <span class="n">epot_mat</span> <span class="o">=</span> <span class="n">epot_mat</span><span class="o">.</span><span class="n">toType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_potential_solve_dtype</span><span class="p">)</span>
+            <span class="n">epot_rhs</span> <span class="o">=</span> <span class="n">epot_rhs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_potential_solve_dtype</span><span class="p">)</span>
+
+        <span class="c1"># Project the RHS onto the compatible subspace of the singular system (per</span>
+        <span class="c1"># batched environment)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_rank_deficient</span><span class="p">:</span>
+            <span class="n">epot_rhs</span> <span class="o">=</span> <span class="n">_subtract_env_mean</span><span class="p">(</span><span class="n">epot_rhs</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epot_initial_guess</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">epot_rhs</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exclude_potential_solve_gradients</span>
+            <span class="k">else</span> <span class="n">nullcontext</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="n">phi</span><span class="p">,</span> <span class="n">solve_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_solve</span><span class="p">(</span>
+                <span class="n">epot_mat</span><span class="p">,</span>
+                <span class="n">epot_rhs</span><span class="p">,</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportArgumentType]</span>
+                <span class="n">use_BiCG</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_potential_use_BiCG</span><span class="p">,</span>
+                <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_potential_tol</span><span class="p">,</span>
+                <span class="n">matrix_rank_deficient</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_potential_rank_deficient</span><span class="p">,</span>
+                <span class="c1"># Same nullspace, same reason as the pressure solve: the forward</span>
+                <span class="c1"># RHS is mean-projected above, the adjoint RHS is an incoming</span>
+                <span class="c1"># gradient and has to be projected in backward</span>
+                <span class="n">adjoint_rank_deficient</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_potential_rank_deficient</span><span class="p">,</span>
+                <span class="n">return_best_result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_potential_return_best_result</span><span class="p">,</span>
+                <span class="n">max_iter</span><span class="o">=</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_potential_solve_max_iter</span> <span class="k">if</span> <span class="n">max_iter</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">max_iter</span>
+                <span class="p">),</span>
+                <span class="n">amg_hierarchy</span><span class="o">=</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_epot_amg_hierarchy</span><span class="p">(</span><span class="n">epot_mat</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_use_preconditioner</span>
+                    <span class="k">else</span> <span class="kc">None</span>
+                <span class="p">),</span>
+                <span class="n">tag</span><span class="o">=</span><span class="s2">"epot"</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+
+        <span class="c1"># Cast the result back to the global dtype before storing it</span>
+        <span class="k">if</span> <span class="n">phi</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">global_dtype</span><span class="p">:</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">global_dtype</span><span class="p">)</span>
+
+        <span class="c1"># Only meaningful while the constant mode is free: with an anchored</span>
+        <span class="c1"># matrix φ is uniquely determined and shifting it would break the</span>
+        <span class="c1"># Dirichlet face it is anchored against</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_normalize</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_rank_deficient</span><span class="p">:</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="n">_subtract_env_mean</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+        <span class="n">domain</span><span class="o">.</span><span class="n">setEpotResult</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+        <span class="n">domain</span><span class="o">.</span><span class="n">UpdateDomainData</span><span class="p">()</span>
+
+        <span class="n">piso_diff</span><span class="o">.</span><span class="n">CopyEpotResultToBlocks</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">solve_ok</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_current_divergence_free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Solve the potential for the current velocity so that div(j) = 0.</span>
+
+<span class="sd">        The MHD counterpart of</span>
+<span class="sd">        :meth:`~phipict.core.piso_simulation.PisoSimulation.make_divergence_free`:</span>
+<span class="sd">        where that one runs pressure corrections until the velocity is</span>
+<span class="sd">        divergence free, this one recomputes ``u x e_b`` from the velocity</span>
+<span class="sd">        currently stored in the blocks and solves the Poisson equation</span>
+<span class="sd">        ``laplacian(phi) = div(u x e_b)`` once, which is exactly the condition</span>
+<span class="sd">        ``div(j) = 0`` for ``j = -grad(phi) + u x e_b``. The velocity is left</span>
+<span class="sd">        untouched.</span>
+
+<span class="sd">        Unlike ``make_divergence_free`` there is no ``iterations`` argument:</span>
+<span class="sd">        with the velocity held fixed the Poisson problem is linear and does not</span>
+<span class="sd">        change between repeats, so a second solve would reproduce the first.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        max_iter : int, optional</span>
+<span class="sd">            Maximum iterations for the potential solve, overriding</span>
+<span class="sd">            :attr:`potential_solve_max_iter` for this call. Default is 1000.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Whether the potential solve succeeded.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_domain</span><span class="p">()</span>
+        <span class="n">domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain</span>
+
+        <span class="c1"># Pull the (possibly user-set) block velocities into domain.velocityResult,</span>
+        <span class="c1"># which is what the magnetic step reads</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="n">piso_diff</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">differentiable</span> <span class="k">else</span> <span class="n">_C</span>
+        <span class="n">backend</span><span class="o">.</span><span class="n">CopyVelocityResultFromBlocks</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+        <span class="n">domain</span><span class="o">.</span><span class="n">UpdateDomainData</span><span class="p">()</span>
+
+        <span class="c1"># The magnetic step does not use the time step, so any valid value works</span>
+        <span class="n">time_step</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">cpu_device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">domain</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">solve_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_magnetic_step_callback</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">)</span>
+
+        <span class="c1"># phi now matches the current field and velocity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potential_stale</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">solve_ok</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current_density</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">block</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Block</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Compute the current density j = -grad(phi) + u x e_b for a block.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        block : _C.Block</span>
+<span class="sd">            The block for which to compute the current density.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        torch.Tensor</span>
+<span class="sd">            Current density field, shape [1, dims, *spatial] for 3D</span>
+<span class="sd">            or [1, 3, *spatial] for 2D (lifted to 3 components).</span>
+<span class="sd">        """</span>
+        <span class="n">domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain</span>
+
+        <span class="k">assert</span> <span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">domain</span><span class="o">.</span><span class="n">epotResult</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+
+        <span class="c1"># grad(phi): flat vector field [dims * totalSize]</span>
+        <span class="n">grad_phi_flat</span> <span class="o">=</span> <span class="n">_C</span><span class="o">.</span><span class="n">ComputeFieldGradient</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">domain</span><span class="o">.</span><span class="n">epotResult</span><span class="p">)</span>
+
+        <span class="c1"># Extract block portion of grad(phi)</span>
+        <span class="n">grad_phi</span> <span class="o">=</span> <span class="n">_flat_to_block</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">grad_phi_flat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">)</span>
+
+        <span class="c1"># Extract block portion of u x e_b</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">"No u x e_b available. Run at least one simulation step first."</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># u_cross_eb_flat has 3 components for 2D; extract all 3 per block</span>
+            <span class="n">u_cross_eb</span> <span class="o">=</span> <span class="n">_flat_to_block</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="c1"># Lift grad(phi) from 2 to 3 components for consistent subtraction</span>
+            <span class="n">grad_phi</span> <span class="o">=</span> <span class="n">_lift_2d_to_3d</span><span class="p">(</span><span class="n">grad_phi</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_cross_eb</span> <span class="o">=</span> <span class="n">_flat_to_block</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_u_cross_eb_flat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="o">-</span><span class="n">grad_phi</span> <span class="o">+</span> <span class="n">u_cross_eb</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

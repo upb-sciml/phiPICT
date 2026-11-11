@@ -1,0 +1,26 @@
+﻿phipict.meshing.connect
+=======================
+
+.. automodule:: phipict.meshing.connect
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      find_connections
+      match_faces
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Connection
+      Orientation
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      NonConformingInterfaceError
+   

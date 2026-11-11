@@ -1,0 +1,46 @@
+﻿phipict.meshing.MeshBlock
+=========================
+
+.. currentmodule:: phipict.meshing
+
+.. autoclass:: MeshBlock
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MeshBlock.__init__
+      ~MeshBlock.cell_centers
+      ~MeshBlock.concat
+      ~MeshBlock.extend
+      ~MeshBlock.extrude
+      ~MeshBlock.face_coords
+      ~MeshBlock.flip
+      ~MeshBlock.from_coords
+      ~MeshBlock.mirror
+      ~MeshBlock.permute
+      ~MeshBlock.rotate
+      ~MeshBlock.scale
+      ~MeshBlock.split
+      ~MeshBlock.translate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MeshBlock.cells
+      ~MeshBlock.n_cells
+      ~MeshBlock.name
+      ~MeshBlock.ndims
+      ~MeshBlock.coords
+      ~MeshBlock.patches
+   
+   

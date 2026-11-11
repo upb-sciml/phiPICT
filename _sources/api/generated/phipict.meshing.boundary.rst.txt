@@ -1,0 +1,23 @@
+﻿phipict.meshing.boundary
+========================
+
+.. automodule:: phipict.meshing.boundary
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      apply_boundary
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      FacePatches
+      FreeSlip
+      Inflow
+      Outflow
+      Patch
+      Wall
+   

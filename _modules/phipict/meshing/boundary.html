@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>phipict.meshing.boundary &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../../../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meshing/index.html">Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">phipict.meshing.boundary</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for phipict.meshing.boundary</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2026 Jannis Becktepe</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the "License");</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an "AS IS" BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">"""Named boundary patches and their conditions.</span>
+
+<span class="sd">A :class:`Patch` names a set of block faces (``"inlet"``, ``"walls"``) and carries</span>
+<span class="sd">the condition the faces get when the mesh becomes a domain::</span>
+
+<span class="sd">    inlet = pm.Patch("inlet", pm.Inflow((1.0, 0.0)))</span>
+<span class="sd">    walls = pm.Patch("walls", pm.Wall())</span>
+<span class="sd">    block = pm.make_box((0, 0), (4, 1), cells=(64, 16),</span>
+<span class="sd">                   patches=pm.FacePatches(x_minus=inlet, y_minus=walls, y_plus=walls))</span>
+
+<span class="sd">Imported meshes carry the patch names of the file; their conditions are set with</span>
+<span class="sd">:meth:`Mesh.set_bc &lt;phipict.meshing.Mesh.set_bc&gt;`. Conditions of further fields</span>
+<span class="sd">(passive scalar, electric potential) are given as ``extra`` specs of</span>
+<span class="sd">:mod:`phipict.bc`.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">replace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeAlias</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict</span><span class="w"> </span><span class="kn">import</span> <span class="n">_C</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict</span><span class="w"> </span><span class="kn">import</span> <span class="n">bc</span> <span class="k">as</span> <span class="n">_bc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.bc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Face</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"BoundarySpec"</span><span class="p">,</span>
+    <span class="s2">"FacePatches"</span><span class="p">,</span>
+    <span class="s2">"FreeSlip"</span><span class="p">,</span>
+    <span class="s2">"Inflow"</span><span class="p">,</span>
+    <span class="s2">"Outflow"</span><span class="p">,</span>
+    <span class="s2">"Patch"</span><span class="p">,</span>
+    <span class="s2">"VelocityLike"</span><span class="p">,</span>
+    <span class="s2">"VelocityProfile"</span><span class="p">,</span>
+    <span class="s2">"Wall"</span><span class="p">,</span>
+    <span class="s2">"apply_boundary"</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">VelocityProfile</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span>
+<span class="n">VelocityLike</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">VelocityProfile</span>
+
+
+<div class="viewcode-block" id="Wall">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.Wall">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Wall</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""No-slip wall, optionally moving (``CloseBoundary``).</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    velocity : torch.Tensor or sequence of float or Callable or None</span>
+<span class="sd">        Wall velocity: static ``(u, v[, w])``, varying ``[1, dims, *face]``, or a</span>
+<span class="sd">        profile, see :class:`Inflow`. None is a resting wall.</span>
+<span class="sd">    extra : tuple of phipict.bc.Spec</span>
+<span class="sd">        Further conditions, e.g. ``bc.Potential.ThinWall(cw=0.1)``.</span>
+<span class="sd">    """</span>
+
+    <span class="n">velocity</span><span class="p">:</span> <span class="n">VelocityLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">extra</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_bc</span><span class="o">.</span><span class="n">Spec</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="FreeSlip">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.FreeSlip">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FreeSlip</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Free-slip wall or symmetry plane (``OpenBoundary``).</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    extra : tuple of phipict.bc.Spec</span>
+<span class="sd">        Further conditions.</span>
+<span class="sd">    """</span>
+
+    <span class="n">extra</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_bc</span><span class="o">.</span><span class="n">Spec</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="Inflow">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.Inflow">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Inflow</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Prescribed inflow velocity.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    velocity : torch.Tensor or sequence of float or Callable</span>
+<span class="sd">        Inflow velocity: static ``(u, v[, w])``, varying ``[1, dims, *face]``, or a</span>
+<span class="sd">        profile ``fn(points) -&gt; velocities`` that maps the face cell centres</span>
+<span class="sd">        ``[n, dims]`` to velocities ``[n, dims]``, e.g.</span>
+<span class="sd">        ``lambda p: torch.stack([1 - p[:, 1] ** 2, 0 * p[:, 1]], 1)``.</span>
+<span class="sd">    extra : tuple of phipict.bc.Spec</span>
+<span class="sd">        Further conditions.</span>
+<span class="sd">    """</span>
+
+    <span class="n">velocity</span><span class="p">:</span> <span class="n">VelocityLike</span>
+    <span class="n">extra</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_bc</span><span class="o">.</span><span class="n">Spec</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="Outflow">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.Outflow">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Outflow</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Outflow with a varying velocity.</span>
+
+<span class="sd">    The face velocity must be updated during the simulation, e.g. with the</span>
+<span class="sd">    callback of :meth:`Mesh.outflow_hook &lt;phipict.meshing.Mesh.outflow_hook&gt;`.</span>
+<span class="sd">    :meth:`Mesh.get_domain &lt;phipict.meshing.Mesh.get_domain&gt;` scales the initial</span>
+<span class="sd">    velocity so that the outflow balances the inflow.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    velocity : torch.Tensor or sequence of float or Callable or None</span>
+<span class="sd">        Initial velocity, as for :class:`Inflow`. None is the outward face</span>
+<span class="sd">        normal, which the flux balance then scales.</span>
+<span class="sd">    extra : tuple of phipict.bc.Spec</span>
+<span class="sd">        Further conditions, e.g. ``bc.Potential.Open()``.</span>
+<span class="sd">    """</span>
+
+    <span class="n">velocity</span><span class="p">:</span> <span class="n">VelocityLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">extra</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_bc</span><span class="o">.</span><span class="n">Spec</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span></div>
+
+
+
+<span class="n">BoundarySpec</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Wall</span> <span class="o">|</span> <span class="n">FreeSlip</span> <span class="o">|</span> <span class="n">Inflow</span> <span class="o">|</span> <span class="n">Outflow</span>
+
+
+<div class="viewcode-block" id="Patch">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.Patch">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Patch</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A named group of boundary faces with a condition.</span>
+
+<span class="sd">    Patches are compared by identity; a mesh keeps one patch per name.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the patch.</span>
+<span class="sd">    bc : BoundarySpec or None</span>
+<span class="sd">        Condition of the faces. None until set, e.g. for imported patches.</span>
+<span class="sd">    kind : str or None</span>
+<span class="sd">        Type of the patch in the file it was read from (``"wall"``, ``"patch"``,</span>
+<span class="sd">        ...), for information.</span>
+<span class="sd">    """</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">bc</span><span class="p">:</span> <span class="n">BoundarySpec</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">bc</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"Patch(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">, bc=</span><span class="si">{</span><span class="n">bc</span><span class="si">}</span><span class="s2">)"</span></div>
+
+
+
+<span class="n">_FACE_FIELDS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"x_minus"</span><span class="p">,</span> <span class="s2">"x_plus"</span><span class="p">,</span> <span class="s2">"y_minus"</span><span class="p">,</span> <span class="s2">"y_plus"</span><span class="p">,</span> <span class="s2">"z_minus"</span><span class="p">,</span> <span class="s2">"z_plus"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="FacePatches">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.FacePatches">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FacePatches</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The patch of each face of a block; None for faces without one.</span>
+
+<span class="sd">    Faces without a patch are connected to other blocks, or made periodic.</span>
+<span class="sd">    """</span>
+
+    <span class="n">x_minus</span><span class="p">:</span> <span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">x_plus</span><span class="p">:</span> <span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">y_minus</span><span class="p">:</span> <span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">y_plus</span><span class="p">:</span> <span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">z_minus</span><span class="p">:</span> <span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">z_plus</span><span class="p">:</span> <span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">face</span><span class="p">:</span> <span class="n">Face</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">patch</span><span class="p">:</span> <span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_FACE_FIELDS</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">face</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">patch</span>
+
+<div class="viewcode-block" id="FacePatches.set">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.FacePatches.set">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">face</span><span class="p">:</span> <span class="n">Face</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">patch</span><span class="p">:</span> <span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FacePatches</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""A copy with the patch of one face replaced."""</span>
+        <span class="k">return</span> <span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">_FACE_FIELDS</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">face</span><span class="p">)]:</span> <span class="n">patch</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="FacePatches.items">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.FacePatches.items">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Face</span><span class="p">,</span> <span class="n">Patch</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""The faces that have a patch, with their patch."""</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">patch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">Face</span><span class="p">(</span><span class="n">_FACE_FIELDS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)),</span> <span class="n">patch</span></div>
+
+
+<div class="viewcode-block" id="FacePatches.from_faces">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.FacePatches.from_faces">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_faces</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">patches</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FacePatches</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""From one entry per face, in :class:`~phipict.Face` order."""</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">_FACE_FIELDS</span><span class="p">,</span> <span class="n">patches</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="FacePatches.as_list">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.FacePatches.as_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""One entry per face, in :class:`~phipict.Face` order."""</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">_FACE_FIELDS</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="FacePatches.uniform">
+<a class="viewcode-back" href="../../../meshing/boundaries.html#phipict.meshing.FacePatches.uniform">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">uniform</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">patch</span><span class="p">:</span> <span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ndims</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FacePatches</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Every face of an ``ndims`` block with the same patch."""</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_faces</span><span class="p">([</span><span class="n">patch</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ndims</span><span class="p">))</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_velocity_tensor</span><span class="p">(</span>
+    <span class="n">velocity</span><span class="p">:</span> <span class="n">VelocityLike</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Block</span><span class="p">,</span> <span class="n">face</span><span class="p">:</span> <span class="n">Face</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">velocity</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">velocity</span><span class="p">):</span>
+        <span class="n">centres</span> <span class="o">=</span> <span class="n">_face_centres</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">face</span><span class="p">)</span>  <span class="c1"># [*face, dims]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">centres</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">vel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">velocity</span><span class="p">(</span><span class="n">centres</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dims</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ref</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vel</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">centres</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">numel</span><span class="p">(),</span> <span class="n">dims</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"The velocity profile of face </span><span class="si">{</span><span class="n">face</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> of block '</span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' "</span>
+                <span class="sa">f</span><span class="s2">"must return [</span><span class="si">{</span><span class="n">shape</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">dims</span><span class="si">}</span><span class="s2">], got </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">vel</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+        <span class="c1"># [1, dims, (z,) y, x] with size 1 along the face normal</span>
+        <span class="n">vel</span> <span class="o">=</span> <span class="n">vel</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">vel</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+    <span class="n">vel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">velocity</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ref</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">vel</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">vel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Velocity of face </span><span class="si">{</span><span class="n">face</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> of block '</span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' needs </span><span class="si">{</span><span class="n">dims</span><span class="si">}</span><span class="s2"> "</span>
+                <span class="sa">f</span><span class="s2">"components, got </span><span class="si">{</span><span class="n">vel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+        <span class="n">vel</span> <span class="o">=</span> <span class="n">vel</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vel</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_face_centres</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Block</span><span class="p">,</span> <span class="n">face</span><span class="p">:</span> <span class="n">Face</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Face cell centres ``[(z,) y, x, dims]``, size 1 along the face normal."""</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">vertexCoordinates</span>
+    <span class="k">if</span> <span class="n">coords</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Block '</span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' has no vertex coordinates for a profile."</span>
+        <span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>  <span class="c1"># [dims, (z+1,) y+1, x+1]</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">normal</span> <span class="o">=</span> <span class="n">dims</span> <span class="o">-</span> <span class="n">face</span><span class="o">.</span><span class="n">axis</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">face</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">normal</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dims</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="n">normal</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_face_normals</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Block</span><span class="p">,</span> <span class="n">face</span><span class="p">:</span> <span class="n">Face</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Outward unit normals of the face cells ``[(z,) y, x, dims]``."""</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">vertexCoordinates</span>
+    <span class="k">if</span> <span class="n">coords</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Block '</span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' has no vertex coordinates."</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">normal_dim</span> <span class="o">=</span> <span class="n">dims</span> <span class="o">-</span> <span class="n">face</span><span class="o">.</span><span class="n">axis</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">normal_dim</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">face</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">normal_dim</span><span class="p">,</span> <span class="n">last</span> <span class="k">if</span> <span class="n">upper</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">inner</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">normal_dim</span><span class="p">,</span> <span class="n">last</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">upper</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">other</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dims</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="n">normal_dim</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">cells</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">t</span>
+
+    <span class="k">if</span> <span class="n">dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">d</span><span class="p">,)</span> <span class="o">=</span> <span class="n">other</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">f</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span> <span class="o">=</span> <span class="n">other</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">d1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">d2</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">d2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">vector_norm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">outward</span> <span class="o">=</span> <span class="n">cells</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">-</span> <span class="n">cells</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+    <span class="n">sign</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sign</span><span class="p">((</span><span class="n">n</span> <span class="o">*</span> <span class="n">outward</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">sign</span><span class="p">)</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_boundary</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="n">BoundarySpec</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Block</span><span class="p">,</span> <span class="n">face</span><span class="p">:</span> <span class="n">Face</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set up a face of a solver block with a condition.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spec : BoundarySpec</span>
+<span class="sd">        The condition.</span>
+<span class="sd">    block : phipict.Block</span>
+<span class="sd">        The block.</span>
+<span class="sd">    face : Face</span>
+<span class="sd">        The face.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If ``spec`` is not a boundary spec.</span>
+<span class="sd">    """</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">Face</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">Wall</span> <span class="o">|</span> <span class="n">Inflow</span><span class="p">):</span>
+        <span class="n">block</span><span class="o">.</span><span class="n">CloseBoundary</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">face</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">velocity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vel</span> <span class="o">=</span> <span class="n">_velocity_tensor</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">face</span><span class="p">)</span>
+            <span class="n">_bc</span><span class="o">.</span><span class="n">set_bc</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">face</span><span class="p">,</span> <span class="n">_bc</span><span class="o">.</span><span class="n">Velocity</span><span class="o">.</span><span class="n">Dirichlet</span><span class="p">(</span><span class="n">vel</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">FreeSlip</span><span class="p">):</span>
+        <span class="n">block</span><span class="o">.</span><span class="n">OpenBoundary</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">face</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">Outflow</span><span class="p">):</span>
+        <span class="n">block</span><span class="o">.</span><span class="n">CloseBoundary</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">face</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">velocity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vel</span> <span class="o">=</span> <span class="n">_velocity_tensor</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">face</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">velocity</span>
+            <span class="n">normals</span> <span class="o">=</span> <span class="n">_face_normals</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">face</span><span class="p">)</span>  <span class="c1"># [*face, dims]</span>
+            <span class="n">vel</span> <span class="o">=</span> <span class="n">normals</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">ref</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="n">_bc</span><span class="o">.</span><span class="n">set_bc</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">face</span><span class="p">,</span> <span class="n">_bc</span><span class="o">.</span><span class="n">Velocity</span><span class="o">.</span><span class="n">Dirichlet</span><span class="p">(</span><span class="n">vel</span><span class="p">))</span>
+        <span class="n">bound</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">getBoundary</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">face</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bound</span><span class="p">,</span> <span class="n">_C</span><span class="o">.</span><span class="n">FixedBoundary</span><span class="p">)</span>
+        <span class="n">bound</span><span class="o">.</span><span class="n">makeVelocityVarying</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not a boundary spec: </span><span class="si">{</span><span class="n">spec</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">extra</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">extra</span><span class="p">:</span>
+        <span class="n">_bc</span><span class="o">.</span><span class="n">set_bc</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">face</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

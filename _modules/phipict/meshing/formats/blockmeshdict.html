@@ -1,0 +1,882 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>phipict.meshing.formats.blockmeshdict &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../../../../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../meshing/index.html">Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../meshing/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../meshing/boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../meshing/connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../meshing/blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../meshing/blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../meshing/grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../meshing/edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../meshing/quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../meshing/io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../meshing/migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">phipict.meshing.formats.blockmeshdict</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for phipict.meshing.formats.blockmeshdict</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2026 Jannis Becktepe</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the "License");</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an "AS IS" BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">"""OpenFOAM ``blockMeshDict`` files.</span>
+
+<span class="sd">blockMesh describes a mesh exactly like a :class:`~phipict.meshing.BlockMesh`:</span>
+<span class="sd">vertices, hex blocks with cells and grading, curved edges and boundary patches.</span>
+<span class="sd">Reading one gives the same mesh blockMesh would make, as phiPICT blocks::</span>
+
+<span class="sd">    mesh = pm.read_blockmeshdict("system/blockMeshDict")</span>
+<span class="sd">    mesh.set_bc("inlet", pm.Inflow((1.0, 0.0)))</span>
+<span class="sd">    mesh.set_bc("outlet", pm.Outflow())</span>
+
+<span class="sd">Supported: ``convertToMeters``/``scale``, ``$macros``, ``hex`` blocks with</span>
+<span class="sd">``simpleGrading`` or ``edgeGrading`` (with multi-grading), ``arc`` (point and</span>
+<span class="sd">``origin`` forms), ``polyLine``, ``spline`` and ``BSpline`` edges, ``boundary``</span>
+<span class="sd">(and the old ``patches``) with ``defaultPatch``, and ``cyclic`` patches, which</span>
+<span class="sd">become periodic connections. A mesh whose blocks have one cell between two</span>
+<span class="sd">``empty`` patches is read as a 2D mesh.</span>
+
+<span class="sd">Patch types map to conditions: ``wall`` to :class:`~phipict.meshing.Wall`,</span>
+<span class="sd">``symmetry``/``symmetryPlane`` to :class:`~phipict.meshing.FreeSlip`; other</span>
+<span class="sd">patches (``patch``, ...) are named only, so their condition must be set.</span>
+
+<span class="sd">Not supported: ``#calc`` and other directives, projected vertices, edges and</span>
+<span class="sd">faces, ``mergePatchPairs`` with entries, and collapsed hexes.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.bc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Face</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..blockmesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockMesh</span><span class="p">,</span> <span class="n">Hex</span><span class="p">,</span> <span class="n">Quad</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..boundary</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundarySpec</span><span class="p">,</span> <span class="n">FacePatches</span><span class="p">,</span> <span class="n">FreeSlip</span><span class="p">,</span> <span class="n">Patch</span><span class="p">,</span> <span class="n">Wall</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..curves</span><span class="w"> </span><span class="kn">import</span> <span class="n">Arc</span><span class="p">,</span> <span class="n">BSpline</span><span class="p">,</span> <span class="n">EdgeShape</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Points</span><span class="p">,</span> <span class="n">Polyline</span><span class="p">,</span> <span class="n">Spline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..grading</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Cluster</span><span class="p">,</span>
+    <span class="n">Geometric</span><span class="p">,</span>
+    <span class="n">Grading</span><span class="p">,</span>
+    <span class="n">MultiGrading</span><span class="p">,</span>
+    <span class="n">Segment</span><span class="p">,</span>
+    <span class="n">Simple</span><span class="p">,</span>
+    <span class="n">Symmetric</span><span class="p">,</span>
+    <span class="n">Uniform</span><span class="p">,</span>
+    <span class="n">_Reversed</span><span class="p">,</span>
+    <span class="n">as_grading</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..quality</span><span class="w"> </span><span class="kn">import</span> <span class="n">cell_volumes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..shapes</span><span class="w"> </span><span class="kn">import</span> <span class="n">CornerEdge</span><span class="p">,</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">Interpolation</span><span class="p">,</span> <span class="n">QuadEdges</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.foam</span><span class="w"> </span><span class="kn">import</span> <span class="n">FoamDict</span><span class="p">,</span> <span class="n">FoamParseError</span><span class="p">,</span> <span class="n">parse_foam</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"load_blockmeshdict"</span><span class="p">,</span> <span class="s2">"read_blockmeshdict"</span><span class="p">,</span> <span class="s2">"write_blockmeshdict"</span><span class="p">]</span>
+
+<span class="n">_DTYPE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float64</span>
+
+<span class="c1">#: solver corner (i + 2 j + 4 k) -&gt; blockMesh hex vertex</span>
+<span class="n">_SOLVER_TO_FOAM</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+<span class="c1">#: blockMesh edgeGrading order as (start, end) blockMesh vertices</span>
+<span class="n">_FOAM_EDGES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="c1">#: blockMesh vertices of each solver face</span>
+<span class="n">_FACE_FOAM_VERTICES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">Face</span><span class="o">.</span><span class="n">X_MINUS</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="n">Face</span><span class="o">.</span><span class="n">X_PLUS</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+    <span class="n">Face</span><span class="o">.</span><span class="n">Y_MINUS</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="n">Face</span><span class="o">.</span><span class="n">Y_PLUS</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+    <span class="n">Face</span><span class="o">.</span><span class="n">Z_MINUS</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="n">Face</span><span class="o">.</span><span class="n">Z_PLUS</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+<span class="p">}</span>
+<span class="n">_PATCH_BC</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">Wall</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">FreeSlip</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"wall"</span><span class="p">:</span> <span class="n">Wall</span><span class="p">,</span>
+    <span class="s2">"symmetry"</span><span class="p">:</span> <span class="n">FreeSlip</span><span class="p">,</span>
+    <span class="s2">"symmetryPlane"</span><span class="p">:</span> <span class="n">FreeSlip</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_entry</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">FoamDict</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">default</span>
+        <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The blockMeshDict has no '</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">' entry."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_single</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">' should have a single value, got </span><span class="si">{</span><span class="n">values</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_grading</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Grading</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A grading from a number or a multi-grading list."""</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Simple</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">MultiGrading</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="p">))</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported grading </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_point</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected a point (x y z), got </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_DTYPE</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Hex</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A parsed hex block."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">vertices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">cells</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">gradings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Grading</span><span class="p">],</span>
+        <span class="n">zone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span>  <span class="c1"># blockMesh order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cells</span> <span class="o">=</span> <span class="n">cells</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradings</span> <span class="o">=</span> <span class="n">gradings</span>  <span class="c1"># 12, blockMesh edge order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zone</span> <span class="o">=</span> <span class="n">zone</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_blocks</span><span class="p">(</span><span class="n">items</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">_Hex</span><span class="p">]:</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"hex"</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Only 'hex' blocks are supported, got </span><span class="si">{</span><span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+        <span class="n">verts</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="n">zone</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">zone</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">cells</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">kind</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">grading</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">verts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"A hex needs 8 vertices, got </span><span class="si">{</span><span class="n">verts</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">verts</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Collapsed hex </span><span class="si">{</span><span class="n">verts</span><span class="si">}</span><span class="s2"> is not supported."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"A hex needs 3 cell counts, got </span><span class="si">{</span><span class="n">cells</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"simpleGrading"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grading</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"simpleGrading needs 3 values, got </span><span class="si">{</span><span class="n">grading</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+            <span class="n">gs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_grading</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">grading</span><span class="p">]</span>
+            <span class="n">per_edge</span> <span class="o">=</span> <span class="p">[</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">[</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">[</span><span class="n">gs</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">4</span>
+        <span class="k">elif</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"edgeGrading"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grading</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">12</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"edgeGrading needs 12 values, got </span><span class="si">{</span><span class="n">grading</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+            <span class="n">per_edge</span> <span class="o">=</span> <span class="p">[</span><span class="n">_grading</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">grading</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown grading type </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+        <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">_Hex</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">verts</span><span class="p">],</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cells</span><span class="p">],</span> <span class="n">per_edge</span><span class="p">,</span> <span class="n">zone</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">blocks</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_edges</span><span class="p">(</span>
+    <span class="n">items</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">vertices</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">EdgeShape</span><span class="p">]]:</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">EdgeShape</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+        <span class="n">kind</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">v0</span><span class="p">,</span> <span class="n">v1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">3</span>
+        <span class="n">shape</span><span class="p">:</span> <span class="n">EdgeShape</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"arc"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"origin"</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span>
+                        <span class="s2">"arc origin with a radius factor is not supported."</span>
+                    <span class="p">)</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="n">Arc</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">_point</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">scale</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="n">Arc</span><span class="p">(</span><span class="n">through</span><span class="o">=</span><span class="n">_point</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">scale</span><span class="p">))</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">kind</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"polyLine"</span><span class="p">,</span> <span class="s2">"spline"</span><span class="p">,</span> <span class="s2">"simpleSpline"</span><span class="p">,</span> <span class="s2">"polySpline"</span><span class="p">,</span> <span class="s2">"BSpline"</span><span class="p">):</span>
+            <span class="n">pts</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">_point</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+                <span class="k">if</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_DTYPE</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"polyLine"</span><span class="p">:</span> <span class="n">Polyline</span><span class="p">,</span> <span class="s2">"BSpline"</span><span class="p">:</span> <span class="n">BSpline</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">Spline</span><span class="p">)</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"line"</span><span class="p">:</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">Line</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Edge type </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2"> is not supported."</span><span class="p">)</span>
+        <span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v0</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">shape</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">edges</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_PatchInfo</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">faces</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">neighbour</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">=</span> <span class="n">kind</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">faces</span> <span class="o">=</span> <span class="n">faces</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neighbour</span> <span class="o">=</span> <span class="n">neighbour</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_boundary</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">FoamDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">_PatchInfo</span><span class="p">]:</span>
+    <span class="n">patches</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="s2">"boundary"</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="n">_single</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"boundary"</span><span class="p">],</span> <span class="s2">"boundary"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">spec</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Patch </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> needs a dictionary."</span><span class="p">)</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="n">_single</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"patch"</span><span class="p">]),</span> <span class="s2">"type"</span><span class="p">)</span>
+            <span class="n">faces</span> <span class="o">=</span> <span class="n">_single</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"faces"</span><span class="p">,</span> <span class="p">[[]]),</span> <span class="s2">"faces"</span><span class="p">)</span>
+            <span class="n">nb</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"neighbourPatch"</span><span class="p">)</span>
+            <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">_PatchInfo</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">kind</span><span class="p">),</span>
+                    <span class="n">faces</span><span class="p">,</span>
+                    <span class="kc">None</span> <span class="k">if</span> <span class="n">nb</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">_single</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="s2">"neighbourPatch"</span><span class="p">)),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+    <span class="k">elif</span> <span class="s2">"patches"</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="n">_single</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"patches"</span><span class="p">],</span> <span class="s2">"patches"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">),</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="n">kind</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_PatchInfo</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">kind</span><span class="p">),</span> <span class="n">faces</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">patches</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_read</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FoamDict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">parse_foam</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load_blockmeshdict</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">ndims</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">BlockMesh</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""The blocks of a blockMeshDict as an unbuilt :class:`BlockMesh`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str or pathlib.Path</span>
+<span class="sd">        The blockMeshDict.</span>
+<span class="sd">    ndims : int or None, optional</span>
+<span class="sd">        2 or 3; None detects 2D meshes from their empty patches.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    BlockMesh</span>
+<span class="sd">        The blocks with their edges and patches.</span>
+<span class="sd">    dict</span>
+<span class="sd">        Information for :func:`read_blockmeshdict`: the cyclic patch pairs and the</span>
+<span class="sd">        default patch.</span>
+<span class="sd">    """</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">_read</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">"mergePatchPairs"</span> <span class="ow">in</span> <span class="n">d</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">_single</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"mergePatchPairs"</span><span class="p">],</span> <span class="s2">"mergePatchPairs"</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span>
+            <span class="s2">"mergePatchPairs is not supported (non-conforming interfaces)."</span>
+        <span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_single</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"convertToMeters"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"scale"</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">])),</span> <span class="s2">"scale"</span><span class="p">))</span>
+    <span class="n">raw_vertices</span> <span class="o">=</span> <span class="n">_single</span><span class="p">(</span><span class="n">_entry</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"vertices"</span><span class="p">),</span> <span class="s2">"vertices"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw_vertices</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Unsupported vertex </span><span class="si">{</span><span class="n">v</span><span class="si">!r}</span><span class="s2"> (named or projected vertices)."</span>
+            <span class="p">)</span>
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">_point</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw_vertices</span><span class="p">])</span>
+    <span class="n">hexes</span> <span class="o">=</span> <span class="n">_parse_blocks</span><span class="p">(</span><span class="n">_single</span><span class="p">(</span><span class="n">_entry</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"blocks"</span><span class="p">),</span> <span class="s2">"blocks"</span><span class="p">))</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">_parse_edges</span><span class="p">(</span><span class="n">_single</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"edges"</span><span class="p">,</span> <span class="p">[[]]),</span> <span class="s2">"edges"</span><span class="p">),</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span>
+    <span class="n">patch_infos</span> <span class="o">=</span> <span class="n">_parse_boundary</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="c1"># patch of every (block, face), by the vertex sets of the faces</span>
+    <span class="n">face_of</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Face</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">b</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hexes</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">face</span><span class="p">,</span> <span class="n">fv</span> <span class="ow">in</span> <span class="n">_FACE_FOAM_VERTICES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">face_of</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fv</span><span class="p">),</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">face</span><span class="p">)</span>
+            <span class="p">)</span>
+    <span class="n">patch_faces</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Face</span><span class="p">],</span> <span class="n">_PatchInfo</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">patch_infos</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">info</span><span class="o">.</span><span class="n">faces</span><span class="p">:</span>
+            <span class="n">owners</span> <span class="o">=</span> <span class="n">face_of</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">f</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">owners</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Face </span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2"> of patch '</span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' is not a block face."</span>
+                <span class="p">)</span>
+            <span class="k">for</span> <span class="n">owner</span> <span class="ow">in</span> <span class="n">owners</span><span class="p">:</span>
+                <span class="n">patch_faces</span><span class="p">[</span><span class="n">owner</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
+
+    <span class="c1"># 2D: one cell between two empty patches in every block</span>
+    <span class="n">empty_axis</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexes</span><span class="p">)):</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">infos</span> <span class="o">=</span> <span class="p">[</span><span class="n">patch_faces</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">b</span><span class="p">,</span> <span class="n">Face</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">+</span> <span class="n">s</span><span class="p">)))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"empty"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">infos</span><span class="p">):</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="n">empty_axis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ndims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ndims</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">empty_axis</span><span class="p">)</span> <span class="k">else</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">b</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">ea</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">hexes</span><span class="p">,</span> <span class="n">empty_axis</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">ea</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Block </span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2"> has no pair of empty patches for a 2D mesh."</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">h</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">ea</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Block </span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">h</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">ea</span><span class="p">]</span><span class="si">}</span><span class="s2"> cells between its empty patches."</span>
+                <span class="p">)</span>
+
+    <span class="n">patches</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Patch</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">patch_infos</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"empty"</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"cyclic"</span><span class="p">:</span>
+            <span class="n">patches</span><span class="p">[</span><span class="n">info</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Patch</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"cyclic"</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">bc_cls</span> <span class="o">=</span> <span class="n">_PATCH_BC</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">kind</span><span class="p">)</span>
+        <span class="n">bc</span><span class="p">:</span> <span class="n">BoundarySpec</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">bc_cls</span><span class="p">()</span> <span class="k">if</span> <span class="n">bc_cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">patches</span><span class="p">[</span><span class="n">info</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Patch</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">bc</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">kind</span><span class="p">)</span>
+
+    <span class="n">edge_shapes</span> <span class="o">=</span> <span class="p">{</span><span class="nb">frozenset</span><span class="p">((</span><span class="n">v0</span><span class="p">,</span> <span class="n">v1</span><span class="p">)):</span> <span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">v0</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">}</span>
+    <span class="n">bm</span> <span class="o">=</span> <span class="n">BlockMesh</span><span class="p">()</span>
+    <span class="n">normal</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">b</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hexes</span><span class="p">):</span>
+        <span class="n">solver_verts</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">_SOLVER_TO_FOAM</span><span class="p">[</span><span class="n">c</span><span class="p">]]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)]</span>
+        <span class="c1"># per-edge gradings (and shapes), keyed by solver corners</span>
+        <span class="n">foam_to_solver</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="p">:</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_SOLVER_TO_FOAM</span><span class="p">)}</span>
+        <span class="n">corner_edges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CornerEdge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">f1</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_FOAM_EDGES</span><span class="p">):</span>
+            <span class="n">s0</span><span class="p">,</span> <span class="n">s1</span> <span class="o">=</span> <span class="n">foam_to_solver</span><span class="p">[</span><span class="n">f0</span><span class="p">],</span> <span class="n">foam_to_solver</span><span class="p">[</span><span class="n">f1</span><span class="p">]</span>
+            <span class="n">g0</span><span class="p">,</span> <span class="n">g1</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">f0</span><span class="p">],</span> <span class="n">h</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">f1</span><span class="p">]</span>
+            <span class="n">shape</span><span class="p">:</span> <span class="n">EdgeShape</span> <span class="o">=</span> <span class="n">Line</span><span class="p">()</span>
+            <span class="n">known</span> <span class="o">=</span> <span class="n">edge_shapes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">((</span><span class="n">g0</span><span class="p">,</span> <span class="n">g1</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="n">known</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="n">known</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">known</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">g0</span> <span class="k">else</span> <span class="n">known</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reversed</span><span class="p">()</span>
+            <span class="n">corner_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CornerEdge</span><span class="p">(</span><span class="n">s0</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">Edge</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">gradings</span><span class="p">[</span><span class="n">k</span><span class="p">])))</span>
+        <span class="n">faces</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Patch</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">6</span>
+        <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="n">Face</span><span class="p">:</span>
+            <span class="n">pinfo</span> <span class="o">=</span> <span class="n">patch_faces</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">b</span><span class="p">,</span> <span class="n">face</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">pinfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">pinfo</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">patches</span><span class="p">:</span>
+                <span class="n">faces</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">face</span><span class="p">)]</span> <span class="o">=</span> <span class="n">patches</span><span class="p">[</span><span class="n">pinfo</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">zone</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"block</span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">Hex</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">vertices</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">solver_verts</span><span class="p">],</span>
+                    <span class="nb">tuple</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">cells</span><span class="p">),</span>  <span class="c1"># type: ignore[arg-type]</span>
+                    <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">corner_edges</span><span class="p">,</span>
+                    <span class="n">FacePatches</span><span class="o">.</span><span class="n">from_faces</span><span class="p">(</span><span class="n">faces</span><span class="p">),</span>
+                    <span class="n">name</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">empty_axis</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">ax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="c1"># cyclic permutation that moves the empty axis to local z</span>
+        <span class="n">perm</span> <span class="o">=</span> <span class="p">[(</span><span class="n">ax</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">ax</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span><span class="p">,</span> <span class="n">ax</span><span class="p">]</span>
+        <span class="n">corners3</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">vertices</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">solver_verts</span><span class="p">])</span>
+        <span class="c1"># corner (i, j) of the quad: local axes perm[0], perm[1] at 0 along perm[2]</span>
+        <span class="n">quad_corners</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="n">perm</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">|</span> <span class="p">(</span><span class="n">j</span> <span class="o">&lt;&lt;</span> <span class="n">perm</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">quad_corners</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corners3</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="c1"># the global axis the empty direction points along</span>
+        <span class="n">span</span> <span class="o">=</span> <span class="n">corners3</span><span class="p">[</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">ax</span><span class="p">]</span> <span class="o">-</span> <span class="n">corners3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n_axis</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">span</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">argmax</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">normal</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">normal</span> <span class="o">=</span> <span class="n">n_axis</span>
+        <span class="k">elif</span> <span class="n">normal</span> <span class="o">!=</span> <span class="n">n_axis</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="s2">"The empty patches of the blocks are not parallel."</span><span class="p">)</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="p">[(</span><span class="n">n_axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">n_axis</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span><span class="p">]</span>
+        <span class="n">quad2</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">quad_corners</span><span class="p">]</span>
+        <span class="c1"># edges and gradings of the two in-plane axes at 0 along the empty axis</span>
+        <span class="n">by_corners</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="p">(</span><span class="n">ce</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">ce</span><span class="o">.</span><span class="n">end</span><span class="p">):</span> <span class="n">ce</span><span class="o">.</span><span class="n">edge</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ce</span><span class="o">.</span><span class="n">edge</span><span class="p">,</span> <span class="n">Edge</span><span class="p">)</span> <span class="k">else</span> <span class="n">Edge</span><span class="p">(</span><span class="n">ce</span><span class="o">.</span><span class="n">edge</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ce</span> <span class="ow">in</span> <span class="n">corner_edges</span>
+        <span class="p">}</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="n">perm</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">|</span> <span class="p">(</span><span class="n">j</span> <span class="o">&lt;&lt;</span> <span class="n">perm</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="n">qe</span> <span class="o">=</span> <span class="n">QuadEdges</span><span class="p">(</span>
+            <span class="n">y_minus</span><span class="o">=</span><span class="n">_quad_edge</span><span class="p">(</span><span class="n">by_corners</span><span class="p">,</span> <span class="n">keep</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="n">y_plus</span><span class="o">=</span><span class="n">_quad_edge</span><span class="p">(</span><span class="n">by_corners</span><span class="p">,</span> <span class="n">keep</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+            <span class="n">x_minus</span><span class="o">=</span><span class="n">_quad_edge</span><span class="p">(</span><span class="n">by_corners</span><span class="p">,</span> <span class="n">keep</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="n">x_plus</span><span class="o">=</span><span class="n">_quad_edge</span><span class="p">(</span><span class="n">by_corners</span><span class="p">,</span> <span class="n">keep</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+        <span class="p">)</span>
+        <span class="n">pf</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">faces</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">perm</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+            <span class="n">faces</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">perm</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">faces</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">perm</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+            <span class="n">faces</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">perm</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">]</span>
+        <span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">Quad</span><span class="p">(</span>
+                <span class="n">quad2</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">perm</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">h</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">perm</span><span class="p">[</span><span class="mi">1</span><span class="p">]]),</span>
+                <span class="kc">None</span><span class="p">,</span>
+                <span class="n">qe</span><span class="p">,</span>
+                <span class="n">FacePatches</span><span class="o">.</span><span class="n">from_faces</span><span class="p">(</span><span class="n">pf</span><span class="p">),</span>
+                <span class="n">name</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">done</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">patch_infos</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="s2">"cyclic"</span> <span class="ow">or</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">neighbour</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">p</span><span class="o">.</span><span class="n">neighbour</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">patches</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cyclic patch '</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' has no neighbourPatch."</span><span class="p">)</span>
+        <span class="n">bm</span><span class="o">.</span><span class="n">add_periodic</span><span class="p">(</span><span class="n">patches</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">patches</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">neighbour</span><span class="p">])</span>
+        <span class="n">done</span> <span class="o">|=</span> <span class="p">{</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">neighbour</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">bm</span><span class="p">,</span> <span class="p">{</span><span class="s2">"default"</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"defaultPatch"</span><span class="p">)}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_quad_edge</span><span class="p">(</span>
+    <span class="n">by_corners</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Edge</span><span class="p">],</span> <span class="n">keep</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">c0</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">c1</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Edge</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The in-plane edge from hex corner ``c0`` to ``c1``, projected to 2D."""</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">by_corners</span><span class="p">:</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">by_corners</span><span class="p">[(</span><span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">by_corners</span><span class="p">[(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c0</span><span class="p">)]</span>
+        <span class="n">grading</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">grading</span><span class="o">.</span><span class="n">reversed</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">grading</span><span class="p">,</span> <span class="n">Grading</span><span class="p">)</span> <span class="k">else</span> <span class="n">e</span><span class="o">.</span><span class="n">grading</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">reversed</span><span class="p">(),</span> <span class="n">grading</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Edge</span><span class="p">(</span><span class="n">_project_shape</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">keep</span><span class="p">),</span> <span class="n">e</span><span class="o">.</span><span class="n">grading</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_project_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <span class="n">EdgeShape</span><span class="p">,</span> <span class="n">keep</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">EdgeShape</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">Line</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">shape</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">Arc</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">shape</span><span class="o">.</span><span class="n">through</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Arc</span><span class="p">(</span><span class="n">through</span><span class="o">=</span><span class="n">shape</span><span class="o">.</span><span class="n">through</span><span class="p">[</span><span class="n">keep</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">shape</span><span class="o">.</span><span class="n">center</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">Arc</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">shape</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="n">keep</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">Polyline</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">shape</span><span class="p">)(</span><span class="n">shape</span><span class="o">.</span><span class="n">points</span><span class="p">[:,</span> <span class="n">keep</span><span class="p">])</span>
+    <span class="k">raise</span> <span class="n">FoamParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cannot project the edge </span><span class="si">{</span><span class="n">shape</span><span class="si">!r}</span><span class="s2"> to 2D."</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="read_blockmeshdict">
+<a class="viewcode-back" href="../../../../meshing/io.html#phipict.meshing.read_blockmeshdict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_blockmeshdict</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">ndims</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rel_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mesh</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Read a blockMeshDict as a :class:`~phipict.meshing.Mesh`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str or pathlib.Path</span>
+<span class="sd">        The blockMeshDict.</span>
+<span class="sd">    ndims : int or None, optional</span>
+<span class="sd">        2 or 3; None reads meshes with one cell between empty patches as 2D.</span>
+<span class="sd">    rel_tol : float, optional</span>
+<span class="sd">        Face matching tolerance, see :class:`~phipict.meshing.Mesh`. Default is</span>
+<span class="sd">        1e-4.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Mesh</span>
+<span class="sd">        The mesh with its connections, periodic (cyclic) connections and patches.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FoamParseError</span>
+<span class="sd">        If the file uses unsupported features.</span>
+<span class="sd">    """</span>
+    <span class="n">bm</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">load_blockmeshdict</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ndims</span><span class="p">)</span>
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">rel_tol</span><span class="o">=</span><span class="n">rel_tol</span><span class="p">)</span>
+    <span class="c1"># blockMesh keeps the orientation of 3D hexes; a 2D block whose empty axis</span>
+    <span class="c1"># points against the plane normal comes out mirrored</span>
+    <span class="k">if</span> <span class="n">mesh</span><span class="o">.</span><span class="n">ndims</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">cell_volumes</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">):</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">cell_volumes</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">b</span>
+        <span class="p">)</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]</span>
+    <span class="n">free</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">free_faces</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">free</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">"defaultFaces"</span>
+        <span class="n">kind</span> <span class="o">=</span> <span class="s2">"empty"</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">_single</span><span class="p">(</span><span class="n">default</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">]),</span> <span class="s2">"name"</span><span class="p">))</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">_single</span><span class="p">(</span><span class="n">default</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="p">[</span><span class="n">kind</span><span class="p">]),</span> <span class="s2">"type"</span><span class="p">))</span>
+        <span class="n">bc_cls</span> <span class="o">=</span> <span class="n">_PATCH_BC</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span>
+        <span class="n">patch</span> <span class="o">=</span> <span class="n">Patch</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bc_cls</span><span class="p">()</span> <span class="k">if</span> <span class="n">bc_cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">)</span>
+        <span class="n">mesh</span><span class="o">.</span><span class="n">assign_patch</span><span class="p">(</span><span class="n">free</span><span class="p">,</span> <span class="n">patch</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mesh</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fmt</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.15g</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fmt_point</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">"("</span> <span class="o">+</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_fmt</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="s2">")"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fmt_grading</span><span class="p">(</span><span class="n">g</span><span class="p">:</span> <span class="n">Grading</span><span class="p">,</span> <span class="n">cells</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">Uniform</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"1"</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">Simple</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">ratio</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">Symmetric</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"((0.5 0.5 </span><span class="si">{</span><span class="n">_fmt</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">ratio</span><span class="p">)</span><span class="si">}</span><span class="s2">) (0.5 0.5 </span><span class="si">{</span><span class="n">_fmt</span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">g</span><span class="o">.</span><span class="n">ratio</span><span class="p">)</span><span class="si">}</span><span class="s2">))"</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">MultiGrading</span><span class="p">):</span>
+        <span class="n">segs</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">_fmt</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">_fmt</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">cells</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">_fmt</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">ratio</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">segments</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">segs</span><span class="si">}</span><span class="s2">)"</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">Geometric</span><span class="p">)</span> <span class="ow">and</span> <span class="n">g</span><span class="o">.</span><span class="n">cluster</span> <span class="o">!=</span> <span class="n">Cluster</span><span class="o">.</span><span class="n">BOTH</span><span class="p">:</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">ratio</span> <span class="o">**</span> <span class="p">(</span><span class="n">cells</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">total</span> <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">cluster</span> <span class="o">==</span> <span class="n">Cluster</span><span class="o">.</span><span class="n">START</span> <span class="k">else</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">total</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">_Reversed</span><span class="p">):</span>
+        <span class="n">inner</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">grading</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="n">MultiGrading</span><span class="p">):</span>
+            <span class="n">mirrored</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">Segment</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">cells</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">s</span><span class="o">.</span><span class="n">ratio</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">inner</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">return</span> <span class="n">_fmt_grading</span><span class="p">(</span><span class="n">MultiGrading</span><span class="p">(</span><span class="n">mirrored</span><span class="p">),</span> <span class="n">cells</span><span class="p">)</span>
+        <span class="n">rev</span> <span class="o">=</span> <span class="n">inner</span><span class="o">.</span><span class="n">reversed</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rev</span><span class="p">,</span> <span class="n">_Reversed</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_fmt_grading</span><span class="p">(</span><span class="n">rev</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The grading </span><span class="si">{</span><span class="n">g</span><span class="si">!r}</span><span class="s2"> has no blockMesh equivalent."</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fmt_edge</span><span class="p">(</span><span class="n">v0</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">v1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="n">EdgeShape</span><span class="p">,</span> <span class="n">lift</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">Line</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">Arc</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">shape</span><span class="o">.</span><span class="n">through</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"    arc </span><span class="si">{</span><span class="n">v0</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">v1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">_fmt_point</span><span class="p">(</span><span class="n">lift</span><span class="p">(</span><span class="n">shape</span><span class="o">.</span><span class="n">through</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">assert</span> <span class="n">shape</span><span class="o">.</span><span class="n">center</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"    arc </span><span class="si">{</span><span class="n">v0</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">v1</span><span class="si">}</span><span class="s2"> origin </span><span class="si">{</span><span class="n">_fmt_point</span><span class="p">(</span><span class="n">lift</span><span class="p">(</span><span class="n">shape</span><span class="o">.</span><span class="n">center</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">Points</span><span class="p">):</span>
+        <span class="n">pts</span> <span class="o">=</span> <span class="n">shape</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">kind</span> <span class="o">=</span> <span class="s2">"polyLine"</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">Spline</span><span class="p">):</span>
+        <span class="n">pts</span><span class="p">,</span> <span class="n">kind</span> <span class="o">=</span> <span class="n">shape</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="s2">"spline"</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">BSpline</span><span class="p">):</span>
+        <span class="n">pts</span><span class="p">,</span> <span class="n">kind</span> <span class="o">=</span> <span class="n">shape</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="s2">"BSpline"</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">Polyline</span><span class="p">):</span>
+        <span class="n">pts</span><span class="p">,</span> <span class="n">kind</span> <span class="o">=</span> <span class="n">shape</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="s2">"polyLine"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The edge </span><span class="si">{</span><span class="n">shape</span><span class="si">!r}</span><span class="s2"> has no blockMesh equivalent."</span><span class="p">)</span>
+    <span class="n">inner</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_fmt_point</span><span class="p">(</span><span class="n">lift</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"    </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">v0</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">v1</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">inner</span><span class="si">}</span><span class="s2">)"</span>
+
+
+<div class="viewcode-block" id="write_blockmeshdict">
+<a class="viewcode-back" href="../../../../meshing/io.html#phipict.meshing.write_blockmeshdict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_blockmeshdict</span><span class="p">(</span>
+    <span class="n">block_mesh</span><span class="p">:</span> <span class="n">BlockMesh</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">thickness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Write the blocks of a :class:`~phipict.meshing.BlockMesh` as a blockMeshDict.</span>
+
+<span class="sd">    Cells and gradings are written as blockMesh ``edgeGrading``, curved edges as</span>
+<span class="sd">    ``arc``/``polyLine``/``spline``/``BSpline``, and patches with their</span>
+<span class="sd">    condition's type (``wall``, ``symmetryPlane``) or the type they were read</span>
+<span class="sd">    with. A 2D mesh is written with one cell of ``thickness`` in z between</span>
+<span class="sd">    ``empty`` patches.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    block_mesh : BlockMesh</span>
+<span class="sd">        The blocks.</span>
+<span class="sd">    path : str or pathlib.Path</span>
+<span class="sd">        Output file.</span>
+<span class="sd">    thickness : float, optional</span>
+<span class="sd">        Extent in z of a 2D mesh. Default is 1.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If a grading or edge has no blockMesh equivalent (e.g. tanh), or a block</span>
+<span class="sd">        uses PICT row interpolation.</span>
+<span class="sd">    """</span>
+    <span class="n">resolved</span> <span class="o">=</span> <span class="n">block_mesh</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="n">ndims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">resolved</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cells</span><span class="p">)</span>
+    <span class="n">neighbours</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block_mesh</span><span class="o">.</span><span class="n">periodic</span><span class="p">}</span>
+    <span class="n">neighbours</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">b</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block_mesh</span><span class="o">.</span><span class="n">periodic</span><span class="p">})</span>
+    <span class="n">n_verts</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">resolved</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+    <span class="n">verts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_verts</span><span class="p">,</span> <span class="n">ndims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_DTYPE</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">resolved</span><span class="p">:</span>
+        <span class="n">verts</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">vertices</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">corners</span>
+    <span class="k">if</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">all_verts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">verts</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_verts</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_DTYPE</span><span class="p">)],</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">verts</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_verts</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">thickness</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_DTYPE</span><span class="p">)],</span> <span class="mi">1</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">lift</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">_DTYPE</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_DTYPE</span><span class="p">)])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">all_verts</span> <span class="o">=</span> <span class="n">verts</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">lift</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">_DTYPE</span><span class="p">)</span>
+
+    <span class="n">block_lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">edge_lines</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">patch_faces</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">resolved</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">!=</span> <span class="n">Interpolation</span><span class="o">.</span><span class="n">TFI</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Block '</span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' uses </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">interpolation</span><span class="si">}</span><span class="s2">, which blockMesh lacks."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">solver</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">vertices</span> <span class="o">+</span> <span class="p">[</span><span class="n">v</span> <span class="o">+</span> <span class="n">n_verts</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">vertices</span><span class="p">]</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">cells</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">solver</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">cells</span><span class="p">)</span>
+        <span class="n">foam</span> <span class="o">=</span> <span class="p">[</span><span class="n">solver</span><span class="p">[</span><span class="n">_SOLVER_TO_FOAM</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)]</span>
+        <span class="n">gradings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f0</span><span class="p">,</span> <span class="n">f1</span> <span class="ow">in</span> <span class="n">_FOAM_EDGES</span><span class="p">:</span>
+            <span class="n">s0</span><span class="p">,</span> <span class="n">s1</span> <span class="o">=</span> <span class="n">_SOLVER_TO_FOAM</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">f0</span><span class="p">),</span> <span class="n">_SOLVER_TO_FOAM</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">s0</span> <span class="o">^</span> <span class="n">s1</span><span class="p">)</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">gradings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"1"</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">others</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndims</span><span class="p">)</span> <span class="k">if</span> <span class="n">b</span> <span class="o">!=</span> <span class="n">a</span><span class="p">]</span>
+            <span class="n">lo</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">s0</span><span class="p">,</span> <span class="n">s1</span><span class="p">)</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(((</span><span class="n">lo</span> <span class="o">&gt;&gt;</span> <span class="n">b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">others</span><span class="p">))</span>
+            <span class="n">edge</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="n">e</span><span class="p">]</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">as_grading</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">grading</span><span class="p">)</span>
+            <span class="n">gradings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_fmt_grading</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">cells</span><span class="p">[</span><span class="n">a</span><span class="p">]))</span>
+            <span class="n">layers</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_verts</span><span class="p">)</span> <span class="k">if</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span>
+            <span class="k">for</span> <span class="n">off</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
+                <span class="n">g0</span><span class="p">,</span> <span class="n">g1</span> <span class="o">=</span> <span class="n">solver</span><span class="p">[</span><span class="n">lo</span><span class="p">]</span> <span class="o">+</span> <span class="n">off</span><span class="p">,</span> <span class="n">solver</span><span class="p">[</span><span class="n">lo</span> <span class="o">|</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">a</span><span class="p">)]</span> <span class="o">+</span> <span class="n">off</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">((</span><span class="n">g0</span><span class="p">,</span> <span class="n">g1</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">edge_lines</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">_fmt_edge</span><span class="p">(</span><span class="n">g0</span><span class="p">,</span> <span class="n">g1</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">lift</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">edge_lines</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span>
+                <span class="k">if</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">off</span> <span class="o">==</span> <span class="n">n_verts</span><span class="p">:</span>
+                    <span class="k">break</span>
+        <span class="n">block_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"    hex (</span><span class="si">{</span><span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="w"> </span><span class="n">foam</span><span class="p">))</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> "</span>
+            <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="w"> </span><span class="n">cells</span><span class="p">))</span><span class="si">}</span><span class="s2">) "</span>
+            <span class="sa">f</span><span class="s2">"edgeGrading (</span><span class="si">{</span><span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gradings</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">face</span><span class="p">,</span> <span class="n">patch</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">fv</span> <span class="o">=</span> <span class="p">[</span><span class="n">foam</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_FACE_FOAM_VERTICES</span><span class="p">[</span><span class="n">face</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">patch</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">neighbours</span><span class="p">:</span>
+                <span class="n">kind</span> <span class="o">=</span> <span class="s2">"cyclic"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">kind</span> <span class="o">=</span> <span class="p">{</span><span class="n">Wall</span><span class="p">:</span> <span class="s2">"wall"</span><span class="p">,</span> <span class="n">FreeSlip</span><span class="p">:</span> <span class="s2">"symmetryPlane"</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="nb">type</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">bc</span><span class="p">),</span> <span class="n">patch</span><span class="o">.</span><span class="n">kind</span> <span class="ow">or</span> <span class="s2">"patch"</span>
+                <span class="p">)</span>  <span class="c1"># type: ignore[call-overload]</span>
+            <span class="n">patch_faces</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="p">[]))[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fv</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="p">(</span><span class="n">Face</span><span class="o">.</span><span class="n">Z_MINUS</span><span class="p">,</span> <span class="n">Face</span><span class="o">.</span><span class="n">Z_PLUS</span><span class="p">):</span>
+                <span class="n">fv</span> <span class="o">=</span> <span class="p">[</span><span class="n">foam</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_FACE_FOAM_VERTICES</span><span class="p">[</span><span class="n">face</span><span class="p">]]</span>
+                <span class="n">patch_faces</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"frontAndBack"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"empty"</span><span class="p">,</span> <span class="p">[]))[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fv</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">"FoamFile</span><span class="se">\n</span><span class="s2">{</span><span class="se">\n</span><span class="s2">    version     2.0;</span><span class="se">\n</span><span class="s2">    format      ascii;</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    class       dictionary;</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"    object      blockMeshDict;</span><span class="se">\n</span><span class="s2">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"// written by phipict.meshing</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"convertToMeters 1;</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"vertices</span><span class="se">\n</span><span class="s2">(</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    </span><span class="si">{</span><span class="n">_fmt_point</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">all_verts</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">);</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"blocks</span><span class="se">\n</span><span class="s2">(</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">block_lines</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">);</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"edges</span><span class="se">\n</span><span class="s2">(</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">edge_lines</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">);</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"boundary</span><span class="se">\n</span><span class="s2">("</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span> <span class="ow">in</span> <span class="n">patch_faces</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">fl</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"            (</span><span class="si">{</span><span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">))</span><span class="si">}</span><span class="s2">)"</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">)</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">        neighbourPatch </span><span class="si">{</span><span class="n">neighbours</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="s2">;"</span> <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"cyclic"</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"    </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">    </span><span class="se">{{\n</span><span class="s2">        type </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">;</span><span class="si">{</span><span class="n">extra</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="sa">f</span><span class="s2">"        faces</span><span class="se">\n</span><span class="s2">        (</span><span class="se">\n</span><span class="si">{</span><span class="n">fl</span><span class="si">}</span><span class="se">\n</span><span class="s2">        );</span><span class="se">\n</span><span class="s2">    </span><span class="se">}}</span><span class="s2">"</span>
+        <span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">");</span><span class="se">\n\n</span><span class="s2">mergePatchPairs</span><span class="se">\n</span><span class="s2">(</span><span class="se">\n</span><span class="s2">);</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

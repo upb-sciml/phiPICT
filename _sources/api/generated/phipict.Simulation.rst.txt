@@ -1,0 +1,81 @@
+﻿phipict.Simulation
+==================
+
+.. currentmodule:: phipict
+
+.. autoclass:: Simulation
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Simulation.__init__
+      ~Simulation.advect_static
+      ~Simulation.clear_pressure_guess
+      ~Simulation.end_step
+      ~Simulation.linear_solve
+      ~Simulation.linear_solve_AMG
+      ~Simulation.linear_solve_GPU
+      ~Simulation.linear_solve_scipy
+      ~Simulation.make_divergence_free
+      ~Simulation.resample
+      ~Simulation.reset_image_out_idx
+      ~Simulation.reset_step_counters
+      ~Simulation.reset_total_step
+      ~Simulation.reset_total_time
+      ~Simulation.run
+      ~Simulation.save_domain
+      ~Simulation.save_domain_images
+      ~Simulation.single_step
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Simulation.NON_ORTHO_CENTER_MATRIX
+      ~Simulation.NON_ORTHO_DIAGONAL_MATRIX
+      ~Simulation.NON_ORTHO_DIAGONAL_RHS
+      ~Simulation.NON_ORTHO_DIRECT_MATRIX
+      ~Simulation.NON_ORTHO_DIRECT_RHS
+      ~Simulation.adaptive_CFL
+      ~Simulation.advect_non_ortho_steps
+      ~Simulation.advection_tol
+      ~Simulation.advection_use_BiCG
+      ~Simulation.block_layout
+      ~Simulation.convergence_tol
+      ~Simulation.corrector_steps
+      ~Simulation.density_viscosity
+      ~Simulation.differentiable
+      ~Simulation.domain
+      ~Simulation.hooks
+      ~Simulation.log_dir
+      ~Simulation.log_images
+      ~Simulation.log_interval
+      ~Simulation.non_orthogonal
+      ~Simulation.norm_vel
+      ~Simulation.normalize_pressure_result
+      ~Simulation.output_resampling_coords
+      ~Simulation.prep_fn
+      ~Simulation.pressure_guess_state
+      ~Simulation.pressure_non_ortho_steps
+      ~Simulation.pressure_return_best_result
+      ~Simulation.pressure_tol
+      ~Simulation.pressure_tol_intermediate
+      ~Simulation.pressure_use_BiCG
+      ~Simulation.pressure_warm_start
+      ~Simulation.scipy_solve_advection
+      ~Simulation.scipy_solve_pressure
+      ~Simulation.stop_fn
+      ~Simulation.substeps
+      ~Simulation.time_step
+      ~Simulation.velocity_corrector
+   
+   

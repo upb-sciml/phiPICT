@@ -1,0 +1,21 @@
+﻿phipict.meshing.quality
+=======================
+
+.. automodule:: phipict.meshing.quality
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      aspect_ratio
+      cell_volumes
+      non_orthogonality
+      scaled_jacobian
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      MeshReport
+   

@@ -1,0 +1,26 @@
+﻿phipict.solvers.amg
+===================
+
+.. automodule:: phipict.solvers.amg
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      amg_pcg_solve
+      build_amg_hierarchy
+      clear_interpolation_cache
+      csr_to_scipy
+      galerkin_refresh
+      hierarchy_for
+      is_pyamg_available
+      native_amg_available
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AMGHierarchy
+      AMGSolveInfo
+   

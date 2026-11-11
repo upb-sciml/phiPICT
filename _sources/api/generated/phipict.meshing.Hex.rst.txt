@@ -1,0 +1,36 @@
+﻿phipict.meshing.Hex
+===================
+
+.. currentmodule:: phipict.meshing
+
+.. autoclass:: Hex
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Hex.__init__
+      ~Hex.edge_list
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Hex.cells
+      ~Hex.grading
+      ~Hex.interpolation
+      ~Hex.name
+      ~Hex.ndims
+      ~Hex.patches
+      ~Hex.corners
+      ~Hex.edges
+   
+   

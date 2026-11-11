@@ -1,0 +1,15 @@
+﻿phipict.grid.helpers
+====================
+
+.. automodule:: phipict.grid.helpers
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_cell_centers
+      get_cell_size
+      get_transform_matrices
+      transform_to_computional_domain
+   

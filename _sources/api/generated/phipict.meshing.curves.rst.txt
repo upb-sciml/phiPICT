@@ -1,0 +1,20 @@
+﻿phipict.meshing.curves
+======================
+
+.. automodule:: phipict.meshing.curves
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Arc
+      BSpline
+      EdgeShape
+      Line
+      Parametric
+      Points
+      Polyline
+      Sampled
+      Spline
+   

@@ -1,0 +1,31 @@
+﻿phipict.meshing.grading
+=======================
+
+.. automodule:: phipict.meshing.grading
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      as_grading
+      cells_for_size
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ChebyshevBlend
+      Cluster
+      Cosine
+      Explicit
+      FirstCell
+      Geometric
+      Grading
+      MultiGrading
+      Segment
+      Simple
+      Symmetric
+      Tanh
+      Uniform
+   

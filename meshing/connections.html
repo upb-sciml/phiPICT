@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connections and periodicity &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Blocks" href="blocks.html" />
+    <link rel="prev" title="Boundary patches and conditions" href="boundaries.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Meshing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Meshing</a></li>
+      <li class="breadcrumb-item active">Connections and periodicity</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/upb-sciml/phiPICT/blob/main/docs/source/meshing/connections.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="connections-and-periodicity">
+<h1>Connections and periodicity<a class="headerlink" href="#connections-and-periodicity" title="Link to this heading"></a></h1>
+<p>Blocks are connected wherever their faces coincide, in any orientation, so you
+usually do nothing: place the blocks so that neighbouring faces share their
+vertices and the <a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a> connects them. This page is for the cases where you
+need more: periodic boundaries, faces that should connect but do not, and
+explicit connections.</p>
+<section id="how-faces-are-matched">
+<h2>How faces are matched<a class="headerlink" href="#how-faces-are-matched" title="Link to this heading"></a></h2>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.auto_connect()</span></code> (called by the <a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a> constructor and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">BlockMesh.build()</span></code>) looks at every face that has no patch and no connection:</p>
+<ol class="arabic simple">
+<li><p>Faces whose corners coincide are candidates.</p></li>
+<li><p>For each candidate pair, every relative orientation of the in-face axes is
+tried (2 in 2D; 8 in 3D: swapped or not, each axis flipped or not). The pair is
+connected if all vertices coincide under one of them, within <code class="docutils literal notranslate"><span class="pre">rel_tol</span></code> times
+the smallest vertex spacing of the faces.</p></li>
+<li><p>The result is a <code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code>, from which
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Connection.axis_codes()</span></code> derives the face and axis codes of the solver’s
+<code class="docutils literal notranslate"><span class="pre">Block.ConnectBlock</span></code>, which you therefore never write yourself.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">phipict.meshing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict</span><span class="w"> </span><span class="kn">import</span> <span class="n">Face</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"a"</span><span class="p">)</span>
+<span class="c1"># the same neighbour, but with its vertex order reversed along both axes</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"b"</span><span class="p">)</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="s2">"x"</span><span class="p">)</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="s2">"y"</span><span class="p">)</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Mesh</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">])</span>
+<span class="p">(</span><span class="n">c</span><span class="p">,)</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">connections</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">face_a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">face_b</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">axis_codes</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="c1"># X_PLUS X_PLUS (3, -1): y of b, running the other way</span>
+</pre></div>
+</div>
+<p>Every relative orientation gives the same flow: the test suite checks the solver
+result of a two-block channel for all 4 orientations in 2D and all 24 in 3D.</p>
+</section>
+<section id="faces-that-do-not-match">
+<h2>Faces that do not match<a class="headerlink" href="#faces-that-do-not-match" title="Link to this heading"></a></h2>
+<p>A face that shares its corners with another face but not its vertices is a
+modelling error: the blocks have different resolutions or gradings along the
+interface. The solver cannot connect such faces, so this raises
+<code class="xref py py-class docutils literal notranslate"><span class="pre">NonConformingInterfaceError</span></code> with the blocks and the reason:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">coarse</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"coarse"</span><span class="p">)</span>
+<span class="n">fine</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"fine"</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">Mesh</span><span class="p">([</span><span class="n">coarse</span><span class="p">,</span> <span class="n">fine</span><span class="p">])</span>
+<span class="k">except</span> <span class="n">pm</span><span class="o">.</span><span class="n">NonConformingInterfaceError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+<span class="c1"># Face X_PLUS of block 'coarse' and face X_MINUS of block 'fine' share their</span>
+<span class="c1"># corners but are not conforming: [4] vs [6] cells; match the resolutions ...</span>
+</pre></div>
+</div>
+<p>Faces that touch only partially are not connected and show up as free faces in
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.check()</span></code>. Split a block (<code class="xref py py-meth docutils literal notranslate"><span class="pre">MeshBlock.split()</span></code>) so that the faces
+match.</p>
+</section>
+<section id="periodicity">
+<h2>Periodicity<a class="headerlink" href="#periodicity" title="Link to this heading"></a></h2>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.make_periodic()</span></code> connects free faces that coincide after a shift:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"walls"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">())</span>
+<span class="n">fp</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span> <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span><span class="p">)</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Mesh</span><span class="p">([</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">patches</span><span class="o">=</span><span class="n">fp</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"upstream"</span><span class="p">),</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">patches</span><span class="o">=</span><span class="n">fp</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"downstream"</span><span class="p">),</span>
+<span class="p">])</span>
+<span class="n">channel</span><span class="o">.</span><span class="n">make_periodic</span><span class="p">(</span><span class="s2">"x"</span><span class="p">)</span>               <span class="c1"># over the full extent in x</span>
+<span class="c1"># the same: channel.make_periodic(translation=(6.0, 0.0))</span>
+</pre></div>
+</div>
+<p>A periodic connection of a block with itself along one axis becomes
+<code class="docutils literal notranslate"><span class="pre">Block.MakePeriodic</span></code>; all others (as between <code class="docutils literal notranslate"><span class="pre">upstream</span></code> and <code class="docutils literal notranslate"><span class="pre">downstream</span></code>
+here) become <code class="docutils literal notranslate"><span class="pre">ConnectBlock</span></code> calls. <code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.extrude()</span></code> makes the extruded mesh
+periodic in z unless patches for the z faces are given, and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">BlockMesh.add_periodic()</span></code> pairs two patches like OpenFOAM’s <code class="docutils literal notranslate"><span class="pre">cyclic</span></code>
+patches.</p>
+</section>
+<section id="explicit-connections">
+<h2>Explicit connections<a class="headerlink" href="#explicit-connections" title="Link to this heading"></a></h2>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.connect()</span></code> connects two given faces. The orientation is still found
+from the geometry unless it is passed, so this is only needed for faces that do
+not coincide:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">left</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
+<span class="n">right</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"right"</span><span class="p">)</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Mesh</span><span class="p">([</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">],</span> <span class="n">auto_connect</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">Face</span><span class="o">.</span><span class="n">X_PLUS</span><span class="p">,</span> <span class="s2">"right"</span><span class="p">,</span> <span class="n">Face</span><span class="o">.</span><span class="n">X_MINUS</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="tolerance">
+<h2>Tolerance<a class="headerlink" href="#tolerance" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">rel_tol</span></code> (default <code class="docutils literal notranslate"><span class="pre">1e-4</span></code>) is relative to the smallest vertex spacing of the
+faces, so it adapts to the resolution. Meshes from files with few significant
+digits may need a larger value: <code class="docutils literal notranslate"><span class="pre">pm.Mesh(blocks,</span> <span class="pre">rel_tol=1e-3)</span></code>.</p>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">Connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">face_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">face_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Orientation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/connect.html#Connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>A connection of face <code class="docutils literal notranslate"><span class="pre">face_a</span></code> of block <code class="docutils literal notranslate"><span class="pre">block_a</span></code> to a face of <code class="docutils literal notranslate"><span class="pre">block_b</span></code>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">block_a,</span> <span class="pre">block_b</span></span></dt>
+<dd><p>Indices of the blocks in the mesh (may be equal).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">face_a,</span> <span class="pre">face_b</span></span></dt>
+<dd><p>The connected faces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Face</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">orientation</span></span></dt>
+<dd><p>Relative orientation of the faces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Orientation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">translation</span></span></dt>
+<dd><p>Offset from face A to face B of a periodic connection, None for faces that
+coincide.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a> of <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">axis_codes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ndims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/phipict/meshing/connect.html#Connection.axis_codes"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">axis1</span></code>/<code class="docutils literal notranslate"><span class="pre">axis2</span></code> arguments of <code class="docutils literal notranslate"><span class="pre">Block.ConnectBlock</span></code>.</p>
+<p>Each code is <code class="docutils literal notranslate"><span class="pre">(axis</span> <span class="pre">of</span> <span class="pre">B)</span> <span class="pre">&lt;&lt;</span> <span class="pre">1</span> <span class="pre">|</span> <span class="pre">inverted</span></code> for the in-face axes of A in
+the solver’s order; the second is -1 in 2D.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_periodic_axis</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span></dt>
+<dd><p>Whether this is the plain periodicity of one block along one axis.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">Orientation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/connect.html#Orientation"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>How the in-face axes of one face map onto those of another.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">perm</span></span></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">perm[k]</span></code>: the tangential axis slot of face B that slot <code class="docutils literal notranslate"><span class="pre">k</span></code> of face A
+runs along (slots in the order of
+<code class="xref py py-func docutils literal notranslate"><span class="pre">tangential_axes()</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a> of <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">flip</span></span></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">flip[k]</span></code>: whether slot <code class="docutils literal notranslate"><span class="pre">k</span></code> of A runs opposite to its partner in B.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a> of <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">NonConformingInterfaceError</span></span><a class="reference internal" href="../_modules/phipict/meshing/connect.html#NonConformingInterfaceError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Two block faces touch but their vertices do not coincide.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="boundaries.html" class="btn btn-neutral float-left" title="Boundary patches and conditions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="blocks.html" class="btn btn-neutral float-right" title="Blocks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

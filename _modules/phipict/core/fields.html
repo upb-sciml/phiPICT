@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>phipict.core.fields &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../../../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meshing/index.html">Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">phipict.core.fields</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for phipict.core.fields</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2026 Jannis Becktepe</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the "License");</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an "AS IS" BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">"""The cell fields of a block, and access to them by name.</span>
+
+<span class="sd">Used wherever code acts on "the velocity of every block" and the like, e.g.</span>
+<span class="sd">:meth:`phipict.core.piso_simulation.Simulation.resample` and the VTK export, so</span>
+<span class="sd">the field-to-block-attribute mapping lives in one place.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flag</span><span class="p">,</span> <span class="n">auto</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict</span><span class="w"> </span><span class="kn">import</span> <span class="n">_C</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Fields"</span><span class="p">,</span> <span class="s2">"block_field"</span><span class="p">,</span> <span class="s2">"domain_field"</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="Fields">
+<a class="viewcode-back" href="../../../meshing/io.html#phipict.io.export.Fields">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Fields</span><span class="p">(</span><span class="n">Flag</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Cell fields of a block. Members combine, e.g. ``VELOCITY | PRESSURE``."""</span>
+
+    <span class="n">VELOCITY</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">PRESSURE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">PASSIVE_SCALAR</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">VELOCITY_SOURCE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">EPOT</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">VISCOSITY</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="c1">#: Cell volume and scaled Jacobian, computed from the vertices (VTK export</span>
+    <span class="c1">#: only; not stored on the block).</span>
+    <span class="n">QUALITY</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ALL</span> <span class="o">=</span> <span class="n">VELOCITY</span> <span class="o">|</span> <span class="n">PRESSURE</span> <span class="o">|</span> <span class="n">PASSIVE_SCALAR</span> <span class="o">|</span> <span class="n">VELOCITY_SOURCE</span> <span class="o">|</span> <span class="n">EPOT</span> <span class="o">|</span> <span class="n">VISCOSITY</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">attr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Name of the block attribute holding this field.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The attribute of :class:`phipict._C.Block`, e.g. ``"velocity"``.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If this is not a single field stored on the block.</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_BLOCK_ATTRS</span><span class="p">[</span><span class="bp">self</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> is not a single block field."</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span></div>
+
+
+
+<span class="c1"># field -&gt; (block attribute, presence check or None if always present)</span>
+<span class="n">_BLOCK_ATTRS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Fields</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">Fields</span><span class="o">.</span><span class="n">VELOCITY</span><span class="p">:</span> <span class="p">(</span><span class="s2">"velocity"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="n">Fields</span><span class="o">.</span><span class="n">PRESSURE</span><span class="p">:</span> <span class="p">(</span><span class="s2">"pressure"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="n">Fields</span><span class="o">.</span><span class="n">PASSIVE_SCALAR</span><span class="p">:</span> <span class="p">(</span><span class="s2">"passiveScalar"</span><span class="p">,</span> <span class="s2">"hasPassiveScalar"</span><span class="p">),</span>
+    <span class="n">Fields</span><span class="o">.</span><span class="n">VELOCITY_SOURCE</span><span class="p">:</span> <span class="p">(</span><span class="s2">"velocitySource"</span><span class="p">,</span> <span class="s2">"hasVelocitySource"</span><span class="p">),</span>
+    <span class="n">Fields</span><span class="o">.</span><span class="n">EPOT</span><span class="p">:</span> <span class="p">(</span><span class="s2">"epot"</span><span class="p">,</span> <span class="s2">"hasEpot"</span><span class="p">),</span>
+    <span class="n">Fields</span><span class="o">.</span><span class="n">VISCOSITY</span><span class="p">:</span> <span class="p">(</span><span class="s2">"viscosity"</span><span class="p">,</span> <span class="s2">"hasViscosity"</span><span class="p">),</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">block_field</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Block</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="n">Fields</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The data of one field of a block, or None if the block does not have it.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    block : phipict._C.Block</span>
+<span class="sd">        The block.</span>
+<span class="sd">    field : Fields</span>
+<span class="sd">        A single field stored on the block.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor or None</span>
+<span class="sd">        The cell data ``[N, C, *spatial]``, or None for an optional field the</span>
+<span class="sd">        block does not have.</span>
+<span class="sd">    """</span>
+    <span class="n">attr</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">attr</span>
+    <span class="n">has</span> <span class="o">=</span> <span class="n">_BLOCK_ATTRS</span><span class="p">[</span><span class="n">field</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">has</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">has</span><span class="p">)():</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">domain_field</span><span class="p">(</span><span class="n">domain</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Domain</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="n">Fields</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""The data of one field of every block of a domain, in block order.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    domain : phipict._C.Domain</span>
+<span class="sd">        The domain.</span>
+<span class="sd">    field : Fields</span>
+<span class="sd">        A single field stored on the blocks.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of torch.Tensor</span>
+<span class="sd">        Per-block cell data.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If a block does not have the field.</span>
+<span class="sd">    """</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">domain</span><span class="o">.</span><span class="n">getBlocks</span><span class="p">():</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">block_field</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Block </span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> has no </span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">attr</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

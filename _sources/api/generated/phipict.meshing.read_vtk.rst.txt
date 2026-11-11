@@ -1,0 +1,6 @@
+﻿phipict.meshing.read\_vtk
+=========================
+
+.. currentmodule:: phipict.meshing
+
+.. autofunction:: read_vtk

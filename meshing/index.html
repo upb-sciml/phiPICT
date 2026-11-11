@@ -1,0 +1,274 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meshing &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Mesh" href="mesh.html" />
+    <link rel="prev" title="Basic Usage" href="../basic_usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Meshing</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/upb-sciml/phiPICT/blob/main/docs/source/meshing/index.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="meshing">
+<h1>Meshing<a class="headerlink" href="#meshing" title="Link to this heading"></a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">phipict.meshing</span></code> creates the structured multi-block meshes that phiPICT
+solves on, reads them from files, and turns them into a <a class="reference internal" href="../api/generated/phipict.Domain.html#phipict.Domain" title="phipict.Domain"><code class="xref py py-class docutils literal notranslate"><span class="pre">Domain</span></code></a>.
+You describe the geometry, the resolution and the boundary conditions; block
+connections, face orientations and the solver setup follow from that.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">phipict.meshing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
+
+<span class="n">walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"walls"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">())</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">(</span>
+    <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+    <span class="n">grading</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Symmetric</span><span class="p">(</span><span class="mf">20.0</span><span class="p">)),</span>
+    <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span> <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Mesh</span><span class="p">([</span><span class="n">channel</span><span class="p">])</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">make_periodic</span><span class="p">(</span><span class="s2">"x"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">check</span><span class="p">())</span>
+<span class="n">domain</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">get_domain</span><span class="p">(</span><span class="n">viscosity</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="blocks-connections-and-patches">
+<h2>Blocks, connections and patches<a class="headerlink" href="#blocks-connections-and-patches" title="Link to this heading"></a></h2>
+<p>A mesh consists of structured blocks, logically rectangular grids of cells. Each
+face of a block (<code class="docutils literal notranslate"><span class="pre">-x</span></code>, <code class="docutils literal notranslate"><span class="pre">+x</span></code>, <code class="docutils literal notranslate"><span class="pre">-y</span></code>, <code class="docutils literal notranslate"><span class="pre">+y</span></code>, and <code class="docutils literal notranslate"><span class="pre">-z</span></code>, <code class="docutils literal notranslate"><span class="pre">+z</span></code> in 3D) is
+either <strong>connected</strong> to a face of another block, <strong>periodic</strong>, or part of a
+boundary <strong>patch</strong> with a condition (wall, inflow, outflow, …). Connections are
+found from the geometry, so what you specify are the blocks and the patches.</p>
+</section>
+<section id="how-the-parts-fit-together">
+<h2>How the parts fit together<a class="headerlink" href="#how-the-parts-fit-together" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Grading, EdgeShape            how vertices are spaced along an edge, and its shape
+      |
+      v
+box / quad / hexa / annulus   one block from corners, cells, gradings, edges
+BlockMesh (Quad, Hex)         many blocks sharing corners, resolution inferred
+      |
+      v
+MeshBlock                     one discretised block: vertices + face patches
+      |
+      v
+Mesh                          blocks + connections + patches with conditions
+  |   |   |                   (connections are found from the geometry)
+  |   |   +--&gt; get_domain()   the solver Domain
+  |   +------&gt; check()        cell quality, open faces, missing conditions
+  +----------&gt; io.export      VTK files for ParaView
+read_blockmeshdict, read_vtk  meshes from files
+</pre></div>
+</div>
+<p>From the top, and where you need each part:</p>
+<dl class="simple">
+<dt><a class="reference internal" href="mesh.html"><span class="doc">Mesh</span></a></dt><dd><p><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a>: always. It holds the finished mesh; you set
+boundary conditions on it, make it periodic, check it and create the domain.</p>
+</dd>
+<dt><a class="reference internal" href="boundaries.html"><span class="doc">Boundary patches and conditions</span></a></dt><dd><p><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.Patch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Patch</span></code></a> and the conditions
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">Wall</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Inflow</span></code>, …):
+whenever the domain has walls, inflows or outflows.</p>
+</dd>
+<dt><a class="reference internal" href="connections.html"><span class="doc">Connections and periodicity</span></a></dt><dd><p>Periodic boundaries, faces that do not connect, explicit connections. Plain
+connections between neighbouring blocks need nothing.</p>
+</dd>
+<dt><a class="reference internal" href="blocks.html"><span class="doc">Blocks</span></a></dt><dd><p><a class="reference internal" href="../api/generated/phipict.meshing.MeshBlock.html#phipict.meshing.MeshBlock" title="phipict.meshing.MeshBlock"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshBlock</span></code></a> and its builders: to mesh a geometry in
+code, one block at a time, or to use existing vertex tensors.</p>
+</dd>
+<dt><a class="reference internal" href="blockmesh.html"><span class="doc">Multi-block meshes with BlockMesh</span></a></dt><dd><p><a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.BlockMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockMesh</span></code></a>: for geometries of many blocks (e.g. an
+O-grid around a cylinder), where corners are shared and cell counts are
+passed on between neighbouring blocks.</p>
+</dd>
+<dt><a class="reference internal" href="grading.html"><span class="doc">Grading</span></a> and <a class="reference internal" href="edges.html"><span class="doc">Curved edges</span></a></dt><dd><p>To refine cells towards walls, and to give blocks curved or measured edges.</p>
+</dd>
+<dt><a class="reference internal" href="quality.html"><span class="doc">Mesh quality</span></a></dt><dd><p>To judge a mesh before running it.</p>
+</dd>
+<dt><a class="reference internal" href="io.html"><span class="doc">Reading and writing meshes</span></a></dt><dd><p>To read OpenFOAM <code class="docutils literal notranslate"><span class="pre">blockMeshDict</span></code> and VTK files, and to look at meshes and
+results in ParaView.</p>
+</dd>
+<dt><a class="reference internal" href="migration.html"><span class="doc">Migrating from phipict.grid</span></a></dt><dd><p>If you have code using <a class="reference internal" href="../api/generated/phipict.grid.shapes.html#module-phipict.grid.shapes" title="phipict.grid.shapes"><code class="xref py py-mod docutils literal notranslate"><span class="pre">phipict.grid.shapes</span></code></a>.</p>
+</dd>
+</dl>
+</section>
+<section id="three-ways-to-a-mesh">
+<h2>Three ways to a mesh<a class="headerlink" href="#three-ways-to-a-mesh" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>From existing vertex tensors</strong>, e.g. grids made with
+<a class="reference internal" href="../api/generated/phipict.grid.shapes.html#module-phipict.grid.shapes" title="phipict.grid.shapes"><code class="xref py py-mod docutils literal notranslate"><span class="pre">phipict.grid.shapes</span></code></a>:
+<code class="docutils literal notranslate"><span class="pre">pm.Mesh([pm.MeshBlock.from_coords(coords)])</span></code>.</p></li>
+<li><p><strong>Built in code</strong>: single blocks with <code class="xref py py-func docutils literal notranslate"><span class="pre">make_box()</span></code>,
+<code class="xref py py-func docutils literal notranslate"><span class="pre">make_quad()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">make_hexa()</span></code> and
+<code class="xref py py-func docutils literal notranslate"><span class="pre">make_annulus()</span></code>, or many blocks with
+<a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.BlockMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockMesh</span></code></a>.</p></li>
+<li><p><strong>Read from a file</strong>: <a class="reference internal" href="../api/generated/phipict.meshing.read_blockmeshdict.html#phipict.meshing.read_blockmeshdict" title="phipict.meshing.read_blockmeshdict"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_blockmeshdict()</span></code></a> and
+<a class="reference internal" href="../api/generated/phipict.meshing.read_vtk.html#phipict.meshing.read_vtk" title="phipict.meshing.read_vtk"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_vtk()</span></code></a>.</p></li>
+</ol>
+<p>All three give a <a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a>, which is used the same way from
+there on.</p>
+</section>
+<section id="conventions">
+<h2>Conventions<a class="headerlink" href="#conventions" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Mesh geometry is kept in float64 on the CPU; <code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.get_domain</span></code> converts it to the precision and device of
+the domain.</p></li>
+<li><p>Vertices are stored like the solver stores them, <code class="docutils literal notranslate"><span class="pre">[dims,</span> <span class="pre">(nz+1,)</span> <span class="pre">ny+1,</span>
+<span class="pre">nx+1]</span></code>: coordinate channels x, y, z first, then the grid in z, y, x order.</p></li>
+<li><p>Corners of a block are listed in the solver’s order, x fastest: <code class="docutils literal notranslate"><span class="pre">(-x-y,</span> <span class="pre">+x-y,</span>
+<span class="pre">-x+y,</span> <span class="pre">+x+y)</span></code> in 2D, followed by the same four at <code class="docutils literal notranslate"><span class="pre">+z</span></code> in 3D.</p></li>
+<li><p>Blocks should be right-handed (positive cell volumes);
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.check</span></code> reports blocks that are not.</p></li>
+<li><p>Faces are addressed with <code class="xref py py-class docutils literal notranslate"><span class="pre">phipict.Face</span></code> (<code class="docutils literal notranslate"><span class="pre">Face.X_MINUS</span></code> …) or, on
+<a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html#phipict.meshing.FacePatches" title="phipict.meshing.FacePatches"><code class="xref py py-class docutils literal notranslate"><span class="pre">FacePatches</span></code></a>, by name (<code class="docutils literal notranslate"><span class="pre">x_minus</span></code> …).</p></li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../basic_usage.html" class="btn btn-neutral float-left" title="Basic Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mesh.html" class="btn btn-neutral float-right" title="Mesh" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

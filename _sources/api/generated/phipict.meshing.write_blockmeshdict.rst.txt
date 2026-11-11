@@ -1,0 +1,6 @@
+﻿phipict.meshing.write\_blockmeshdict
+====================================
+
+.. currentmodule:: phipict.meshing
+
+.. autofunction:: write_blockmeshdict

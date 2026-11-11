@@ -1,0 +1,30 @@
+﻿phipict.meshing.Patch
+=====================
+
+.. currentmodule:: phipict.meshing
+
+.. autoclass:: Patch
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Patch.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Patch.bc
+      ~Patch.kind
+      ~Patch.name
+   
+   

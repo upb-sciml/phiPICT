@@ -1,0 +1,475 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reading and writing meshes &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Migrating from phipict.grid" href="migration.html" />
+    <link rel="prev" title="Mesh quality" href="quality.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Meshing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quality.html">Mesh quality</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Meshing</a></li>
+      <li class="breadcrumb-item active">Reading and writing meshes</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/upb-sciml/phiPICT/blob/main/docs/source/meshing/io.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="reading-and-writing-meshes">
+<h1>Reading and writing meshes<a class="headerlink" href="#reading-and-writing-meshes" title="Link to this heading"></a></h1>
+<p>Use the readers to run on meshes made with other tools, and the VTK export to
+look at meshes and results in ParaView or pyvista.</p>
+<section id="openfoam-blockmeshdict">
+<h2>OpenFOAM blockMeshDict<a class="headerlink" href="#openfoam-blockmeshdict" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="../api/generated/phipict.meshing.read_blockmeshdict.html#phipict.meshing.read_blockmeshdict" title="phipict.meshing.read_blockmeshdict"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_blockmeshdict()</span></code></a> reads an OpenFOAM <code class="docutils literal notranslate"><span class="pre">blockMeshDict</span></code> and returns the
+<a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a> blockMesh would create, as phiPICT blocks: one block per <code class="docutils literal notranslate"><span class="pre">hex</span></code>,
+with the same vertices, cell counts, gradings and curved edges. Patches keep their
+names; set the conditions of those whose type does not determine one:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">phipict.meshing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">read_blockmeshdict</span><span class="p">(</span><span class="s2">"examples/meshes/flow_past_cylinder/blockMeshDict"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="c1"># Mesh(2D, 9 blocks, 78400 cells, 12 connections, patches=[inlet, side1, side2, outlet])</span>
+<span class="k">for</span> <span class="n">patch</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">patches</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">patch</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">faces</span><span class="p">(</span><span class="n">patch</span><span class="p">)))</span>
+
+<span class="n">mesh</span><span class="o">.</span><span class="n">set_bc</span><span class="p">(</span><span class="s2">"inlet"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Inflow</span><span class="p">((</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)))</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">set_bc</span><span class="p">(</span><span class="s2">"outlet"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Outflow</span><span class="p">())</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">set_bc</span><span class="p">(</span><span class="s2">"side1"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">FreeSlip</span><span class="p">())</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">set_bc</span><span class="p">(</span><span class="s2">"side2"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">FreeSlip</span><span class="p">())</span>
+<span class="k">assert</span> <span class="n">mesh</span><span class="o">.</span><span class="n">check</span><span class="p">()</span><span class="o">.</span><span class="n">ok</span>
+</pre></div>
+</div>
+<p>What is read, and how it maps:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 65.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>blockMeshDict</p></th>
+<th class="head"><p>phiPICT</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vertices</span></code>, <code class="docutils literal notranslate"><span class="pre">convertToMeters</span></code>/<code class="docutils literal notranslate"><span class="pre">scale</span></code>, <code class="docutils literal notranslate"><span class="pre">$variables</span></code></p></td>
+<td><p>block corners</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hex</span> <span class="pre">(...)</span> <span class="pre">name</span> <span class="pre">(nx</span> <span class="pre">ny</span> <span class="pre">nz)</span></code></p></td>
+<td><p>one block; the optional name becomes the block name</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">simpleGrading</span></code>, <code class="docutils literal notranslate"><span class="pre">edgeGrading</span></code>, multi-grading</p></td>
+<td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Simple</span></code> / <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiGrading</span></code> per edge</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">arc</span></code> (point or <code class="docutils literal notranslate"><span class="pre">origin</span></code>), <code class="docutils literal notranslate"><span class="pre">polyLine</span></code>, <code class="docutils literal notranslate"><span class="pre">spline</span></code>, <code class="docutils literal notranslate"><span class="pre">BSpline</span></code></p></td>
+<td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Arc</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Polyline</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Spline</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BSpline</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wall</span></code> patch</p></td>
+<td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Wall</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">symmetry</span></code>/<code class="docutils literal notranslate"><span class="pre">symmetryPlane</span></code> patch</p></td>
+<td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">FreeSlip</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">patch</span></code> and other types</p></td>
+<td><p>named patch without a condition, set it with <code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.set_bc()</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cyclic</span></code> with <code class="docutils literal notranslate"><span class="pre">neighbourPatch</span></code></p></td>
+<td><p>periodic connection</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">empty</span></code> front and back, one cell between them</p></td>
+<td><p>a 2D mesh</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">defaultPatch</span></code></p></td>
+<td><p>patch for faces not listed in <code class="docutils literal notranslate"><span class="pre">boundary</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Not supported, and reported as an error: <code class="docutils literal notranslate"><span class="pre">#calc</span></code>, <code class="docutils literal notranslate"><span class="pre">#codeStream</span></code>, <code class="docutils literal notranslate"><span class="pre">#include</span></code>
+and other directives, projected vertices, edges and faces, <code class="docutils literal notranslate"><span class="pre">mergePatchPairs</span></code>
+with entries (non-conforming interfaces), and collapsed hexes. A general OpenFOAM
+<code class="docutils literal notranslate"><span class="pre">polyMesh</span></code> cannot be read: it is unstructured, and the solver needs structured
+blocks.</p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">load_blockmeshdict</span></code> returns
+the unbuilt <a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.BlockMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockMesh</span></code></a>, e.g. to change cell counts before building.
+<a class="reference internal" href="../api/generated/phipict.meshing.write_blockmeshdict.html#phipict.meshing.write_blockmeshdict" title="phipict.meshing.write_blockmeshdict"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_blockmeshdict()</span></code></a> writes a <a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.BlockMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockMesh</span></code></a> as a <code class="docutils literal notranslate"><span class="pre">blockMeshDict</span></code>,
+e.g. to run the same blocks in OpenFOAM:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"walls"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">())</span>
+<span class="n">bm</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">BlockMesh</span><span class="p">()</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+               <span class="n">grading</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Symmetric</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)),</span>
+               <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span> <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span>
+                                      <span class="n">x_minus</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"inlet"</span><span class="p">),</span>
+                                      <span class="n">x_plus</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"outlet"</span><span class="p">))))</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">write_blockmeshdict</span><span class="p">(</span><span class="n">bm</span><span class="p">,</span> <span class="s2">"blockMeshDict"</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="vtk">
+<h2>VTK<a class="headerlink" href="#vtk" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="../api/generated/phipict.meshing.read_vtk.html#phipict.meshing.read_vtk" title="phipict.meshing.read_vtk"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_vtk()</span></code></a> reads VTK structured grids: <code class="docutils literal notranslate"><span class="pre">.vts</span></code> files and <code class="docutils literal notranslate"><span class="pre">.vtm</span></code>
+multi-block files of them, as written by <code class="xref py py-func docutils literal notranslate"><span class="pre">phipict.io.export.write_vtk()</span></code> or
+ParaView. Each grid becomes a block, coinciding faces are connected, and the
+patches written by <code class="xref py py-func docutils literal notranslate"><span class="pre">write_vtk()</span></code> are restored (without
+conditions). Other VTK formats are read with pyvista, if installed
+(<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyvista</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">phipict.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">export</span>
+
+<span class="n">export</span><span class="o">.</span><span class="n">write_vtk</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">"mesh"</span><span class="p">)</span>          <span class="c1"># writes mesh.vtm and mesh/</span>
+<span class="n">again</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">read_vtk</span><span class="p">(</span><span class="s2">"mesh.vtm"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">again</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="export-to-vtk">
+<h2>Export to VTK<a class="headerlink" href="#export-to-vtk" title="Link to this heading"></a></h2>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">phipict.io.export</span></code> writes meshes and simulation results as VTK XML files:
+one <code class="docutils literal notranslate"><span class="pre">.vts</span></code> structured grid per block, collected in a <code class="docutils literal notranslate"><span class="pre">.vtm</span></code> multi-block file
+that ParaView opens directly. Only numpy and the standard library are used.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">phipict.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">export</span>
+
+<span class="n">export</span><span class="o">.</span><span class="n">write_vtk</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">"out/mesh"</span><span class="p">)</span>      <span class="c1"># cell volume and scaled Jacobian as cell data</span>
+
+<span class="n">domain</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">get_domain</span><span class="p">(</span><span class="n">viscosity</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">,</span>
+                         <span class="n">passive_scalar_channels</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">export</span><span class="o">.</span><span class="n">write_vtk</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="s2">"out/solution"</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>   <span class="c1"># fields and named patches</span>
+</pre></div>
+</div>
+<p>For a domain, the cell fields are chosen with <code class="xref py py-class docutils literal notranslate"><span class="pre">Fields</span></code>
+(velocity, pressure, passive scalar, velocity source, electric potential,
+viscosity; <code class="docutils literal notranslate"><span class="pre">Fields.QUALITY</span></code> adds the quality measures). Passing the <code class="docutils literal notranslate"><span class="pre">mesh</span></code>
+also writes its boundary patches, one grid per patch face, so they can be shown
+separately in ParaView. 2D meshes are written as grids of zero thickness in z.</p>
+<section id="time-series">
+<h3>Time series<a class="headerlink" href="#time-series" title="Link to this heading"></a></h3>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">VTKSeries</span></code> writes snapshots into a <code class="docutils literal notranslate"><span class="pre">.pvd</span></code> collection
+that ParaView plays as a time series. Its <code class="xref py py-meth docutils literal notranslate"><span class="pre">hook()</span></code>
+writes every n-th step during a simulation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">phipict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hook</span><span class="p">,</span> <span class="n">Hooks</span>
+
+<span class="n">series</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">VTKSeries</span><span class="p">(</span><span class="s2">"out/run"</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">hooks</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">Hooks</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Hook</span><span class="o">.</span><span class="n">PRE</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">outflow_hook</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">velocity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Hook</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">hook</span><span class="p">(</span><span class="n">every</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+<span class="p">)</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">phipict</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">single_step</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">read_blockmeshdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.mesh.Mesh"><span class="pre">Mesh</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/formats/blockmeshdict.html#read_blockmeshdict"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Read a blockMeshDict as a <a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><em>pathlib.Path</em></a>) – The blockMeshDict.</p></li>
+<li><p><strong>ndims</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – 2 or 3; None reads meshes with one cell between empty patches as 2D.</p></li>
+<li><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>optional</em>) – Face matching tolerance, see <a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a>. Default is
+1e-4.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mesh with its connections, periodic (cyclic) connections and patches.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh">Mesh</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FoamParseError</strong> – If the file uses unsupported features.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">write_blockmeshdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_mesh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.blockmesh.BlockMesh"><span class="pre">BlockMesh</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">thickness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/formats/blockmeshdict.html#write_blockmeshdict"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Write the blocks of a <a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.BlockMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockMesh</span></code></a> as a blockMeshDict.</p>
+<p>Cells and gradings are written as blockMesh <code class="docutils literal notranslate"><span class="pre">edgeGrading</span></code>, curved edges as
+<code class="docutils literal notranslate"><span class="pre">arc</span></code>/<code class="docutils literal notranslate"><span class="pre">polyLine</span></code>/<code class="docutils literal notranslate"><span class="pre">spline</span></code>/<code class="docutils literal notranslate"><span class="pre">BSpline</span></code>, and patches with their
+condition’s type (<code class="docutils literal notranslate"><span class="pre">wall</span></code>, <code class="docutils literal notranslate"><span class="pre">symmetryPlane</span></code>) or the type they were read
+with. A 2D mesh is written with one cell of <code class="docutils literal notranslate"><span class="pre">thickness</span></code> in z between
+<code class="docutils literal notranslate"><span class="pre">empty</span></code> patches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>block_mesh</strong> (<a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.BlockMesh"><em>BlockMesh</em></a>) – The blocks.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><em>pathlib.Path</em></a>) – Output file.</p></li>
+<li><p><strong>thickness</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>optional</em>) – Extent in z of a 2D mesh. Default is 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If a grading or edge has no blockMesh equivalent (e.g. tanh), or a block
+    uses PICT row interpolation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">read_vtk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.mesh.Mesh"><span class="pre">Mesh</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/formats/vtk.html#read_vtk"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Read structured grids as a mesh.</p>
+<p>Every grid becomes a block; coinciding faces are connected. Grids of a
+<code class="docutils literal notranslate"><span class="pre">boundary</span></code> group written by <code class="xref py py-func docutils literal notranslate"><span class="pre">phipict.io.export.write_vtk()</span></code> restore the
+patches (without conditions). Grids that are one vertex thick in z and flat
+are read as 2D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><em>pathlib.Path</em></a>) – A <code class="docutils literal notranslate"><span class="pre">.vtm</span></code> or <code class="docutils literal notranslate"><span class="pre">.vts</span></code> file, or any file pyvista reads.</p></li>
+<li><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>optional</em>) – Face matching tolerance, see <a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a>. Default is
+1e-4.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh">Mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">phipict.io.export.</span></span><span class="sig-name descname"><span class="pre">write_vtk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">target:</span> <span class="pre">_C.Domain</span> <span class="pre">|</span> <span class="pre">Mesh,</span> <span class="pre">path:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">os.PathLike[str],</span> <span class="pre">*,</span> <span class="pre">fields:</span> <span class="pre">Fields</span> <span class="pre">=</span> <span class="pre">&lt;Fields.ALL:</span> <span class="pre">63&gt;,</span> <span class="pre">mesh:</span> <span class="pre">Mesh</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">batch_index:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">compress:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="reference internal" href="../_modules/phipict/io/export/vtk.html#write_vtk"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Write a domain or mesh as a VTK multi-block file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target</strong> (<a class="reference internal" href="../api/generated/phipict.Domain.html#phipict.Domain" title="phipict.Domain"><em>phipict.Domain</em></a><em> or </em><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><em>phipict.meshing.Mesh</em></a>) – What to write. A domain needs vertex coordinates on its blocks.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.15)"><em>os.PathLike</em></a>) – Output path; <code class="docutils literal notranslate"><span class="pre">.vtm</span></code> is added if missing, the blocks go to a directory of
+the same name without the extension.</p></li>
+<li><p><strong>fields</strong> (<em>Fields</em><em>, </em><em>optional</em>) – Cell fields to write (for a domain). Default is all present fields; add
+<code class="docutils literal notranslate"><span class="pre">Fields.QUALITY</span></code> for cell volume and scaled Jacobian. A mesh always gets
+the quality fields.</p></li>
+<li><p><strong>mesh</strong> (<a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><em>Mesh</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The mesh the domain was made from, to also write its boundary patches.
+Default is None.</p></li>
+<li><p><strong>batch_index</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>, </em><em>optional</em>) – Environment to write from a batched domain. Default is 0.</p></li>
+<li><p><strong>compress</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to zlib-compress the data. Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Path of the <code class="docutils literal notranslate"><span class="pre">.vtm</span></code> file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)">pathlib.Path</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.io.export.</span></span><span class="sig-name descname"><span class="pre">Fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/core/fields.html#Fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Cell fields of a block. Members combine, e.g. <code class="docutils literal notranslate"><span class="pre">VELOCITY</span> <span class="pre">|</span> <span class="pre">PRESSURE</span></code>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.io.export.</span></span><span class="sig-name descname"><span class="pre">VTKSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">path:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">os.PathLike[str],</span> <span class="pre">*,</span> <span class="pre">fields:</span> <span class="pre">Fields</span> <span class="pre">=</span> <span class="pre">&lt;Fields.ALL:</span> <span class="pre">63&gt;,</span> <span class="pre">mesh:</span> <span class="pre">Mesh</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">batch_index:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">compress:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/io/export/series.html#VTKSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Snapshots of a domain over time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.15)"><em>os.PathLike</em></a>) – Collection file; <code class="docutils literal notranslate"><span class="pre">.pvd</span></code> is added if missing. The snapshots go to a
+directory of the same name without the extension.</p></li>
+<li><p><strong>fields</strong> (<em>Fields</em><em>, </em><em>optional</em>) – Cell fields to write. Default is all present fields.</p></li>
+<li><p><strong>mesh</strong> (<a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><em>Mesh</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Mesh of the domain, to also write its boundary patches. Default is None.</p></li>
+<li><p><strong>batch_index</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>, </em><em>optional</em>) – Environment to write from a batched domain. Default is 0.</p></li>
+<li><p><strong>compress</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to compress the data. Default is True.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">hook</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">every</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.15)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/phipict/io/export/series.html#VTKSeries.hook"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>A callback for <code class="xref py py-attr docutils literal notranslate"><span class="pre">Hook.POST</span></code> that writes every
+<code class="docutils literal notranslate"><span class="pre">every</span></code>-th step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>every</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>, </em><em>optional</em>) – Write interval in steps. Default is 1.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The callback.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">phipict._C.Domain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><span class="pre">Path</span></a></span></span><a class="reference internal" href="../_modules/phipict/io/export/series.html#VTKSeries.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Write a snapshot and add it to the collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain</strong> (<a class="reference internal" href="../api/generated/phipict.Domain.html#phipict.Domain" title="phipict.Domain"><em>phipict.Domain</em></a>) – The domain.</p></li>
+<li><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – Simulation time of the snapshot.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The snapshot’s <code class="docutils literal notranslate"><span class="pre">.vtm</span></code> file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)">pathlib.Path</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quality.html" class="btn btn-neutral float-left" title="Mesh quality" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="migration.html" class="btn btn-neutral float-right" title="Migrating from phipict.grid" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

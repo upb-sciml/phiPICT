@@ -1,0 +1,12 @@
+﻿phipict.io.export.series
+========================
+
+.. automodule:: phipict.io.export.series
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      VTKSeries
+   

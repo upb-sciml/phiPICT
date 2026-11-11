@@ -1,0 +1,6 @@
+﻿phipict.simulation.sgs.append\_sgs\_viscosity\_prep\_fn
+=======================================================
+
+.. currentmodule:: phipict.simulation.sgs
+
+.. autofunction:: append_sgs_viscosity_prep_fn

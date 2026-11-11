@@ -1,0 +1,6 @@
+﻿phipict.FixedBoundary
+=====================
+
+.. currentmodule:: phipict
+
+.. autodata:: FixedBoundary

@@ -1,0 +1,52 @@
+﻿phipict.meshing.Mesh
+====================
+
+.. currentmodule:: phipict.meshing
+
+.. autoclass:: Mesh
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Mesh.__init__
+      ~Mesh.add
+      ~Mesh.assign_patch
+      ~Mesh.auto_connect
+      ~Mesh.block
+      ~Mesh.boundaries
+      ~Mesh.bounds
+      ~Mesh.check
+      ~Mesh.connect
+      ~Mesh.extrude
+      ~Mesh.faces
+      ~Mesh.free_faces
+      ~Mesh.from_domain
+      ~Mesh.get_domain
+      ~Mesh.index
+      ~Mesh.make_periodic
+      ~Mesh.outflow_hook
+      ~Mesh.patch
+      ~Mesh.plot
+      ~Mesh.set_bc
+      ~Mesh.transform
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Mesh.blocks
+      ~Mesh.connections
+      ~Mesh.n_cells
+      ~Mesh.ndims
+      ~Mesh.patches
+   
+   

@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>phipict.simulation.simulation &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../../../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meshing/index.html">Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../meshing/migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">phipict.simulation.simulation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for phipict.simulation.simulation</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2026 Jannis Becktepe</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the "License");</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an "AS IS" BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">"""FluidGym simulation class based on the PICT PISO solver."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict</span><span class="w"> </span><span class="kn">import</span> <span class="n">_C</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">piso_diff</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hooks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.core.piso_simulation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Simulation</span> <span class="k">as</span> <span class="n">PisoSimulation</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.core.piso_simulation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_max_time_step</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.io.output</span><span class="w"> </span><span class="kn">import</span> <span class="n">numerical_to_numpy</span> <span class="k">as</span> <span class="n">ntonp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict.solvers.tolerance</span><span class="w"> </span><span class="kn">import</span> <span class="n">SolverTolerance</span>
+
+
+<div class="viewcode-block" id="Simulation">
+<a class="viewcode-back" href="../../../api/generated/phipict.Simulation.html#phipict.Simulation">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Simulation</span><span class="p">(</span><span class="n">PisoSimulation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""FluidGym simulation class based on the PICT PISO solver.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    domain: _C.Domain</span>
+<span class="sd">        The simulation domain.</span>
+
+<span class="sd">    dt: float</span>
+<span class="sd">        The simulation time step.</span>
+
+<span class="sd">    substeps: int | Literal["ADAPTIVE"]</span>
+<span class="sd">        Number of substeps per simulation step or "ADAPTIVE" for adaptive substepping.</span>
+<span class="sd">        Defaults to 1.</span>
+
+<span class="sd">    corrector_steps: int</span>
+<span class="sd">        Number of corrector steps in the PISO algorithm. Defaults to 2.</span>
+
+<span class="sd">    density_viscosity: float | None</span>
+<span class="sd">        Fluid density viscosity. If None, uses domain default. Defaults to None.</span>
+
+<span class="sd">    adaptive_CFL: float</span>
+<span class="sd">        CFL number for adaptive time stepping. Defaults to 0.8.</span>
+
+<span class="sd">    adaptive_CFL_per_env: bool</span>
+<span class="sd">        With batched environments, derive the adaptive substeps of every</span>
+<span class="sd">        environment from its own maximum velocity, so it takes the substeps it</span>
+<span class="sd">        would take on its own. Defaults to True.</span>
+
+<span class="sd">    hooks: Hooks | dict | None</span>
+<span class="sd">        Callbacks run at the hooks of every PISO step, see</span>
+<span class="sd">        :class:`~phipict.core.hooks.Hooks`. Defaults to None.</span>
+
+<span class="sd">    prep_fn: Hooks | dict | None</span>
+<span class="sd">        The former name of ``hooks``, kept for compatibility. Defaults to None.</span>
+
+<span class="sd">    advection_use_BiCG: bool</span>
+<span class="sd">        Whether to use BiCG solver for advection. Defaults to True.</span>
+
+<span class="sd">    pressure_use_BiCG: bool</span>
+<span class="sd">        Whether to use BiCG solver for pressure. Defaults to False.</span>
+
+<span class="sd">    scipy_solve_advection: bool</span>
+<span class="sd">        Whether to use SciPy solver for advection. Defaults to False.</span>
+
+<span class="sd">    scipy_solve_pressure: bool</span>
+<span class="sd">        Whether to use SciPy solver for pressure. Defaults to False.</span>
+
+<span class="sd">    preconditionBiCG: bool</span>
+<span class="sd">        Whether to precondition BiCG solver. Defaults to False.</span>
+
+<span class="sd">    BiCG_precondition_fallback: bool</span>
+<span class="sd">        Whether to fallback if preconditioning fails. Defaults to True.</span>
+
+<span class="sd">    advection_tol: float | SolverTolerance | None</span>
+<span class="sd">        Tolerance for the advection solves (momentum *and* passive scalar). A</span>
+<span class="sd">        float is an absolute tolerance on ``||r||_2/sqrt(n)``; a</span>
+<span class="sd">        :class:`~phipict.solvers.tolerance.SolverTolerance` specifies</span>
+<span class="sd">        it relative to the RHS instead, which keeps its meaning across domain</span>
+<span class="sd">        sizes. If None, uses the dtype default. Defaults to None.</span>
+
+<span class="sd">    pressure_tol: float | SolverTolerance | None</span>
+<span class="sd">        Tolerance for the pressure solve; same forms as ``advection_tol``. The</span>
+<span class="sd">        residual of this solve is the mass-conservation error of the projection.</span>
+<span class="sd">        If None, uses the dtype default. Defaults to None.</span>
+
+<span class="sd">    pressure_tol_intermediate: float | SolverTolerance | None</span>
+<span class="sd">        Tolerance for every pressure solve that is *not* the final corrector.</span>
+<span class="sd">        Only the final corrector's pressure survives into the solution, so the</span>
+<span class="sd">        earlier ones can be solved loosely. None (the default) applies</span>
+<span class="sd">        ``pressure_tol`` everywhere, i.e. the historical behaviour.</span>
+
+<span class="sd">    pressure_warm_start: bool</span>
+<span class="sd">        Seed each pressure solve with the previous sub-step's result for the same</span>
+<span class="sd">        corrector index instead of with zero. An initial guess cannot change the</span>
+<span class="sd">        converged answer, only the iteration count. Defaults to False.</span>
+
+<span class="sd">    flux_balance_tol: float</span>
+<span class="sd">        Tolerance for flux balance check before each step. Defaults to 1e-5.</span>
+
+<span class="sd">    convergence_tol: float | None</span>
+<span class="sd">        Convergence tolerance for the solver. If None, uses default. Defaults to None.</span>
+
+<span class="sd">    solver_double_fallback: bool</span>
+<span class="sd">        Whether to fallback to double precision if single precision fails.</span>
+<span class="sd">        Defaults to False.</span>
+
+<span class="sd">    advect_non_ortho_steps: int</span>
+<span class="sd">        Number of non-orthogonal corrector steps for advection. Defaults to 1.</span>
+
+<span class="sd">    pressure_non_ortho_steps: int</span>
+<span class="sd">        Number of non-orthogonal corrector steps for pressure. Defaults to 1.</span>
+
+<span class="sd">    normalize_pressure_result: bool</span>
+<span class="sd">        Whether to normalize pressure results. Defaults to True.</span>
+
+<span class="sd">    pressure_return_best_result: bool</span>
+<span class="sd">        Whether to return the best pressure result. Defaults to False.</span>
+
+<span class="sd">    advect_passive_scalar: bool</span>
+<span class="sd">        Whether to advect passive scalars. Defaults to True.</span>
+
+<span class="sd">    pressure_time_step_normalized: bool</span>
+<span class="sd">        Whether pressure is normalized by time step. Defaults to False.</span>
+
+<span class="sd">    velocity_corrector: str</span>
+<span class="sd">        Type of velocity corrector to use. Defaults to "FD".</span>
+
+<span class="sd">    non_orthogonal: bool</span>
+<span class="sd">        Whether to use non-orthogonal corrections. Defaults to True.</span>
+
+<span class="sd">    differentiable: bool</span>
+<span class="sd">        Whether to use the differentiable solver backend. Defaults to False.</span>
+
+<span class="sd">    exclude_advection_solve_gradients: bool</span>
+<span class="sd">        Whether to exclude gradients from advection solve. Defaults to False.</span>
+
+<span class="sd">    exclude_pressure_solve_gradients: bool</span>
+<span class="sd">        Whether to exclude gradients from pressure solve. Defaults to False.</span>
+
+<span class="sd">    output_resampling_shape: tuple[int, ...] | None</span>
+<span class="sd">        Shape for output resampling. If None, dynamic shape is used. Defaults to None.</span>
+
+<span class="sd">    output_resampling_fill_max_steps: int</span>
+<span class="sd">        Number of steps to fill for max step resampling. Defaults to 0.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="Simulation.__init__">
+<a class="viewcode-back" href="../../../api/generated/phipict.Simulation.html#phipict.Simulation.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">:</span> <span class="n">_C</span><span class="o">.</span><span class="n">Domain</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">substeps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"ADAPTIVE"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">corrector_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">density_viscosity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">adaptive_CFL</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+        <span class="n">adaptive_CFL_per_env</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">prep_fn</span><span class="p">:</span> <span class="n">Hooks</span> <span class="o">|</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">advection_use_BiCG</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">pressure_use_BiCG</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">scipy_solve_advection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">scipy_solve_pressure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">preconditionBiCG</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">BiCG_precondition_fallback</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">advection_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">SolverTolerance</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pressure_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">SolverTolerance</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pressure_tol_intermediate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">SolverTolerance</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pressure_warm_start</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">flux_balance_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
+        <span class="n">convergence_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">solver_double_fallback</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">advect_non_ortho_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">pressure_non_ortho_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">normalize_pressure_result</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">pressure_return_best_result</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">advect_passive_scalar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">pressure_time_step_normalized</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">velocity_corrector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"FD"</span><span class="p">,</span>
+        <span class="n">non_orthogonal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">exclude_advection_solve_gradients</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">exclude_pressure_solve_gradients</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">output_resampling_shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_resampling_fill_max_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Hooks</span> <span class="o">|</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">time_step</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+            <span class="n">substeps</span><span class="o">=</span><span class="n">substeps</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="n">corrector_steps</span><span class="o">=</span><span class="n">corrector_steps</span><span class="p">,</span>
+            <span class="n">density_viscosity</span><span class="o">=</span><span class="n">density_viscosity</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="n">adaptive_CFL</span><span class="o">=</span><span class="n">adaptive_CFL</span><span class="p">,</span>
+            <span class="n">adaptive_CFL_per_env</span><span class="o">=</span><span class="n">adaptive_CFL_per_env</span><span class="p">,</span>
+            <span class="n">prep_fn</span><span class="o">=</span><span class="n">prep_fn</span><span class="p">,</span>
+            <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">,</span>
+            <span class="n">advection_use_BiCG</span><span class="o">=</span><span class="n">advection_use_BiCG</span><span class="p">,</span>
+            <span class="n">pressure_use_BiCG</span><span class="o">=</span><span class="n">pressure_use_BiCG</span><span class="p">,</span>
+            <span class="n">scipy_solve_advection</span><span class="o">=</span><span class="n">scipy_solve_advection</span><span class="p">,</span>
+            <span class="n">scipy_solve_pressure</span><span class="o">=</span><span class="n">scipy_solve_pressure</span><span class="p">,</span>
+            <span class="n">preconditionBiCG</span><span class="o">=</span><span class="n">preconditionBiCG</span><span class="p">,</span>
+            <span class="n">BiCG_precondition_fallback</span><span class="o">=</span><span class="n">BiCG_precondition_fallback</span><span class="p">,</span>
+            <span class="n">advection_tol</span><span class="o">=</span><span class="n">advection_tol</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="n">pressure_tol</span><span class="o">=</span><span class="n">pressure_tol</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="n">pressure_tol_intermediate</span><span class="o">=</span><span class="n">pressure_tol_intermediate</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="n">pressure_warm_start</span><span class="o">=</span><span class="n">pressure_warm_start</span><span class="p">,</span>
+            <span class="n">convergence_tol</span><span class="o">=</span><span class="n">convergence_tol</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="n">solver_double_fallback</span><span class="o">=</span><span class="n">solver_double_fallback</span><span class="p">,</span>
+            <span class="n">advect_non_ortho_steps</span><span class="o">=</span><span class="n">advect_non_ortho_steps</span><span class="p">,</span>
+            <span class="n">pressure_non_ortho_steps</span><span class="o">=</span><span class="n">pressure_non_ortho_steps</span><span class="p">,</span>
+            <span class="n">normalize_pressure_result</span><span class="o">=</span><span class="n">normalize_pressure_result</span><span class="p">,</span>
+            <span class="n">pressure_return_best_result</span><span class="o">=</span><span class="n">pressure_return_best_result</span><span class="p">,</span>
+            <span class="n">advect_passive_scalar</span><span class="o">=</span><span class="n">advect_passive_scalar</span><span class="p">,</span>
+            <span class="n">pressure_time_step_normalized</span><span class="o">=</span><span class="n">pressure_time_step_normalized</span><span class="p">,</span>
+            <span class="n">velocity_corrector</span><span class="o">=</span><span class="n">velocity_corrector</span><span class="p">,</span>
+            <span class="n">non_orthogonal</span><span class="o">=</span><span class="n">non_orthogonal</span><span class="p">,</span>
+            <span class="n">differentiable</span><span class="o">=</span><span class="n">differentiable</span><span class="p">,</span>
+            <span class="n">exclude_advection_solve_gradients</span><span class="o">=</span><span class="n">exclude_advection_solve_gradients</span><span class="p">,</span>
+            <span class="n">exclude_pressure_solve_gradients</span><span class="o">=</span><span class="n">exclude_pressure_solve_gradients</span><span class="p">,</span>
+            <span class="n">log_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="n">log_interval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">log_images</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">norm_vel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">block_layout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">log_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">output_resampling_coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">output_resampling_shape</span><span class="o">=</span><span class="n">output_resampling_shape</span><span class="p">,</span>
+            <span class="n">output_resampling_fill_max_steps</span><span class="o">=</span><span class="n">output_resampling_fill_max_steps</span><span class="p">,</span>
+            <span class="n">save_domain_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="n">stop_fn</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">flux_balance_tol</span> <span class="o">=</span> <span class="n">flux_balance_tol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cpu_device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">"cpu"</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">single_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">static</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Perform a single simulation step.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        static: bool</span>
+<span class="sd">            If True, perform a static step without adaptive substepping.</span>
+<span class="sd">            Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the simulation step was successful, False otherwise.</span>
+<span class="sd">        """</span>
+        <span class="c1"># one balance per batched environment; every one has to hold</span>
+        <span class="n">domain_flux_balance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">GetBoundaryFluxBalance</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ntonp</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">domain_flux_balance</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">&gt;</span> <span class="n">ntonp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_balance_tol</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Domain boundary fluxes not balanced, cannot proceed with simulation "</span>
+                <span class="sa">f</span><span class="s2">"step. Flux balance: </span><span class="si">{</span><span class="n">domain_flux_balance</span><span class="si">}</span><span class="s2">, "</span>
+                <span class="sa">f</span><span class="s2">"flux_balance_tol: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_balance_tol</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+
+        <span class="n">time_step_target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span>
+        <span class="n">substeps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">substeps</span>
+        <span class="n">CFL_cond</span> <span class="o">=</span> <span class="mf">0.8</span>
+        <span class="n">adaptive_step</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">time_step</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">substeps</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">substeps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># just fixed substeps</span>
+            <span class="c1"># 1 iteration with have physical time = time_step*substeps</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">substeps</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># compute max time step for each iteration/substep based on current</span>
+            <span class="c1"># velocity. 1 iteration with have physical time = time_step</span>
+            <span class="n">adaptive_step</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">substeps</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># compute max time step based on initial conditions, then keep it constant</span>
+            <span class="c1"># 1 iteration with have physical time = time_step</span>
+            <span class="n">time_step_value</span><span class="p">,</span> <span class="n">substeps</span> <span class="o">=</span> <span class="n">get_max_time_step</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">time_step_target</span><span class="p">,</span> <span class="n">CFL_cond</span><span class="p">,</span> <span class="n">with_transformations</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">"Setting time step to </span><span class="si">%.02e</span><span class="s2">,"</span>
+                <span class="s2">"substeps to </span><span class="si">%d</span><span class="s2"> based on initial conditions."</span><span class="p">,</span>
+                <span class="n">time_step_value</span><span class="p">,</span>
+                <span class="n">substeps</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">time_step</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">time_step_value</span><span class="p">],</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">getBlock</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">velocity</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpu_device</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid substeps"</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">static</span><span class="p">:</span>
+                <span class="n">sim_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">advect_static</span><span class="p">(</span><span class="n">iterations</span><span class="o">=</span><span class="n">substeps</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">adaptive_step</span><span class="p">:</span>
+                <span class="n">sim_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PISO_adaptive_step</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sim_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PISO_split_step</span><span class="p">(</span><span class="n">iterations</span><span class="o">=</span><span class="n">substeps</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">piso_diff</span><span class="o">.</span><span class="n">LinsolveError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__LOG</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+                <span class="s2">"Simulation failed in step (total step </span><span class="si">%d</span><span class="s2">):"</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">total_step</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">sim_ok</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

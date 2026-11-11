@@ -1,0 +1,496 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boundary patches and conditions &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Connections and periodicity" href="connections.html" />
+    <link rel="prev" title="Mesh" href="mesh.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Meshing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Meshing</a></li>
+      <li class="breadcrumb-item active">Boundary patches and conditions</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/upb-sciml/phiPICT/blob/main/docs/source/meshing/boundaries.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="boundary-patches-and-conditions">
+<h1>Boundary patches and conditions<a class="headerlink" href="#boundary-patches-and-conditions" title="Link to this heading"></a></h1>
+<p>Use patches to say what happens at the boundary of the domain: every block face
+that is not connected to another block belongs to a <a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.Patch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Patch</span></code></a>, which names
+the boundary (“inlet”, “walls”, “cylinder”) and carries its condition. You attach
+patches to block faces with <a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html#phipict.meshing.FacePatches" title="phipict.meshing.FacePatches"><code class="xref py py-class docutils literal notranslate"><span class="pre">FacePatches</span></code></a> when building blocks, and set or
+change conditions by patch name with <code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.set_bc()</span></code>, which is how you give
+conditions to meshes read from files. One patch can span many faces of many
+blocks.</p>
+<section id="patch">
+<h2>Patch<a class="headerlink" href="#patch" title="Link to this heading"></a></h2>
+<p>A <a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.Patch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Patch</span></code></a> is a name, a condition (<code class="docutils literal notranslate"><span class="pre">bc</span></code>) and, for imported patches, the
+type it had in the file (<code class="docutils literal notranslate"><span class="pre">kind</span></code>). A mesh keeps one patch per name; blocks that
+use patches of the same name share the same patch.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">phipict.meshing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
+
+<span class="n">walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"walls"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">())</span>
+<span class="n">inlet</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"inlet"</span><span class="p">)</span>                 <span class="c1"># condition set later</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">walls</span><span class="p">,</span> <span class="n">inlet</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="facepatches">
+<h2>FacePatches<a class="headerlink" href="#facepatches" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html#phipict.meshing.FacePatches" title="phipict.meshing.FacePatches"><code class="xref py py-class docutils literal notranslate"><span class="pre">FacePatches</span></code></a> assigns patches to the faces of one block. It is a small
+typed record with one field per face (<code class="docutils literal notranslate"><span class="pre">x_minus</span></code>, <code class="docutils literal notranslate"><span class="pre">x_plus</span></code>, <code class="docutils literal notranslate"><span class="pre">y_minus</span></code>,
+<code class="docutils literal notranslate"><span class="pre">y_plus</span></code>, <code class="docutils literal notranslate"><span class="pre">z_minus</span></code>, <code class="docutils literal notranslate"><span class="pre">z_plus</span></code>) rather than a dictionary, so a misspelled
+face is an error. Faces left at <code class="docutils literal notranslate"><span class="pre">None</span></code> are to be connected or made periodic.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">phipict</span><span class="w"> </span><span class="kn">import</span> <span class="n">Face</span>
+
+<span class="n">fp</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">x_minus</span><span class="o">=</span><span class="n">inlet</span><span class="p">,</span> <span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span> <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">fp</span><span class="p">[</span><span class="n">Face</span><span class="o">.</span><span class="n">Y_MINUS</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>                     <span class="c1"># walls</span>
+<span class="n">fp</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">Face</span><span class="o">.</span><span class="n">X_PLUS</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"outlet"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Outflow</span><span class="p">()))</span>
+<span class="n">all_walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">walls</span><span class="p">,</span> <span class="n">ndims</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>   <span class="c1"># every face</span>
+</pre></div>
+</div>
+<p>Block operations keep the patches with their faces: flipping or permuting the axes
+of a block moves the patches accordingly (see <a class="reference internal" href="blocks.html"><span class="doc">Blocks</span></a>).</p>
+</section>
+<section id="conditions">
+<h2>Conditions<a class="headerlink" href="#conditions" title="Link to this heading"></a></h2>
+<p>The conditions are small frozen dataclasses:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 40.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Condition</p></th>
+<th class="head"><p>Meaning</p></th>
+<th class="head"><p>Solver setup</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Wall</span></code></p></td>
+<td><p>no-slip wall, optionally moving (<code class="docutils literal notranslate"><span class="pre">velocity</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CloseBoundary</span></code>, Dirichlet velocity</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">FreeSlip</span></code></p></td>
+<td><p>free-slip wall or symmetry plane</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OpenBoundary</span></code> (zero normal velocity, zero tangential gradient)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Inflow</span></code></p></td>
+<td><p>prescribed velocity</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CloseBoundary</span></code>, Dirichlet velocity</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Outflow</span></code></p></td>
+<td><p>advected outflow</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CloseBoundary</span></code> with a varying velocity, balanced against the inflow</p></td>
+</tr>
+</tbody>
+</table>
+<p>A velocity can be a vector, a tensor with one value per face cell
+(<code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">dims,</span> <span class="pre">*face]</span></code>), or a <strong>profile</strong>: a function that maps the centres of the
+face cells <code class="docutils literal notranslate"><span class="pre">[n,</span> <span class="pre">dims]</span></code> to velocities <code class="docutils literal notranslate"><span class="pre">[n,</span> <span class="pre">dims]</span></code>. Profiles are evaluated when
+the domain is made, so they need no knowledge of the face resolution:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">parabola</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">p</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>           <span class="c1"># channel between y = -1 and 1</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">u</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">u</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">inlet</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"inlet"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Inflow</span><span class="p">(</span><span class="n">parabola</span><span class="p">))</span>
+<span class="n">lid</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"lid"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">(</span><span class="n">velocity</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)))</span>   <span class="c1"># moving wall</span>
+</pre></div>
+</div>
+<section id="other-fields">
+<h3>Other fields<a class="headerlink" href="#other-fields" title="Link to this heading"></a></h3>
+<p>Conditions for the passive scalar and the electric potential are passed as
+<code class="docutils literal notranslate"><span class="pre">extra</span></code> specs of <code class="xref py py-mod docutils literal notranslate"><span class="pre">phipict.bc</span></code> and applied with <code class="xref py py-func docutils literal notranslate"><span class="pre">phipict.bc.set_bc()</span></code>
+after the velocity condition:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">phipict</span><span class="w"> </span><span class="kn">import</span> <span class="n">bc</span>
+
+<span class="n">hartmann_walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span>
+    <span class="s2">"hartmann_walls"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="p">(</span><span class="n">bc</span><span class="o">.</span><span class="n">Potential</span><span class="o">.</span><span class="n">ThinWall</span><span class="p">(</span><span class="n">cw</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),))</span>
+<span class="p">)</span>
+<span class="n">heated</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span>
+    <span class="s2">"heated"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="p">(</span><span class="n">bc</span><span class="o">.</span><span class="n">Scalar</span><span class="o">.</span><span class="n">Dirichlet</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">]])),))</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="setting-conditions-by-name">
+<h2>Setting conditions by name<a class="headerlink" href="#setting-conditions-by-name" title="Link to this heading"></a></h2>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.set_bc()</span></code> sets the condition of a patch. A misspelled name raises a
+<code class="docutils literal notranslate"><span class="pre">KeyError</span></code> that suggests the closest names:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">block</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+               <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">x_minus</span><span class="o">=</span><span class="n">inlet</span><span class="p">,</span> <span class="n">x_plus</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"outlet"</span><span class="p">),</span>
+                                      <span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span> <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span><span class="p">))</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Mesh</span><span class="p">([</span><span class="n">block</span><span class="p">])</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">set_bc</span><span class="p">(</span><span class="s2">"outlet"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Outflow</span><span class="p">())</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">mesh</span><span class="o">.</span><span class="n">set_bc</span><span class="p">(</span><span class="s2">"outlt"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Outflow</span><span class="p">())</span>
+<span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>          <span class="c1"># No patch called 'outlt'. Did you mean 'outlet'? ...</span>
+</pre></div>
+</div>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.get_domain()</span></code> refuses meshes with patches that have no condition and
+lists them. <code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.assign_patch()</span></code> puts further faces into a patch, e.g. all
+remaining free faces.</p>
+</section>
+<section id="outflow">
+<h2>Outflow<a class="headerlink" href="#outflow" title="Link to this heading"></a></h2>
+<p>The solver needs the boundary fluxes of a domain to balance, and an outflow has to
+move with the flow. <code class="xref py py-class docutils literal notranslate"><span class="pre">Outflow</span></code> handles both:</p>
+<ul class="simple">
+<li><p>its initial velocity is the outward face normal (or a given <code class="docutils literal notranslate"><span class="pre">velocity</span></code>),
+which <code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.get_domain()</span></code> scales so that the outflow carries exactly the
+inflow,</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.outflow_hook()</span></code> returns the callback that advects the outflow
+velocity before every step.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">phipict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">phipict</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hook</span><span class="p">,</span> <span class="n">Hooks</span>
+
+<span class="n">domain</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">get_domain</span><span class="p">(</span><span class="n">viscosity</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">,</span>
+                         <span class="n">passive_scalar_channels</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">hooks</span> <span class="o">=</span> <span class="n">Hooks</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Hook</span><span class="o">.</span><span class="n">PRE</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">outflow_hook</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">velocity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">phipict</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">Patch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Wall</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">FreeSlip</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Inflow</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Outflow</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#Patch"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>A named group of boundary faces with a condition.</p>
+<p>Patches are compared by identity; a mesh keeps one patch per name.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">name</span></span></dt>
+<dd><p>Name of the patch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">bc</span></span></dt>
+<dd><p>Condition of the faces. None until set, e.g. for imported patches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>BoundarySpec or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">kind</span></span></dt>
+<dd><p>Type of the patch in the file it was read from (<code class="docutils literal notranslate"><span class="pre">&quot;wall&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;patch&quot;</span></code>,
+…), for information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">FacePatches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_minus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_plus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_minus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_plus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_minus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_plus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#FacePatches"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>The patch of each face of a block; None for faces without one.</p>
+<p>Faces without a patch are connected to other blocks, or made periodic.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">as_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#FacePatches.as_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>One entry per face, in <code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code> order.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_faces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html#phipict.meshing.FacePatches" title="phipict.meshing.boundary.FacePatches"><span class="pre">FacePatches</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#FacePatches.from_faces"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>From one entry per face, in <code class="xref py py-class docutils literal notranslate"><span class="pre">Face</span></code> order.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" title="(in Python v3.15)"><span class="pre">Iterator</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Face</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#FacePatches.items"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>The faces that have a patch, with their patch.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Face</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html#phipict.meshing.FacePatches" title="phipict.meshing.boundary.FacePatches"><span class="pre">FacePatches</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#FacePatches.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>A copy with the patch of one face replaced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">uniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html#phipict.meshing.FacePatches" title="phipict.meshing.boundary.FacePatches"><span class="pre">FacePatches</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#FacePatches.uniform"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Every face of an <code class="docutils literal notranslate"><span class="pre">ndims</span></code> block with the same patch.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">Wall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velocity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.15)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Insulating</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Open</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Current</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ThinWall</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Neumann</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Neumann</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#Wall"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>No-slip wall, optionally moving (<code class="docutils literal notranslate"><span class="pre">CloseBoundary</span></code>).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">velocity</span></span></dt>
+<dd><p>Wall velocity: static <code class="docutils literal notranslate"><span class="pre">(u,</span> <span class="pre">v[,</span> <span class="pre">w])</span></code>, varying <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">dims,</span> <span class="pre">*face]</span></code>, or a
+profile, see <code class="xref py py-class docutils literal notranslate"><span class="pre">Inflow</span></code>. None is a resting wall.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)">torch.Tensor</a> or sequence of <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a> or Callable or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">extra</span></span></dt>
+<dd><p>Further conditions, e.g. <code class="docutils literal notranslate"><span class="pre">bc.Potential.ThinWall(cw=0.1)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a> of phipict.bc.Spec</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">FreeSlip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Insulating</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Open</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Current</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ThinWall</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Neumann</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Neumann</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#FreeSlip"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Free-slip wall or symmetry plane (<code class="docutils literal notranslate"><span class="pre">OpenBoundary</span></code>).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">extra</span></span></dt>
+<dd><p>Further conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a> of phipict.bc.Spec</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">Inflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velocity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.15)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Insulating</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Open</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Current</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ThinWall</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Neumann</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Neumann</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#Inflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Prescribed inflow velocity.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">velocity</span></span></dt>
+<dd><p>Inflow velocity: static <code class="docutils literal notranslate"><span class="pre">(u,</span> <span class="pre">v[,</span> <span class="pre">w])</span></code>, varying <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">dims,</span> <span class="pre">*face]</span></code>, or a
+profile <code class="docutils literal notranslate"><span class="pre">fn(points)</span> <span class="pre">-&gt;</span> <span class="pre">velocities</span></code> that maps the face cell centres
+<code class="docutils literal notranslate"><span class="pre">[n,</span> <span class="pre">dims]</span></code> to velocities <code class="docutils literal notranslate"><span class="pre">[n,</span> <span class="pre">dims]</span></code>, e.g.
+<code class="docutils literal notranslate"><span class="pre">lambda</span> <span class="pre">p:</span> <span class="pre">torch.stack([1</span> <span class="pre">-</span> <span class="pre">p[:,</span> <span class="pre">1]</span> <span class="pre">**</span> <span class="pre">2,</span> <span class="pre">0</span> <span class="pre">*</span> <span class="pre">p[:,</span> <span class="pre">1]],</span> <span class="pre">1)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)">torch.Tensor</a> or sequence of <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a> or Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">extra</span></span></dt>
+<dd><p>Further conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a> of phipict.bc.Spec</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">Outflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velocity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.15)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Insulating</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Open</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Current</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ThinWall</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Neumann</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dirichlet</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Neumann</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/boundary.html#Outflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Outflow with a varying velocity.</p>
+<p>The face velocity must be updated during the simulation, e.g. with the
+callback of <code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.outflow_hook</span></code>.
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.get_domain</span></code> scales the initial
+velocity so that the outflow balances the inflow.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">velocity</span></span></dt>
+<dd><p>Initial velocity, as for <code class="xref py py-class docutils literal notranslate"><span class="pre">Inflow</span></code>. None is the outward face
+normal, which the flux balance then scales.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)">torch.Tensor</a> or sequence of <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a> or Callable or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">extra</span></span></dt>
+<dd><p>Further conditions, e.g. <code class="docutils literal notranslate"><span class="pre">bc.Potential.Open()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a> of phipict.bc.Spec</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mesh.html" class="btn btn-neutral float-left" title="Mesh" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="connections.html" class="btn btn-neutral float-right" title="Connections and periodicity" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

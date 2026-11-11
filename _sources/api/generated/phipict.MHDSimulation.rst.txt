@@ -1,0 +1,88 @@
+﻿phipict.MHDSimulation
+=====================
+
+.. currentmodule:: phipict
+
+.. autoclass:: MHDSimulation
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MHDSimulation.__init__
+      ~MHDSimulation.advect_static
+      ~MHDSimulation.clear_pressure_guess
+      ~MHDSimulation.detach
+      ~MHDSimulation.end_step
+      ~MHDSimulation.get_current_density
+      ~MHDSimulation.linear_solve
+      ~MHDSimulation.linear_solve_AMG
+      ~MHDSimulation.linear_solve_GPU
+      ~MHDSimulation.linear_solve_scipy
+      ~MHDSimulation.make_current_divergence_free
+      ~MHDSimulation.make_divergence_free
+      ~MHDSimulation.resample
+      ~MHDSimulation.reset_image_out_idx
+      ~MHDSimulation.reset_step_counters
+      ~MHDSimulation.reset_total_step
+      ~MHDSimulation.reset_total_time
+      ~MHDSimulation.run
+      ~MHDSimulation.save_domain
+      ~MHDSimulation.save_domain_images
+      ~MHDSimulation.set_magnetic_field
+      ~MHDSimulation.single_step
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MHDSimulation.NON_ORTHO_CENTER_MATRIX
+      ~MHDSimulation.NON_ORTHO_DIAGONAL_MATRIX
+      ~MHDSimulation.NON_ORTHO_DIAGONAL_RHS
+      ~MHDSimulation.NON_ORTHO_DIRECT_MATRIX
+      ~MHDSimulation.NON_ORTHO_DIRECT_RHS
+      ~MHDSimulation.adaptive_CFL
+      ~MHDSimulation.advect_non_ortho_steps
+      ~MHDSimulation.advection_tol
+      ~MHDSimulation.advection_use_BiCG
+      ~MHDSimulation.block_layout
+      ~MHDSimulation.convergence_tol
+      ~MHDSimulation.corrector_steps
+      ~MHDSimulation.density_viscosity
+      ~MHDSimulation.differentiable
+      ~MHDSimulation.domain
+      ~MHDSimulation.hooks
+      ~MHDSimulation.log_dir
+      ~MHDSimulation.log_images
+      ~MHDSimulation.log_interval
+      ~MHDSimulation.magnetic_field
+      ~MHDSimulation.non_orthogonal
+      ~MHDSimulation.norm_vel
+      ~MHDSimulation.normalize_pressure_result
+      ~MHDSimulation.output_resampling_coords
+      ~MHDSimulation.potential_solve_max_iter
+      ~MHDSimulation.potential_tol
+      ~MHDSimulation.prep_fn
+      ~MHDSimulation.pressure_guess_state
+      ~MHDSimulation.pressure_non_ortho_steps
+      ~MHDSimulation.pressure_return_best_result
+      ~MHDSimulation.pressure_tol
+      ~MHDSimulation.pressure_tol_intermediate
+      ~MHDSimulation.pressure_use_BiCG
+      ~MHDSimulation.pressure_warm_start
+      ~MHDSimulation.scipy_solve_advection
+      ~MHDSimulation.scipy_solve_pressure
+      ~MHDSimulation.stop_fn
+      ~MHDSimulation.substeps
+      ~MHDSimulation.time_step
+      ~MHDSimulation.velocity_corrector
+   
+   

@@ -1,0 +1,36 @@
+﻿phipict.meshing.Quad
+====================
+
+.. currentmodule:: phipict.meshing
+
+.. autoclass:: Quad
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Quad.__init__
+      ~Quad.edge_list
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Quad.cells
+      ~Quad.edges
+      ~Quad.grading
+      ~Quad.interpolation
+      ~Quad.name
+      ~Quad.ndims
+      ~Quad.patches
+      ~Quad.corners
+   
+   

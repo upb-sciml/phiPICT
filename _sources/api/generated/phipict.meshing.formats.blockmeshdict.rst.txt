@@ -1,0 +1,14 @@
+﻿phipict.meshing.formats.blockmeshdict
+=====================================
+
+.. automodule:: phipict.meshing.formats.blockmeshdict
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      load_blockmeshdict
+      read_blockmeshdict
+      write_blockmeshdict
+   

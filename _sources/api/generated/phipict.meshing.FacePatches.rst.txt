@@ -1,0 +1,38 @@
+﻿phipict.meshing.FacePatches
+===========================
+
+.. currentmodule:: phipict.meshing
+
+.. autoclass:: FacePatches
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FacePatches.__init__
+      ~FacePatches.as_list
+      ~FacePatches.from_faces
+      ~FacePatches.items
+      ~FacePatches.set
+      ~FacePatches.uniform
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FacePatches.x_minus
+      ~FacePatches.x_plus
+      ~FacePatches.y_minus
+      ~FacePatches.y_plus
+      ~FacePatches.z_minus
+      ~FacePatches.z_plus
+   
+   

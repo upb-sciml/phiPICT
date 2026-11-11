@@ -1,0 +1,29 @@
+﻿phipict.meshing.shapes
+======================
+
+.. automodule:: phipict.meshing.shapes
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      annulus_radial_weights
+      build_block
+      discretize_edges
+      hex_edges
+      make_annulus
+      make_box
+      make_hexa
+      make_quad
+      resolve_cells
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CornerEdge
+      Edge
+      Interpolation
+      QuadEdges
+   

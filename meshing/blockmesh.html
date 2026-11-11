@@ -1,0 +1,557 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-block meshes with BlockMesh &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Grading" href="grading.html" />
+    <link rel="prev" title="Blocks" href="blocks.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            phiPICT
+              <img src="../_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Meshing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="blocks.html">Blocks</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Meshing</a></li>
+      <li class="breadcrumb-item active">Multi-block meshes with BlockMesh</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/upb-sciml/phiPICT/blob/main/docs/source/meshing/blockmesh.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="multi-block-meshes-with-blockmesh">
+<h1>Multi-block meshes with BlockMesh<a class="headerlink" href="#multi-block-meshes-with-blockmesh" title="Link to this heading"></a></h1>
+<p>Use <a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.BlockMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockMesh</span></code></a> when a geometry needs several blocks that share corners and
+edges, e.g. an O-grid around a cylinder inside a channel. You describe each block
+by its corners (<a class="reference internal" href="../api/generated/phipict.meshing.Quad.html#phipict.meshing.Quad" title="phipict.meshing.Quad"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quad</span></code></a> in 2D, <a class="reference internal" href="../api/generated/phipict.meshing.Hex.html#phipict.meshing.Hex" title="phipict.meshing.Hex"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hex</span></code></a> in 3D) and give cell counts and
+gradings only where they matter; <code class="xref py py-meth docutils literal notranslate"><span class="pre">BlockMesh.build()</span></code> fills in the rest from
+the neighbouring blocks and returns a connected <a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a>. It works like
+OpenFOAM’s blockMesh, and <a class="reference internal" href="../api/generated/phipict.meshing.read_blockmeshdict.html#phipict.meshing.read_blockmeshdict" title="phipict.meshing.read_blockmeshdict"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_blockmeshdict()</span></code></a> uses it to read blockMesh
+files.</p>
+<p>For a single block, or for blocks that do not share edges, the builders on
+<a class="reference internal" href="blocks.html"><span class="doc">Blocks</span></a> are simpler.</p>
+<section id="building-a-mesh">
+<h2>Building a mesh<a class="headerlink" href="#building-a-mesh" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">phipict.meshing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
+
+<span class="n">walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"walls"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">())</span>
+<span class="n">bm</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">BlockMesh</span><span class="p">()</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">(</span>
+    <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
+    <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+    <span class="n">grading</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Symmetric</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)),</span>
+    <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span> <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span><span class="p">),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"a"</span><span class="p">,</span>
+<span class="p">))</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">(</span>
+    <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
+    <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>              <span class="c1"># 12 cells in y, from block a</span>
+    <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span> <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span><span class="p">),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"b"</span><span class="p">,</span>
+<span class="p">))</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">cells</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>     <span class="c1"># [(16, 12), (24, 12)]</span>
+</pre></div>
+</div>
+</section>
+<section id="what-is-passed-on-between-blocks">
+<h2>What is passed on between blocks<a class="headerlink" href="#what-is-passed-on-between-blocks" title="Link to this heading"></a></h2>
+<p>Corners closer than the merge tolerance (<code class="docutils literal notranslate"><span class="pre">BlockMesh(merge_tol=1e-9)</span></code>, relative
+to the mesh size) are the same vertex, and edges between the same two vertices are
+the same edge. Along chains of shared edges:</p>
+<ul class="simple">
+<li><p><strong>Cell counts</strong> must agree. A block may leave a count at <code class="docutils literal notranslate"><span class="pre">None</span></code> if a
+neighbour sharing an edge along that axis gives it. Conflicting counts raise an
+error that lists every source.</p></li>
+<li><p><strong>Gradings</strong>: an axis with grading <code class="docutils literal notranslate"><span class="pre">None</span></code> takes the grading of a neighbour’s
+shared edge, mirrored if that edge runs the other way. Without such a
+neighbour it is uniform. This keeps the faces between blocks conforming.</p></li>
+<li><p><strong>Curved edges</strong> given by one block, or with <code class="xref py py-meth docutils literal notranslate"><span class="pre">BlockMesh.add_edge()</span></code>, apply
+to every block with that edge.</p></li>
+</ul>
+<p>Counts are passed along edges, not corners: blocks that only touch at a corner
+(like the four blocks of an O-grid, along the angle) need their own counts.</p>
+</section>
+<section id="shared-curved-edges">
+<h2>Shared curved edges<a class="headerlink" href="#shared-curved-edges" title="Link to this heading"></a></h2>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">BlockMesh.add_edge()</span></code> shapes the edge between two corners for all blocks that
+have it, in the right direction for each:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bm</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">BlockMesh</span><span class="p">()</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"left"</span><span class="p">))</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"right"</span><span class="p">))</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">pm</span><span class="o">.</span><span class="n">Arc</span><span class="p">(</span><span class="n">through</span><span class="o">=</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)))</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="example-cylinder-in-a-channel">
+<h2>Example: cylinder in a channel<a class="headerlink" href="#example-cylinder-in-a-channel" title="Link to this heading"></a></h2>
+<p>Four blocks form an O-grid between the cylinder and a square; eight channel
+blocks surround it. Only a few counts are given; the patches name the boundaries:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="n">r</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.0</span>          <span class="c1"># cylinder radius, O-grid half-width, half-height</span>
+<span class="n">arc</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Arc</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">on_circle</span><span class="p">(</span><span class="n">deg</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">deg</span><span class="p">)),</span> <span class="n">r</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">deg</span><span class="p">)))</span>
+
+<span class="n">cyl</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"cylinder"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">())</span>
+<span class="n">walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"walls"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">FreeSlip</span><span class="p">())</span>
+<span class="n">inlet</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"inlet"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Inflow</span><span class="p">((</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)))</span>
+<span class="n">outlet</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"outlet"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Outflow</span><span class="p">())</span>
+<span class="n">radial</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Simple</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span>            <span class="c1"># cells grow 4x away from the cylinder</span>
+
+<span class="n">bm</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">BlockMesh</span><span class="p">()</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">([</span><span class="n">on_circle</span><span class="p">(</span><span class="o">-</span><span class="mi">45</span><span class="p">),</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">),</span> <span class="n">on_circle</span><span class="p">(</span><span class="mi">45</span><span class="p">),</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">)],</span>       <span class="c1"># right</span>
+               <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">grading</span><span class="o">=</span><span class="p">(</span><span class="n">radial</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+               <span class="n">edges</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">QuadEdges</span><span class="p">(</span><span class="n">x_minus</span><span class="o">=</span><span class="n">arc</span><span class="p">),</span> <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">x_minus</span><span class="o">=</span><span class="n">cyl</span><span class="p">)))</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">([</span><span class="n">on_circle</span><span class="p">(</span><span class="mi">135</span><span class="p">),</span> <span class="n">on_circle</span><span class="p">(</span><span class="mi">45</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">)],</span>       <span class="c1"># top</span>
+               <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">grading</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">radial</span><span class="p">),</span>
+               <span class="n">edges</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">QuadEdges</span><span class="p">(</span><span class="n">y_minus</span><span class="o">=</span><span class="n">arc</span><span class="p">),</span> <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">y_minus</span><span class="o">=</span><span class="n">cyl</span><span class="p">)))</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">([(</span><span class="o">-</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">),</span> <span class="n">on_circle</span><span class="p">(</span><span class="o">-</span><span class="mi">135</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span> <span class="n">on_circle</span><span class="p">(</span><span class="mi">135</span><span class="p">)],</span>   <span class="c1"># left</span>
+               <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">grading</span><span class="o">=</span><span class="p">(</span><span class="n">radial</span><span class="o">.</span><span class="n">reversed</span><span class="p">(),</span> <span class="kc">None</span><span class="p">),</span>
+               <span class="n">edges</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">QuadEdges</span><span class="p">(</span><span class="n">x_plus</span><span class="o">=</span><span class="n">arc</span><span class="p">),</span> <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">x_plus</span><span class="o">=</span><span class="n">cyl</span><span class="p">)))</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">([(</span><span class="o">-</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">),</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">),</span> <span class="n">on_circle</span><span class="p">(</span><span class="o">-</span><span class="mi">135</span><span class="p">),</span> <span class="n">on_circle</span><span class="p">(</span><span class="o">-</span><span class="mi">45</span><span class="p">)],</span>   <span class="c1"># bottom</span>
+               <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">grading</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">radial</span><span class="o">.</span><span class="n">reversed</span><span class="p">()),</span>
+               <span class="n">edges</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">QuadEdges</span><span class="p">(</span><span class="n">y_plus</span><span class="o">=</span><span class="n">arc</span><span class="p">),</span> <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">y_plus</span><span class="o">=</span><span class="n">cyl</span><span class="p">)))</span>
+
+<span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="mf">16.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">h</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">continue</span>                                  <span class="c1"># the O-grid</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span>
+            <span class="n">x_minus</span><span class="o">=</span><span class="n">inlet</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">x_plus</span><span class="o">=</span><span class="n">outlet</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span> <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span> <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">(</span>
+            <span class="p">[(</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ys</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ys</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ys</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ys</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])],</span>
+            <span class="n">cells</span><span class="o">=</span><span class="p">((</span><span class="mi">12</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">64</span><span class="p">)[</span><span class="n">i</span><span class="p">],</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">8</span><span class="p">)[</span><span class="n">j</span><span class="p">]),</span>
+            <span class="n">patches</span><span class="o">=</span><span class="n">fp</span><span class="p">,</span>
+        <span class="p">))</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>     <span class="c1"># Mesh(2D, 12 blocks, 3712 cells, 16 connections, ...)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">examples/cylinder.py</span></code> is this mesh with graded channel blocks and a flow
+simulation.</p>
+</section>
+<section id="periodic-patch-pairs">
+<h2>Periodic patch pairs<a class="headerlink" href="#periodic-patch-pairs" title="Link to this heading"></a></h2>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">BlockMesh.add_periodic()</span></code> makes the faces of two patches periodic partners,
+like OpenFOAM’s <code class="docutils literal notranslate"><span class="pre">cyclic</span></code> patches:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"left"</span><span class="p">),</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"right"</span><span class="p">)</span>
+<span class="n">walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"walls"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">())</span>
+<span class="n">bm</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">BlockMesh</span><span class="p">()</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Quad</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+               <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">x_minus</span><span class="o">=</span><span class="n">left</span><span class="p">,</span> <span class="n">x_plus</span><span class="o">=</span><span class="n">right</span><span class="p">,</span>
+                                      <span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span> <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span><span class="p">)))</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add_periodic</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="d-blocks">
+<h2>3D blocks<a class="headerlink" href="#d-blocks" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="../api/generated/phipict.meshing.Hex.html#phipict.meshing.Hex" title="phipict.meshing.Hex"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hex</span></code></a> takes eight corners (solver order, index <code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">+</span> <span class="pre">2j</span> <span class="pre">+</span> <span class="pre">4k</span></code> for the
+corner at <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j,</span> <span class="pre">k)</span></code>) and curved edges as <code class="xref py py-class docutils literal notranslate"><span class="pre">CornerEdge</span></code> between two corner
+indices. Many 3D meshes are simpler as a 2D mesh extruded with
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Mesh.extrude()</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">corners</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+           <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+<span class="n">bm</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">BlockMesh</span><span class="p">()</span>
+<span class="n">bm</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Hex</span><span class="p">(</span><span class="n">corners</span><span class="p">,</span> <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">grading</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Symmetric</span><span class="p">(</span><span class="mf">3.0</span><span class="p">),</span> <span class="kc">None</span><span class="p">)))</span>
+<span class="n">cube</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="inspecting-the-result">
+<h2>Inspecting the result<a class="headerlink" href="#inspecting-the-result" title="Link to this heading"></a></h2>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">BlockMesh.resolve()</span></code> returns the blocks with merged corners and all counts,
+gradings and edges filled in, without building them. <a class="reference internal" href="../api/generated/phipict.meshing.write_blockmeshdict.html#phipict.meshing.write_blockmeshdict" title="phipict.meshing.write_blockmeshdict"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_blockmeshdict()</span></code></a>
+writes a <a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.BlockMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockMesh</span></code></a> as an OpenFOAM file (see <a class="reference internal" href="io.html"><span class="doc">Reading and writing meshes</span></a>).</p>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">BlockMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">merge_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-09</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/blockmesh.html#BlockMesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Builds a <a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a> from block corners, edges, cells and gradings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>merge_tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>optional</em>) – Corners closer than this, relative to the size of the mesh, are merged.
+Default is 1e-9.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Quad.html#phipict.meshing.Quad" title="phipict.meshing.blockmesh.Quad"><span class="pre">Quad</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/generated/phipict.meshing.Hex.html#phipict.meshing.Hex" title="phipict.meshing.blockmesh.Hex"><span class="pre">Hex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/blockmesh.html#BlockMesh.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Add a block and return its index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">add_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Edge</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">EdgeShape</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/blockmesh.html#BlockMesh.add_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Give the edge between two corners a shape and/or grading.</p>
+<p>It applies to every block with that edge, in the right direction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">add_periodic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/blockmesh.html#BlockMesh.add_periodic"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Make the faces of two patches periodic partners (OpenFOAM <code class="docutils literal notranslate"><span class="pre">cyclic</span></code>).</p>
+<p>The faces of <code class="docutils literal notranslate"><span class="pre">patch_b</span></code> must coincide with those of <code class="docutils literal notranslate"><span class="pre">patch_a</span></code> after a
+translation; they are connected instead of getting a condition.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">blocks</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../api/generated/phipict.meshing.Quad.html#phipict.meshing.Quad" title="phipict.meshing.blockmesh.Quad"><span class="pre">Quad</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/generated/phipict.meshing.Hex.html#phipict.meshing.Hex" title="phipict.meshing.blockmesh.Hex"><span class="pre">Hex</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></dt>
+<dd><p>The block specifications.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.mesh.Mesh"><span class="pre">Mesh</span></a></span></span><a class="reference internal" href="../_modules/phipict/meshing/blockmesh.html#BlockMesh.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Discretise the blocks and connect them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rel_tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>optional</em>) – Face matching tolerance of the connections, see <a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></a>.
+Default is 1e-4.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../api/generated/phipict.meshing.Mesh.html#phipict.meshing.Mesh" title="phipict.meshing.Mesh">Mesh</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If cell counts conflict or cannot be inferred, or corners of blocks do
+    not form valid edges.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">periodic</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../api/generated/phipict.meshing.Patch.html#phipict.meshing.Patch" title="phipict.meshing.boundary.Patch"><span class="pre">Patch</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></dt>
+<dd><p>The periodic patch pairs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">resolve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">ResolvedBlock</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/phipict/meshing/blockmesh.html#BlockMesh.resolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>The blocks with merged corners, inferred cells, gradings and shared edges.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>One per block, in order.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)">list</a> of ResolvedBlock</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">Quad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corners</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cells</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grading</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Grading</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Grading</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuadEdges</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html#phipict.meshing.FacePatches" title="phipict.meshing.boundary.FacePatches"><span class="pre">FacePatches</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'block'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Interpolation</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Interpolation.TFI</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/blockmesh.html#Quad"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>A 2D block of a <a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.BlockMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockMesh</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">corners</span></span></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">(-x-y,</span> <span class="pre">+x-y,</span> <span class="pre">-x+y,</span> <span class="pre">+x+y)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sequence of point</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">cells</span></span></dt>
+<dd><p>Cells along x and y; None to infer from neighbours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a> of <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">grading</span></span></dt>
+<dd><p>Grading per axis (or one for both); None to infer from neighbours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sequence or Grading or <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">edges</span></span></dt>
+<dd><p>Curved edges or per-edge gradings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QuadEdges or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">patches</span></span></dt>
+<dd><p>Patches of the faces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html#phipict.meshing.FacePatches" title="phipict.meshing.FacePatches">FacePatches</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">name</span></span></dt>
+<dd><p>Name of the block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">interpolation</span></span></dt>
+<dd><p>Interpolation of the interior.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Interpolation</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">phipict.meshing.</span></span><span class="sig-name descname"><span class="pre">Hex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">corners:</span> <span class="pre">~collections.abc.Sequence[~collections.abc.Sequence[float]</span> <span class="pre">|</span> <span class="pre">~torch.Tensor],</span> <span class="pre">cells:</span> <span class="pre">tuple[int</span> <span class="pre">|</span> <span class="pre">None,</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None,</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None]</span> <span class="pre">=</span> <span class="pre">(None,</span> <span class="pre">None,</span> <span class="pre">None),</span> <span class="pre">grading:</span> <span class="pre">~collections.abc.Sequence[~phipict.meshing.grading.Grading</span> <span class="pre">|</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None]</span> <span class="pre">|</span> <span class="pre">~phipict.meshing.grading.Grading</span> <span class="pre">|</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">edges:</span> <span class="pre">~collections.abc.Sequence[~phipict.meshing.shapes.CornerEdge]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">patches:</span> <span class="pre">~phipict.meshing.boundary.FacePatches</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'block'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phipict/meshing/blockmesh.html#Hex"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>A 3D block of a <a class="reference internal" href="../api/generated/phipict.meshing.BlockMesh.html#phipict.meshing.BlockMesh" title="phipict.meshing.BlockMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockMesh</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">corners</span></span></dt>
+<dd><p>Eight corners in solver order (<code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">j</span> <span class="pre">+</span> <span class="pre">4</span> <span class="pre">k</span></code> for <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span> <span class="pre">=</span> <span class="pre">(i,</span> <span class="pre">j,</span>
+<span class="pre">k)</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sequence of point</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">cells</span></span></dt>
+<dd><p>Cells along x, y and z; None to infer from neighbours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)">tuple</a> of <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)">int</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">grading</span></span></dt>
+<dd><p>Grading per axis (or one for all); None to infer from neighbours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sequence or Grading or <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">edges</span></span></dt>
+<dd><p>Curved edges or per-edge gradings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sequence of CornerEdge</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">patches</span></span></dt>
+<dd><p>Patches of the faces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../api/generated/phipict.meshing.FacePatches.html#phipict.meshing.FacePatches" title="phipict.meshing.FacePatches">FacePatches</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">name</span></span></dt>
+<dd><p>Name of the block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="blocks.html" class="btn btn-neutral float-left" title="Blocks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="grading.html" class="btn btn-neutral float-right" title="Grading" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

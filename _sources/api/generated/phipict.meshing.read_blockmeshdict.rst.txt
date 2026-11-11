@@ -1,0 +1,6 @@
+﻿phipict.meshing.read\_blockmeshdict
+===================================
+
+.. currentmodule:: phipict.meshing
+
+.. autofunction:: read_blockmeshdict

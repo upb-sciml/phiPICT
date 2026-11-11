@@ -1,0 +1,228 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Basic Usage" href="basic_usage.html" />
+    <link rel="prev" title="phiPICT Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            phiPICT
+              <img src="_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="meshing/index.html">Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="meshing/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/upb-sciml/phiPICT/blob/main/docs/source/installation.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<p>phiPICT ships a compiled CUDA extension (<code class="docutils literal notranslate"><span class="pre">phipict._C</span></code>). It requires Linux, an
+NVIDIA GPU, and Python 3.11-3.13. We recommend a dedicated virtual environment.</p>
+<section id="from-pypi">
+<h2>1. From PyPI<a class="headerlink" href="#from-pypi" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>phipict
+</pre></div>
+</div>
+<p>This installs the default build together with the PyTorch it was built for:
+PyTorch 2.10 with CUDA 12.8, which needs an NVIDIA driver ≥ 570. pyamg, used for
+the AMG pressure solver, is installed as well.</p>
+<p>There is no need to install PyTorch first. If a different PyTorch version is
+installed, pip replaces it with 2.10, because the extension only works with the
+PyTorch version it was built against (see below). To use another PyTorch or
+CUDA version, build from source (section 2).</p>
+<p>Two optional extras exist, mainly for contributors: <code class="docutils literal notranslate"><span class="pre">dev</span></code> (linters, type
+checking, tests) and <code class="docutils literal notranslate"><span class="pre">docs</span></code> (Sphinx), e.g. <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;phipict[dev]&quot;</span></code>.
+Reading VTK formats other than <code class="docutils literal notranslate"><span class="pre">.vts</span></code>/<code class="docutils literal notranslate"><span class="pre">.vtm</span></code> needs pyvista
+(<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyvista</span></code>).</p>
+</section>
+<section id="why-pytorch-2-10">
+<h2>Why PyTorch 2.10?<a class="headerlink" href="#why-pytorch-2-10" title="Link to this heading"></a></h2>
+<p>The extension is bound to two versions it was built against:</p>
+<ul class="simple">
+<li><p>the <strong>PyTorch minor version</strong> (e.g. 2.12), because libtorch has no stable C++ ABI;</p></li>
+<li><p>the <strong>CUDA major version</strong> (cu12x or cu13x). A build for CUDA 13.0 also works
+with PyTorch built for CUDA 13.2.</p></li>
+</ul>
+<p>The PyPI wheel is built for PyTorch 2.10 with CUDA 12.8, the newest combination
+that runs on NVIDIA drivers ≥ 570. For any other combination, build from source.
+Check your installed PyTorch with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import torch; print(torch.__version__, torch.version.cuda)"</span>
+</pre></div>
+</div>
+</section>
+<section id="building-from-source">
+<h2>2. Building from source<a class="headerlink" href="#building-from-source" title="Link to this heading"></a></h2>
+<p>phiPICT builds against the PyTorch already installed in your environment, so
+any PyTorch ≥ 2.9 with a CUDA build works. This requires a CUDA toolkit whose major
+version matches <code class="docutils literal notranslate"><span class="pre">torch.version.cuda</span></code> (<code class="docutils literal notranslate"><span class="pre">nvcc</span></code> on the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> or
+<code class="docutils literal notranslate"><span class="pre">CUDA_HOME</span></code> set) and <code class="docutils literal notranslate"><span class="pre">setuptools&gt;=77</span></code>, since the build uses the environment’s
+PyTorch and setuptools. With conda, <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">cuda-toolkit</span>
+<span class="pre">cuda-version=12.8</span></code> also installs a gcc/g++ that this nvcc supports.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/upb-sciml/phiPICT.git
+<span class="nb">cd</span><span class="w"> </span>phiPICT
+make<span class="w"> </span>install<span class="w">        </span><span class="c1"># builds and installs the package</span>
+make<span class="w"> </span>install-dev<span class="w">    </span><span class="c1"># editable install with development tools</span>
+</pre></div>
+</div>
+<p>The build honours the usual PyTorch extension variables:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">TORCH_CUDA_ARCH_LIST</span></code>: target GPU architectures, <code class="docutils literal notranslate"><span class="pre">&quot;8.0;8.6;9.0+PTX&quot;</span></code> in
+the Makefile. Add <code class="docutils literal notranslate"><span class="pre">12.0</span></code> for Blackwell GPUs (needs CUDA ≥ 12.8).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MAX_JOBS</span></code>: number of parallel compile jobs. Compiling is memory hungry, so
+the Makefile uses <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PHIPICT_BUILD_NOISE_EXT=1</span></code>: additionally build the simplex noise extension
+<code class="docutils literal notranslate"><span class="pre">phipict._noise</span></code> (<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">install-dev</span></code> does this).</p></li>
+</ul>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
+<p>An <code class="docutils literal notranslate"><span class="pre">ImportError:</span> <span class="pre">...</span> <span class="pre">undefined</span> <span class="pre">symbol</span></code> when importing <code class="docutils literal notranslate"><span class="pre">phipict</span></code> means that the
+installed wheel was built for a different PyTorch version, e.g. because PyTorch
+was upgraded after installing phipict. Reinstall phipict from PyPI (which
+reinstalls PyTorch 2.10), or build it from source against your PyTorch.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="phiPICT Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="basic_usage.html" class="btn btn-neutral float-right" title="Basic Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

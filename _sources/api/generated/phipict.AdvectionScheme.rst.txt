@@ -1,0 +1,6 @@
+﻿phipict.AdvectionScheme
+=======================
+
+.. currentmodule:: phipict
+
+.. autodata:: AdvectionScheme
