@@ -14,6 +14,7 @@
 ![CUDA](https://img.shields.io/badge/CUDA-12.8-%2376B900)
 ![License](https://img.shields.io/badge/License-Apache--2.0-orange)
 [![Release](https://github.com/upb-sciml/phiPICT/actions/workflows/release.yml/badge.svg)](https://github.com/upb-sciml/phiPICT/actions/workflows/release.yml)
+[![Docs](https://github.com/upb-sciml/phiPICT/actions/workflows/docs.yml/badge.svg)](https://github.com/upb-sciml/phiPICT/actions/workflows/docs.yml)
 
 </div>
 
