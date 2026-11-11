@@ -33,7 +33,7 @@ html_theme = "sphinx_rtd_theme"
 html_logo = "_static/img/logo_lm.png"
 html_context = {
     "display_github": True,
-    "github_user": "safe-autonomous-systems",
+    "github_user": "upb-sciml",
     "github_repo": "phiPICT",
     "github_version": "main",
     "conf_py_path": "/docs/source/",

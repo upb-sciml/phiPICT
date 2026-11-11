@@ -106,12 +106,11 @@ test-command = "python -c \"import phipict, phipict._C\""
 
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux_2_28"
-# Build combination, e.g. TORCH_VERSION=2.14 CUDA_VERSION=13.0 CUDA_TAG=cu130
-# PHIPICT_LOCAL_VERSION=1 tags the version (+ptXYcuXYZ) for the own wheel index;
-# the PyPI wheels use PHIPICT_LOCAL_VERSION=0 PHIPICT_PIN_TORCH=1 instead.
+# Build combination, e.g. TORCH_VERSION=2.10 CUDA_VERSION=12.8 CUDA_TAG=cu128;
+# PHIPICT_PIN_TORCH=1 pins the wheel to the torch minor version it was built with
 environment-pass = [
     "TORCH_VERSION", "CUDA_VERSION", "CUDA_TAG", "TORCH_CUDA_ARCH_LIST", "MAX_JOBS",
-    "PHIPICT_LOCAL_VERSION", "PHIPICT_PIN_TORCH",
+    "PHIPICT_PIN_TORCH",
 ]
 # gcc-toolset-13 only exists for CUDA < 12.8 (see before-all), whose nvcc
 # rejects the image's default GCC 14; otherwise the PATH entry is a no-op.
