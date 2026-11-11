@@ -90,7 +90,7 @@ multi-block files of them, as written by :func:`phipict.io.export.write_vtk` or
 ParaView. Each grid becomes a block, coinciding faces are connected, and the
 patches written by :func:`~phipict.io.export.write_vtk` are restored (without
 conditions). Other VTK formats are read with pyvista, if installed
-(``pip install phipict[mesh]``).
+(``pip install pyvista``).
 
 .. code-block:: python
 

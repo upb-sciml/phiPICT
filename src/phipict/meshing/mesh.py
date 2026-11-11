@@ -760,7 +760,7 @@ class Mesh:
         linewidth: float = 0.5,
         z_index: int = 0,
     ) -> Any:
-        """Plot the grid lines of the blocks with matplotlib (the ``plot`` extra).
+        """Plot the grid lines of the blocks with matplotlib.
 
         Parameters
         ----------

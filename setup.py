@@ -78,7 +78,16 @@ def _get_install_requires() -> list[str]:
         major, minor = torch.__version__.split("+")[0].split(".")[:2]
         torch_req = f"torch=={major}.{minor}.*"
     # pyamg: the AMG pressure solver is used automatically for large systems
-    return [torch_req, "numpy", "scipy", "pyamg>=4.0"]
+    # matplotlib/imageio: grid plots and image output; psutil: phipict.utils
+    return [
+        torch_req,
+        "numpy",
+        "scipy",
+        "pyamg>=4.0",
+        "matplotlib>=3.9",
+        "imageio",
+        "psutil",
+    ]
 
 
 def _get_extensions():

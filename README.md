@@ -39,11 +39,21 @@ Python 3.11–3.13.
 pip install phipict
 ```
 
-This also installs the matching PyTorch (2.10, built with CUDA 12.8) and pyamg.
+This also installs the matching PyTorch (2.10, built with CUDA 12.8), pyamg, and
+the remaining runtime dependencies (NumPy, SciPy, matplotlib, imageio, psutil).
 There is no need to install PyTorch first: the compiled extension only works with
 the PyTorch version it was built against, so pip replaces any other version.
 Wheels for other PyTorch/CUDA versions are listed in the
 [installation docs](https://safe-autonomous-systems.github.io/phiPICT/installation.html).
+
+Optional extras:
+
+```bash
+pip install "phipict[dev]"   # linters, type checking, and tests
+pip install "phipict[docs]"  # Sphinx, to build the documentation
+```
+
+Reading VTK formats other than `.vts`/`.vtm` needs `pip install pyvista`.
 
 ### 🧱 Build from Source
 
@@ -81,8 +91,7 @@ make install
 For development, use `make install-dev` instead, which installs the package in
 editable mode together with the development dependencies.
 
-Optional extras can be installed via `pip install ".[plot]"`, `".[utils]"`,
-or `".[all]"`.
+The documentation dependencies are installed via `pip install ".[docs]"`.
 
 ## Getting Started
 

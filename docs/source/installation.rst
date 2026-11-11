@@ -20,6 +20,11 @@ installed, pip replaces it with 2.10, because the extension only works with the
 PyTorch version it was built against (see below). To keep another PyTorch
 version, use a wheel from section 2 or build from source.
 
+Two optional extras exist, mainly for contributors: ``dev`` (linters, type
+checking, tests) and ``docs`` (Sphinx), e.g. ``pip install "phipict[dev]"``.
+Reading VTK formats other than ``.vts``/``.vtm`` needs pyvista
+(``pip install pyvista``).
+
 Which wheel do I need?
 ----------------------
 
@@ -51,8 +56,6 @@ minor x CUDA major. Install PyTorch first, then point ``pip`` to the matching pa
 
 The available combinations are listed on the
 `wheel index <https://safe-autonomous-systems.github.io/phiPICT/whl/>`_.
-
-Optional extras: ``plot`` (grid plots and image output), ``utils``, or ``all``.
 
 3. Building from source
 -----------------------

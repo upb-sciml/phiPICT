@@ -189,7 +189,7 @@ def _read_pyvista(path: Path) -> list[tuple[str, torch.Tensor]]:
         import pyvista as pv  # type: ignore[import-not-found]
     except ImportError as err:
         raise ValueError(
-            f"Reading {path.suffix} files needs pyvista (pip install phipict[mesh])."
+            f"Reading {path.suffix} files needs pyvista (pip install pyvista)."
         ) from err
     data: Any = pv.read(str(path))
     items = (
