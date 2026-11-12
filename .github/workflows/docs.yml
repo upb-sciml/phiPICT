@@ -2,7 +2,13 @@ name: Docs
 
 # Manual only (Actions -> Docs -> Run workflow). Builds the Sphinx docs of the
 # selected branch/tag; with `deploy`, publishes them to the gh-pages branch
-# (GitHub Pages source: gh-pages / root).
+# (GitHub Pages source: gh-pages / root). Site layout:
+#   /       landing page (docs/landing_page, once it exists), otherwise a
+#           redirect to docs/
+#   /docs/  the Sphinx docs
+#   /whl/   the wheel index, maintained by wheel-index.yml and kept as is here
+# The docs used to live at the root; every top-level page there redirects to
+# its new location under docs/, so old links keep working.
 #
 # No GPU build is needed: without the compiled extension, conf.py mocks
 # phipict._C, so only the signatures of the pybind11 classes are missing.
@@ -66,10 +72,21 @@ jobs:
           name: docs-html
           path: html
 
-      - name: Replace the docs
+      - name: Assemble the site
         run: |
-          find pages -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-          cp -r html/. pages/
+          find pages -mindepth 1 -maxdepth 1 ! -name .git ! -name whl -exec rm -rf {} +
+          if [[ -d docs/landing_page ]]; then
+            cp -r docs/landing_page/. pages/
+            rm -f pages/README.md
+          fi
+          # Redirects from the old top-level docs URLs (keeps #anchors)
+          for f in html/*.html; do
+            name=${f#html/}
+            [[ -e pages/$name ]] && continue  # e.g. the landing page's index.html
+            printf '<!DOCTYPE html>\n<meta charset="utf-8">\n<link rel="canonical" href="docs/%s">\n<meta http-equiv="refresh" content="0; url=docs/%s">\n<script>location.replace("docs/%s" + location.search + location.hash)</script>\n' \
+              "$name" "$name" "$name" > "pages/$name"
+          done
+          cp -r html pages/docs
           touch pages/.nojekyll
 
       - name: Push

@@ -26,7 +26,7 @@
     <h3>
       <a href="#installation">Installation</a> |
       <a href="#getting-started">Getting Started</a> |
-      <a href="https://upb-sciml.github.io/phiPICT/index.html">Documentation</a> |
+      <a href="https://upb-sciml.github.io/phiPICT/docs/">Documentation</a> |
       <a href="#license">License</a>
     </h3>
 </div>
@@ -80,7 +80,8 @@ This also installs the matching PyTorch (2.10, built with CUDA 12.8), pyamg, and
 the remaining runtime dependencies (NumPy, SciPy, matplotlib, imageio, psutil).
 There is no need to install PyTorch first: the compiled extension only works with
 the PyTorch version it was built against, so pip replaces any other version.
-To use another PyTorch or CUDA version, build from source (see below).
+For other PyTorch or CUDA versions, use a prebuilt wheel from our wheel index or
+build from source (see below).
 
 Optional extras:
 
@@ -90,6 +91,30 @@ pip install "phipict[docs]"  # Sphinx, to build the documentation
 ```
 
 Reading VTK formats other than `.vts`/`.vtm` needs `pip install pyvista`.
+
+### 🎡 Other PyTorch Versions
+
+Prebuilt wheels for other PyTorch/CUDA combinations are available from our
+[wheel index](https://upb-sciml.github.io/phiPICT/whl/):
+
+| PyTorch | CUDA 12 (driver ≥ 570) | CUDA 13 (driver ≥ 580) |
+|---|---|---|
+| 2.10 | PyPI default (`pip install phipict`) | – |
+| 2.13 | – | ✓ |
+| 2.14 | ✓ | ✓ |
+| 2.15 | – | ✓ |
+
+Install PyTorch first, then the phiPICT wheel matching its version, e.g. for
+PyTorch 2.14 with CUDA 12.6:
+```bash
+pip install "torch==2.14.*" --index-url https://download.pytorch.org/whl/cu126
+pip install phipict -f https://upb-sciml.github.io/phiPICT/whl/torch-2.14+cu12.html
+```
+The page name is `torch-<PyTorch minor>+cu<CUDA major>.html`. For the PyTorch
+already installed in your environment:
+```bash
+pip install phipict -f "https://upb-sciml.github.io/phiPICT/whl/torch-$(python -c 'import torch; v = torch.__version__.split("."); print(f"{v[0]}.{v[1]}+cu{torch.version.cuda.split(".")[0]}")').html"
+```
 
 ### 🧱 Build from Source
 

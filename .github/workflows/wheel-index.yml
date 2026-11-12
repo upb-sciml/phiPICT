@@ -1,0 +1,55 @@
+name: Wheel index
+
+# Regenerates the pip find-links pages (whl/torch-X.Y+cuN.html) on gh-pages from
+# the wheels attached to all published GitHub releases. Only whl/ is touched; the
+# rest of the site belongs to docs.yml.
+#
+# Runs after a release (called by release.yml, since a release created with the
+# workflow token triggers no `release` event), when a release is published,
+# edited or deleted by hand, or manually (Actions -> Wheel index -> Run workflow).
+on:
+  workflow_call:
+  workflow_dispatch:
+  release:
+    types: [published, edited, deleted]
+
+permissions:
+  contents: write
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check out gh-pages
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages; then
+            git fetch origin gh-pages
+            git worktree add pages origin/gh-pages
+          else
+            git worktree add --orphan -b gh-pages pages
+          fi
+
+      - name: Generate index
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python .github/scripts/make_wheel_index.py "$GITHUB_REPOSITORY" pages/whl
+
+      - name: Push
+        working-directory: pages
+        run: |
+          touch .nojekyll
+          git add .nojekyll whl
+          if git diff --cached --quiet; then
+            echo "Index unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update wheel index"
+          git push origin HEAD:gh-pages
