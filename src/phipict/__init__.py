@@ -18,6 +18,9 @@
 # libraries are loaded and resolved instead of whatever LD_LIBRARY_PATH points to.
 import torch  # noqa: F401, I001
 
+# Raises a clear ImportError (instead of an "undefined symbol" from _C) if the
+# installed torch does not match the torch the extension was built for
+from phipict import _build_check  # noqa: F401
 from phipict import _C, bc
 from phipict._C import (
     AdvectionScheme,

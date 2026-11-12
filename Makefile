@@ -34,9 +34,8 @@ stubs:
 docs:
 	$(MAKE) -C docs html SPHINXBUILD="$(PYTHON) -m sphinx"
 
-.PHONY: upload-docs
-upload-docs: docs
-	ghp-import -n -p -f docs/build/html
+# The docs are published by the Docs workflow (Actions -> Docs), which keeps the
+# wheel index (whl/) on gh-pages
 
 .PHONY: pre-commit
 pre-commit:

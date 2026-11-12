@@ -106,11 +106,15 @@ test-command = "python -c \"import phipict, phipict._C\""
 
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux_2_28"
-# Build combination, e.g. TORCH_VERSION=2.10 CUDA_VERSION=12.8 CUDA_TAG=cu128;
+# Build combination, e.g. TORCH_VERSION=2.14 CUDA_VERSION=12.6 CUDA_TAG=cu126:
+# CUDA_VERSION is the toolkit used to compile, CUDA_TAG the PyTorch wheel index
+# torch is installed from (may be a newer minor of the same CUDA major).
 # PHIPICT_PIN_TORCH=1 pins the wheel to the torch minor version it was built with
+# (PyPI wheels); PHIPICT_LOCAL_VERSION=1 additionally tags the version
+# (+pt214cu126) for the own wheel index.
 environment-pass = [
     "TORCH_VERSION", "CUDA_VERSION", "CUDA_TAG", "TORCH_CUDA_ARCH_LIST", "MAX_JOBS",
-    "PHIPICT_PIN_TORCH",
+    "PHIPICT_PIN_TORCH", "PHIPICT_LOCAL_VERSION",
 ]
 # gcc-toolset-13 only exists for CUDA < 12.8 (see before-all), whose nvcc
 # rejects the image's default GCC 14; otherwise the PATH entry is a no-op.
@@ -134,8 +138,14 @@ pip install "setuptools>=77" wheel numpy
 """
 # The test venv installs torch with its CUDA wheels again; remove the toolkit
 # (only needed to build) to free the disk. The repaired wheel needs only what
-# torch provides, as for users without a toolkit.
-before-test = "rm -rf /usr/local/cuda-$CUDA_VERSION /usr/local/cuda"
+# torch provides, as for users without a toolkit. torch comes from the same
+# index as for the build: from PyPI, the pin torch==X.Y.* could resolve to
+# another CUDA major (e.g. torch 2.14 is CUDA 13 on PyPI), which a CUDA 12 wheel
+# cannot load.
+before-test = """
+rm -rf /usr/local/cuda-$CUDA_VERSION /usr/local/cuda
+pip install "torch==$TORCH_VERSION.*" --index-url https://download.pytorch.org/whl/$CUDA_TAG
+"""
 # libtorch and the CUDA runtime are provided by the user's torch install and
 # must not be vendored into the wheel.
 repair-wheel-command = """

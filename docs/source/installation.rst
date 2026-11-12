@@ -17,8 +17,9 @@ the AMG pressure solver, is installed as well.
 
 There is no need to install PyTorch first. If a different PyTorch version is
 installed, pip replaces it with 2.10, because the extension only works with the
-PyTorch version it was built against (see below). To use another PyTorch or
-CUDA version, build from source (section 2).
+PyTorch version it was built against (see below). For another PyTorch or CUDA
+version, use a wheel from the wheel index (section 2) or build from source
+(section 3).
 
 Two optional extras exist, mainly for contributors: ``dev`` (linters, type
 checking, tests) and ``docs`` (Sphinx), e.g. ``pip install "phipict[dev]"``.
@@ -35,14 +36,58 @@ The extension is bound to two versions it was built against:
   with PyTorch built for CUDA 13.2.
 
 The PyPI wheel is built for PyTorch 2.10 with CUDA 12.8, the newest combination
-that runs on NVIDIA drivers ≥ 570. For any other combination, build from source.
-Check your installed PyTorch with:
+that runs on NVIDIA drivers ≥ 570. Other combinations are available from the
+wheel index (section 2) or can be built from source (section 3). Check your
+installed PyTorch with:
 
 .. code-block:: bash
 
     python -c "import torch; print(torch.__version__, torch.version.cuda)"
 
-2. Building from source
+On import, phiPICT checks that the installed PyTorch matches the one it was
+built for and otherwise raises an ``ImportError`` that names the matching wheel.
+
+2. Other PyTorch versions: wheel index
+--------------------------------------
+
+Prebuilt wheels for further PyTorch/CUDA combinations are published with every
+release on our `wheel index <https://upb-sciml.github.io/phiPICT/whl/>`_:
+
+=======  ======================================  ======================
+PyTorch  CUDA 12 (driver ≥ 570)                  CUDA 13 (driver ≥ 580)
+=======  ======================================  ======================
+2.10     PyPI default (``pip install phipict``)  –
+2.13     –                                       ✓
+2.14     ✓                                       ✓
+2.15     –                                       ✓
+=======  ======================================  ======================
+
+There is one page per PyTorch minor version and CUDA major version,
+``torch-<PyTorch minor>+cu<CUDA major>.html``. A wheel for CUDA 13 works with
+every CUDA 13 build of PyTorch (cu130, cu132, ...), and a wheel for CUDA 12 with
+cu126 and cu129. Install PyTorch first, then phiPICT from the matching page,
+e.g. for PyTorch 2.14 with CUDA 12.6:
+
+.. code-block:: bash
+
+    pip install "torch==2.14.*" --index-url https://download.pytorch.org/whl/cu126
+    pip install phipict -f https://upb-sciml.github.io/phiPICT/whl/torch-2.14+cu12.html
+
+To pick the page for the PyTorch already installed in your environment:
+
+.. code-block:: bash
+
+    pip install phipict -f "https://upb-sciml.github.io/phiPICT/whl/torch-$(python -c 'import torch; v = torch.__version__.split("."); print(f"{v[0]}.{v[1]}+cu{torch.version.cuda.split(".")[0]}")').html"
+
+The wheel pins its PyTorch minor version (e.g. ``torch==2.14.*``), so pip keeps
+the installed PyTorch. The wheels for CUDA 12 are compiled with CUDA 12.6, which
+does not support Blackwell GPUs natively; they run there through PTX JIT
+compilation. On Blackwell, prefer the CUDA 13 wheels.
+
+The index covers the newest PyTorch versions and is updated with each release.
+For combinations it does not cover, build from source.
+
+3. Building from source
 -----------------------
 
 phiPICT builds against the PyTorch already installed in your environment, so
@@ -71,7 +116,9 @@ The build honours the usual PyTorch extension variables:
 Troubleshooting
 ---------------
 
-An ``ImportError: ... undefined symbol`` when importing ``phipict`` means that the
-installed wheel was built for a different PyTorch version, e.g. because PyTorch
-was upgraded after installing phipict. Reinstall phipict from PyPI (which
-reinstalls PyTorch 2.10), or build it from source against your PyTorch.
+An ``ImportError`` saying that phiPICT was built for a different PyTorch means
+that PyTorch was changed after installing phipict, e.g. upgraded. Install the
+matching wheel from the wheel index as shown in the error message, reinstall
+phipict from PyPI (which reinstalls PyTorch 2.10), or build it from source
+against your PyTorch. Versions of phipict before 0.1.1 show this as
+``ImportError: ... undefined symbol`` instead.
