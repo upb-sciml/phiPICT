@@ -12,8 +12,11 @@
 ![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-blue)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.10%20%7C%202.13--2.15-EE4C2C?logo=pytorch&logoColor=white)](https://upb-sciml.github.io/phiPICT/docs/installation.html)
 [![CUDA](https://img.shields.io/badge/CUDA-12%20%7C%2013-%2376B900)](https://upb-sciml.github.io/phiPICT/docs/installation.html)
-![License](https://img.shields.io/badge/License-Apache--2.0-orange)
-[![Linters](https://github.com/upb-sciml/phiPICT/actions/workflows/linters.yml/badge.svg)](https://github.com/upb-sciml/phiPICT/actions/workflows/linters.yml)
+
+</div>
+<div align="center">
+    
+[![Linters](https://github.com/upb-sciml/phiPICT/actions/workflows/linters.yml/badge.svg?branch=main)](https://github.com/upb-sciml/phiPICT/actions/workflows/linters.yml)
 [![Docs](https://github.com/upb-sciml/phiPICT/actions/workflows/docs.yml/badge.svg)](https://github.com/upb-sciml/phiPICT/actions/workflows/docs.yml)
 [![Release](https://github.com/upb-sciml/phiPICT/actions/workflows/release.yml/badge.svg)](https://github.com/upb-sciml/phiPICT/actions/workflows/release.yml)
 
