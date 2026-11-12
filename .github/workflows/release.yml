@@ -77,7 +77,10 @@ jobs:
   # with torch cu130/cu132/cu134 and a CUDA 12.6 build with torch cu126/cu129.
   # `cuda_tag` is the PyTorch wheel index torch is installed from. CUDA 12.6
   # cannot compile for Blackwell (10.0, 12.0), so the CUDA 12 wheels run there
-  # via PTX JIT.
+  # via PTX JIT. `cc`/`cxx` is the host compiler: CUDA < 12.8 supports GCC < 14
+  # only, so these builds use gcc-toolset-13 (installed in before-all), the
+  # others the image's default GCC 14. torch checks CXX (default `c++`) and passes
+  # CC to nvcc as -ccbin, so both must be set explicitly.
   #
   # Rolling window, updated with each release: the newest three torch minors
   # with CUDA 13, and the newest torch that still has a CUDA 12 build (for
@@ -93,10 +96,10 @@ jobs:
         python: [cp311, cp312, cp313]
         combo: [pt213cu130, pt214cu126, pt214cu130, pt215cu130]
         include:
-          - {combo: pt213cu130, torch: "2.13", cuda: "13.0", cuda_tag: cu130, arch: "8.0;9.0;10.0;12.0+PTX"}
-          - {combo: pt214cu126, torch: "2.14", cuda: "12.6", cuda_tag: cu126, arch: "8.0;9.0+PTX"}
-          - {combo: pt214cu130, torch: "2.14", cuda: "13.0", cuda_tag: cu130, arch: "8.0;9.0;10.0;12.0+PTX"}
-          - {combo: pt215cu130, torch: "2.15", cuda: "13.0", cuda_tag: cu132, arch: "8.0;9.0;10.0;12.0+PTX"}
+          - {combo: pt213cu130, torch: "2.13", cuda: "13.0", cuda_tag: cu130, arch: "8.0;9.0;10.0;12.0+PTX", cc: gcc, cxx: g++}
+          - {combo: pt214cu126, torch: "2.14", cuda: "12.6", cuda_tag: cu126, arch: "8.0;9.0+PTX", cc: /opt/rh/gcc-toolset-13/root/usr/bin/gcc, cxx: /opt/rh/gcc-toolset-13/root/usr/bin/g++}
+          - {combo: pt214cu130, torch: "2.14", cuda: "13.0", cuda_tag: cu130, arch: "8.0;9.0;10.0;12.0+PTX", cc: gcc, cxx: g++}
+          - {combo: pt215cu130, torch: "2.15", cuda: "13.0", cuda_tag: cu132, arch: "8.0;9.0;10.0;12.0+PTX", cc: gcc, cxx: g++}
     steps:
       - uses: actions/checkout@v5
 
@@ -120,6 +123,8 @@ jobs:
           CUDA_VERSION: ${{ matrix.cuda }}
           CUDA_TAG: ${{ matrix.cuda_tag }}
           TORCH_CUDA_ARCH_LIST: ${{ matrix.arch }}
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
           PHIPICT_LOCAL_VERSION: "1"
         with:
           output-dir: wheelhouse
@@ -163,6 +168,8 @@ jobs:
           CUDA_VERSION: ${{ env.DEFAULT_CUDA }}
           CUDA_TAG: ${{ env.DEFAULT_CUDA_TAG }}
           TORCH_CUDA_ARCH_LIST: ${{ env.DEFAULT_ARCH_LIST }}
+          CC: gcc
+          CXX: g++
           PHIPICT_LOCAL_VERSION: "0"
           PHIPICT_PIN_TORCH: "1"
         with:

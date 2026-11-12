@@ -115,6 +115,8 @@ manylinux-x86_64-image = "manylinux_2_28"
 environment-pass = [
     "TORCH_VERSION", "CUDA_VERSION", "CUDA_TAG", "TORCH_CUDA_ARCH_LIST", "MAX_JOBS",
     "PHIPICT_PIN_TORCH", "PHIPICT_LOCAL_VERSION",
+    # host compiler, gcc-toolset-13 for CUDA < 12.8 (see release.yml)
+    "CC", "CXX",
 ]
 # gcc-toolset-13 only exists for CUDA < 12.8 (see before-all), whose nvcc
 # rejects the image's default GCC 14; otherwise the PATH entry is a no-op.
