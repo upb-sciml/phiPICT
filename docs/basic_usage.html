@@ -1,0 +1,272 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basic Usage &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Meshing" href="meshing/index.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            phiPICT
+              <img src="_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="meshing/index.html">Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="meshing/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="batching.html">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Basic Usage</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/upb-sciml/phiPICT/blob/main/docs/source/basic_usage.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="basic-usage">
+<h1>Basic Usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h1>
+<p>A simulation consists of a <a class="reference internal" href="api/generated/phipict.Domain.html#phipict.Domain" title="phipict.Domain"><code class="xref py py-class docutils literal notranslate"><span class="pre">Domain</span></code></a> with one or more blocks, and a
+<a class="reference internal" href="api/generated/phipict.Simulation.html#phipict.Simulation" title="phipict.Simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Simulation</span></code></a> that advances it in time.</p>
+<section id="domain-and-grid">
+<h2>Domain and grid<a class="headerlink" href="#domain-and-grid" title="Link to this heading"></a></h2>
+<p>A mesh is made with <code class="xref py py-mod docutils literal notranslate"><span class="pre">phipict.meshing</span></code> (see <a class="reference internal" href="meshing/index.html"><span class="doc">Meshing</span></a>): blocks with a
+number of cells and a grading per axis, and named patches with boundary
+conditions on the faces that are not connected to other blocks:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">phipict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">phipict.meshing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
+
+<span class="n">dtype</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">"cuda"</span><span class="p">)</span>
+
+<span class="n">walls</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="s2">"walls"</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Wall</span><span class="p">())</span>                  <span class="c1"># no-slip</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">make_box</span><span class="p">(</span>
+    <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="n">cells</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+    <span class="n">grading</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Symmetric</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)),</span>               <span class="c1"># refined towards both walls</span>
+    <span class="n">patches</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">FacePatches</span><span class="p">(</span><span class="n">y_minus</span><span class="o">=</span><span class="n">walls</span><span class="p">,</span> <span class="n">y_plus</span><span class="o">=</span><span class="n">walls</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Mesh</span><span class="p">([</span><span class="n">channel</span><span class="p">])</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">make_periodic</span><span class="p">(</span><span class="s2">"x"</span><span class="p">)</span>
+<span class="c1"># mesh = mesh.extrude((0.0, 2.0), cells=20)           # 3D, periodic in z</span>
+
+<span class="n">domain</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">get_domain</span><span class="p">(</span><span class="n">viscosity</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">block</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">getBlocks</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="boundaries">
+<h2>Boundaries<a class="headerlink" href="#boundaries" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">get_domain</span></code> sets up the solver blocks: coinciding block faces are connected,
+periodic faces made periodic, and each patch gets its condition
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">Wall</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">FreeSlip</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Inflow</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Outflow</span></code>). Underneath,
+this is the block API of the extension, which can also be used directly; block
+sides are addressed as <code class="docutils literal notranslate"><span class="pre">&quot;-x&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;+x&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;-y&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;+y&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;-z&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;+z&quot;</span></code>
+and configured before calling <code class="docutils literal notranslate"><span class="pre">PrepareSolve</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">block</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">CreateBlock</span><span class="p">(</span><span class="n">vertexCoordinates</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Block"</span><span class="p">)</span>
+<span class="n">block</span><span class="o">.</span><span class="n">CloseBoundary</span><span class="p">(</span><span class="s2">"-y"</span><span class="p">)</span>   <span class="c1"># no-slip wall</span>
+<span class="n">block</span><span class="o">.</span><span class="n">CloseBoundary</span><span class="p">(</span><span class="s2">"+y"</span><span class="p">)</span>
+<span class="n">block</span><span class="o">.</span><span class="n">MakePeriodic</span><span class="p">(</span><span class="s2">"x"</span><span class="p">)</span>     <span class="c1"># periodic in x</span>
+<span class="c1"># block.OpenBoundary("-x")  # free-slip wall or symmetry plane</span>
+<span class="c1"># block.ConnectBlock("+x", other_block, "-x", "-y")  # multi-block domains</span>
+<span class="n">domain</span><span class="o">.</span><span class="n">PrepareSolve</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="simulation">
+<h2>Simulation<a class="headerlink" href="#simulation" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sim</span> <span class="o">=</span> <span class="n">phipict</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span>
+    <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+    <span class="n">dt</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
+    <span class="n">substeps</span><span class="o">=</span><span class="s2">"ADAPTIVE"</span><span class="p">,</span>  <span class="c1"># sub-steps chosen from adaptive_CFL</span>
+    <span class="n">non_orthogonal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># the grid above is orthogonal</span>
+    <span class="n">pressure_tol</span><span class="o">=</span><span class="n">phipict</span><span class="o">.</span><span class="n">SolverTolerance</span><span class="p">(</span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">make_divergence_free</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">single_step</span><span class="p">()</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">velocity</span>  <span class="c1"># [1, dims, (nz,) ny, nx]</span>
+</pre></div>
+</div>
+<section id="callbacks-prep-fn">
+<h3>Callbacks (<code class="docutils literal notranslate"><span class="pre">prep_fn</span></code>)<a class="headerlink" href="#callbacks-prep-fn" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">prep_fn</span></code> maps hook names (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;PRE&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;PRE_VELOCITY_SETUP&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;POST&quot;</span></code>)
+to functions <code class="docutils literal notranslate"><span class="pre">fn(domain,</span> <span class="pre">time_step,</span> <span class="pre">**kwargs)</span></code>. A typical use is a body force,
+e.g. a constant pressure gradient driving a periodic channel:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_forcing</span><span class="p">(</span><span class="n">domain</span><span class="p">:</span> <span class="n">phipict</span><span class="o">.</span><span class="n">Domain</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">domain</span><span class="o">.</span><span class="n">getBlocks</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setVelocitySource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+    <span class="n">domain</span><span class="o">.</span><span class="n">UpdateDomainData</span><span class="p">()</span>
+
+<span class="n">sim</span> <span class="o">=</span> <span class="n">phipict</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">prep_fn</span><span class="o">=</span><span class="p">{</span><span class="s2">"PRE_VELOCITY_SETUP"</span><span class="p">:</span> <span class="n">apply_forcing</span><span class="p">})</span>
+</pre></div>
+</div>
+</section>
+<section id="solver-tolerances">
+<h3>Solver tolerances<a class="headerlink" href="#solver-tolerances" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">advection_tol</span></code>, <code class="docutils literal notranslate"><span class="pre">pressure_tol</span></code> (and <code class="docutils literal notranslate"><span class="pre">potential_tol</span></code> for MHD) take either a
+float or a <a class="reference internal" href="api/generated/phipict.SolverTolerance.html#phipict.SolverTolerance" title="phipict.SolverTolerance"><code class="xref py py-class docutils literal notranslate"><span class="pre">SolverTolerance</span></code></a>:</p>
+<ul class="simple">
+<li><p>a <strong>float</strong> is an absolute tolerance on <code class="docutils literal notranslate"><span class="pre">||r||_2</span> <span class="pre">/</span> <span class="pre">sqrt(n)</span></code>;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SolverTolerance(rtol,</span> <span class="pre">atol)</span></code> stops at <code class="docutils literal notranslate"><span class="pre">||r||_2</span> <span class="pre">&lt;</span> <span class="pre">rtol</span> <span class="pre">*</span> <span class="pre">||b||_2</span></code>, with
+<code class="docutils literal notranslate"><span class="pre">atol</span></code> as a floor for a (near) zero right-hand side. Its meaning does not
+depend on the domain size, so a tolerance tuned on a small domain carries over
+to a large one.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">pressure_tol_intermediate</span></code> sets a looser tolerance for all but the last
+corrector step, and <code class="docutils literal notranslate"><span class="pre">pressure_warm_start=True</span></code> starts each pressure solve from
+the previous result.</p>
+</section>
+<section id="other-options">
+<h3>Other options<a class="headerlink" href="#other-options" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Advection scheme: <code class="docutils literal notranslate"><span class="pre">domain.setAdvectionScheme(phipict.AdvectionScheme.LINEAR_UPWIND)</span></code>
+(default <code class="docutils literal notranslate"><span class="pre">CENTRAL</span></code>).</p></li>
+<li><p>Sub-grid-scale models: <a class="reference internal" href="api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html#phipict.simulation.sgs.append_sgs_viscosity_prep_fn" title="phipict.simulation.sgs.append_sgs_viscosity_prep_fn"><code class="xref py py-func docutils literal notranslate"><span class="pre">phipict.simulation.sgs.append_sgs_viscosity_prep_fn()</span></code></a>
+adds Smagorinsky or WALE eddy viscosity.</p></li>
+<li><p>Batched environments: see <a class="reference internal" href="batching.html"><span class="doc">Batched Simulations</span></a>.</p></li>
+<li><p>Gradients: <code class="docutils literal notranslate"><span class="pre">differentiable=True</span></code> uses the differentiable solver backend, so
+losses on the flow fields can be back-propagated with PyTorch.</p></li>
+<li><p>Saving/loading: <a class="reference internal" href="api/generated/phipict.io.domain_io.html#module-phipict.io.domain_io" title="phipict.io.domain_io"><code class="xref py py-mod docutils literal notranslate"><span class="pre">phipict.io.domain_io</span></code></a> (<code class="docutils literal notranslate"><span class="pre">save_domain</span></code> / <code class="docutils literal notranslate"><span class="pre">load_domain</span></code>).</p></li>
+<li><p>Logging: <code class="docutils literal notranslate"><span class="pre">phipict.set_verbosity(...)</span></code>.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="meshing/index.html" class="btn btn-neutral float-right" title="Meshing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

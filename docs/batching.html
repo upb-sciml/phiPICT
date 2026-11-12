@@ -1,0 +1,310 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Batched Simulations &mdash; phiPICT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Magnetohydrodynamics" href="mhd.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            phiPICT
+              <img src="_static/logo_lm.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="meshing/index.html">Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="meshing/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/boundaries.html">Boundary patches and conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/connections.html">Connections and periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/blocks.html">Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/blockmesh.html">Multi-block meshes with BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/grading.html">Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/edges.html">Curved edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/quality.html">Mesh quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/io.html">Reading and writing meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing/migration.html">Migrating from phipict.grid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mhd.html">Magnetohydrodynamics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Batched Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Simulation.html">phipict.Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.MHDSimulation.html">phipict.MHDSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.SolverTolerance.html">phipict.SolverTolerance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.simulation.sgs.append_sgs_viscosity_prep_fn.html">phipict.simulation.sgs.append_sgs_viscosity_prep_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Domain.html">phipict.Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Block.html">phipict.Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.Boundary.html">phipict.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.FixedBoundary.html">phipict.FixedBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.AdvectionScheme.html">phipict.AdvectionScheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Mesh.html">phipict.meshing.Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.MeshBlock.html">phipict.meshing.MeshBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.BlockMesh.html">phipict.meshing.BlockMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Quad.html">phipict.meshing.Quad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Hex.html">phipict.meshing.Hex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.Patch.html">phipict.meshing.Patch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.FacePatches.html">phipict.meshing.FacePatches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.read_blockmeshdict.html">phipict.meshing.read_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.write_blockmeshdict.html">phipict.meshing.write_blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.read_vtk.html">phipict.meshing.read_vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.shapes.html">phipict.meshing.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.grading.html">phipict.meshing.grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.curves.html">phipict.meshing.curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.boundary.html">phipict.meshing.boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.connect.html">phipict.meshing.connect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.quality.html">phipict.meshing.quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.formats.blockmeshdict.html">phipict.meshing.formats.blockmeshdict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.meshing.formats.vtk.html">phipict.meshing.formats.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.io.export.vtk.html">phipict.io.export.vtk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.io.export.series.html">phipict.io.export.series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.io.domain_io.html">phipict.io.domain_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.grid.shapes.html">phipict.grid.shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.grid.helpers.html">phipict.grid.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.solvers.amg.html">phipict.solvers.amg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/generated/phipict.batching.html">phipict.batching</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">phiPICT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Batched Simulations</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/upb-sciml/phiPICT/blob/main/docs/source/batching.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="batched-simulations">
+<h1>Batched Simulations<a class="headerlink" href="#batched-simulations" title="Link to this heading"></a></h1>
+<p>A batched domain holds <code class="docutils literal notranslate"><span class="pre">B</span></code> environments: copies of one setup that share the
+grid, the block and boundary layout and the sparsity patterns, but each have
+their own state. One simulation advances all of them together, so every kernel
+launch and every solver iteration covers the whole batch. This pays off for small
+environments, whose runtime is dominated by host overhead (e.g. many
+reinforcement learning environments): a small 2D MHD duct runs at about 213
+environment steps/s unbatched and about 1900 at <code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">=</span> <span class="pre">64</span></code>–<code class="docutils literal notranslate"><span class="pre">128</span></code>.</p>
+<p>Batched results match those of separate simulations.</p>
+<section id="creating-a-batched-domain">
+<h2>Creating a batched domain<a class="headerlink" href="#creating-a-batched-domain" title="Link to this heading"></a></h2>
+<p>Set up the domain as usual, then call <code class="docutils literal notranslate"><span class="pre">setBatchSize</span></code> and <code class="docutils literal notranslate"><span class="pre">PrepareSolve</span></code> again
+before creating the simulation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">domain</span> <span class="o">=</span> <span class="n">make_domain</span><span class="p">()</span>      <span class="c1"># blocks and boundaries, PrepareSolve() done</span>
+<span class="n">domain</span><span class="o">.</span><span class="n">setBatchSize</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">domain</span><span class="o">.</span><span class="n">PrepareSolve</span><span class="p">()</span>
+
+<span class="n">block</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">getBlocks</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">block</span><span class="o">.</span><span class="n">velocity</span><span class="o">.</span><span class="n">shape</span>        <span class="c1"># [8, dims, (nz,) ny, nx]</span>
+<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+    <span class="n">block</span><span class="o">.</span><span class="n">velocity</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">initial_velocity</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="n">domain</span><span class="o">.</span><span class="n">UpdateDomainData</span><span class="p">()</span>
+
+<span class="n">sim</span> <span class="o">=</span> <span class="n">phipict</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">substeps</span><span class="o">=</span><span class="s2">"ADAPTIVE"</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">single_step</span><span class="p">()</span>           <span class="c1"># advances all 8 environments</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">setBatchSize</span></code> repeats the state fields of all blocks (velocity, pressure,
+passive scalar and, for MHD, the electric potential) from batch size 1 to <code class="docutils literal notranslate"><span class="pre">B</span></code>.
+Static data stays shared until you give it per environment.</p>
+<p>Alternatively, <code class="xref py py-func docutils literal notranslate"><span class="pre">phipict.batching.stack_domains()</span></code> combines single-environment
+domains of the same setup, e.g. with different initial states or loaded from
+files:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">phipict.batching</span><span class="w"> </span><span class="kn">import</span> <span class="n">stack_domains</span>
+
+<span class="n">domains</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_domain</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">)]</span>
+<span class="o">...</span>  <span class="c1"># set the state of each</span>
+<span class="n">domain</span> <span class="o">=</span> <span class="n">stack_domains</span><span class="p">(</span><span class="n">domains</span><span class="p">)</span>  <span class="c1"># domains[0], now batched and prepared</span>
+</pre></div>
+</div>
+<p>The first domain becomes the batched domain in place; grid, boundaries and solver
+settings are taken from it. <code class="xref py py-func docutils literal notranslate"><span class="pre">phipict.batching.copy_env_state()</span></code> writes a
+single-environment domain into one environment of an existing batch, e.g. to
+reset that environment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">phipict.batching</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy_env_state</span>
+
+<span class="n">copy_env_state</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">env_idx</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">reset_domain</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="shared-and-per-environment-data">
+<h2>Shared and per-environment data<a class="headerlink" href="#shared-and-per-environment-data" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 65.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Data</p></th>
+<th class="head"><p>Batching</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Grid, block and boundary layout, sparsity patterns</p></td>
+<td><p>Always shared.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Block fields (velocity, pressure, passive scalar, potential)</p></td>
+<td><p>Always per environment, leading dimension <code class="docutils literal notranslate"><span class="pre">B</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p>Velocity sources</p></td>
+<td><p>Shared (<code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">dims]</span></code>) or per environment (<code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">dims]</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p>Fixed boundary data (velocity, passive scalar)</p></td>
+<td><p>Shared (leading dimension 1) or per environment (leading dimension <code class="docutils literal notranslate"><span class="pre">B</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p>Potential condition types (MHD)</p></td>
+<td><p>Always shared: they set the potential matrix and its AMG hierarchy.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Dirichlet potential values (MHD)</p></td>
+<td><p>Shared or per environment, see <a class="reference internal" href="mhd.html"><span class="doc">Magnetohydrodynamics</span></a>.</p></td>
+</tr>
+</tbody>
+</table>
+<p>To give the boundary data different values per environment, set a tensor with
+leading dimension <code class="docutils literal notranslate"><span class="pre">B</span></code>. For example, a scaled inflow per environment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inflow_bound</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">getBoundary</span><span class="p">(</span><span class="s2">"-x"</span><span class="p">)</span>
+<span class="n">inflow</span> <span class="o">=</span> <span class="n">inflow_bound</span><span class="o">.</span><span class="n">velocity</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="o">*</span><span class="n">inflow_bound</span><span class="o">.</span><span class="n">velocity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+<span class="n">scales</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">inflow_bound</span><span class="o">.</span><span class="n">setVelocity</span><span class="p">((</span><span class="n">inflow</span> <span class="o">*</span> <span class="n">scales</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">contiguous</span><span class="p">())</span>
+<span class="n">domain</span><span class="o">.</span><span class="n">UpdateDomainData</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Flux balancing of outflow boundaries and advective outflows work per
+environment. <code class="xref py py-func docutils literal notranslate"><span class="pre">copy_env_state()</span></code> makes shared boundary data
+per environment when the copied environment differs from the rest.</p>
+</section>
+<section id="solvers">
+<h2>Solvers<a class="headerlink" href="#solvers" title="Link to this heading"></a></h2>
+<p>Batched linear solves iterate until every environment has converged. Relative
+tolerances (<a class="reference internal" href="api/generated/phipict.SolverTolerance.html#phipict.SolverTolerance" title="phipict.SolverTolerance"><code class="xref py py-class docutils literal notranslate"><span class="pre">SolverTolerance</span></code></a>) are resolved per environment, so
+each environment is solved to the same accuracy as in a separate run, even if
+their right-hand sides differ by orders of magnitude. The potential matrix and
+its AMG hierarchy are shared by all environments.</p>
+</section>
+<section id="adaptive-substeps">
+<h2>Adaptive substeps<a class="headerlink" href="#adaptive-substeps" title="Link to this heading"></a></h2>
+<p>With <code class="docutils literal notranslate"><span class="pre">substeps=&quot;ADAPTIVE&quot;</span></code>, every environment splits the time step by its own
+maximum velocity (<code class="docutils literal notranslate"><span class="pre">adaptive_CFL_per_env=True</span></code>, the default), so it takes the
+same substeps as it would on its own:</p>
+<ul class="simple">
+<li><p>The batch runs as many substeps as the environment that needs the most. An
+environment that has already covered the time step runs the extra substeps
+too, and its state is restored afterwards
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">EnvStateSnapshot</span></code>). A batched substep costs about
+as much as with shared substeps.</p></li>
+<li><p>Hooks receive the substep sizes as a <code class="docutils literal notranslate"><span class="pre">[B]</span></code> tensor <code class="docutils literal notranslate"><span class="pre">time_step</span></code>. A hook that
+uses <code class="docutils literal notranslate"><span class="pre">time_step</span></code> must broadcast it over the environments (as
+<code class="docutils literal notranslate"><span class="pre">update_advective_boundaries</span></code> does).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sim.total_time</span></code> advances by <code class="docutils literal notranslate"><span class="pre">dt</span></code> per step.
+<code class="docutils literal notranslate"><span class="pre">Domain.getMaxVelocityPerEnv</span></code> returns the <code class="docutils literal notranslate"><span class="pre">[B]</span></code> maximum velocities used for
+the CFL condition.</p></li>
+</ul>
+<p>With <code class="docutils literal notranslate"><span class="pre">adaptive_CFL_per_env=False</span></code> all environments take the substeps of the
+fastest one. The differentiable path always uses shared substeps.</p>
+<p>Per-environment state outside the domain that a custom
+<a class="reference internal" href="api/generated/phipict.Simulation.html#phipict.Simulation" title="phipict.Simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Simulation</span></code></a> subclass carries across substeps must be restored
+too; override <code class="docutils literal notranslate"><span class="pre">_env_state_extras</span></code> to return getters of flat tensors with one
+slice per environment (see <a class="reference internal" href="api/generated/phipict.MHDSimulation.html#phipict.MHDSimulation" title="phipict.MHDSimulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">MHDSimulation</span></code></a>).</p>
+</section>
+<section id="gradients">
+<h2>Gradients<a class="headerlink" href="#gradients" title="Link to this heading"></a></h2>
+<p>Batching works with <code class="docutils literal notranslate"><span class="pre">differentiable=True</span></code>. Each environment gets its own
+gradients w.r.t. its per-environment inputs (initial fields, per-environment
+sources and boundary data, Dirichlet potential values), and parameters shared by
+all environments (e.g. a shared velocity source or the Stuart number) get the
+sum over the environments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">v0</span> <span class="o">=</span> <span class="n">initial_velocities</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>   <span class="c1"># [B, dims, (nz,) ny, nx]</span>
+<span class="n">block</span><span class="o">.</span><span class="n">setVelocity</span><span class="p">(</span><span class="n">v0</span><span class="o">.</span><span class="n">clone</span><span class="p">())</span>
+<span class="n">domain</span><span class="o">.</span><span class="n">UpdateDomainData</span><span class="p">()</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">phipict</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">differentiable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_steps</span><span class="p">):</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">single_step</span><span class="p">()</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">block</span><span class="o">.</span><span class="n">velocity</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="p">(</span><span class="n">grad</span><span class="p">,)</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">v0</span><span class="p">)</span>        <span class="c1"># one gradient per environment</span>
+<span class="n">domain</span><span class="o">.</span><span class="n">Detach</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mhd.html" class="btn btn-neutral float-left" title="Magnetohydrodynamics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Safe Autonomous Systems (SAS), TU Dortmund University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
