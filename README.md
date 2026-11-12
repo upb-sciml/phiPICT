@@ -26,7 +26,7 @@
     <h3>
       <a href="#installation">Installation</a> |
       <a href="#getting-started">Getting Started</a> |
-      <a href="https://upb-sciml.github.io/phiPICT/docs/">Documentation</a> |
+      <a href="https://upb-sciml.github.io/phiPICT/index.html">Documentation</a> |
       <a href="#license">License</a>
     </h3>
 </div>
