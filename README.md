@@ -163,6 +163,17 @@ The documentation dependencies are installed via `pip install ".[docs]"`.
 
 See the [`examples`](examples) directory for example simulations.
 
-## License
+## License & Citation
 
-This repository is published under the Apache-2.0 license.
+This repository is published under the Apache-2.0 license. If you use φ-PICT in your work, please cite us:
+```bibtex
+@misc{becktepe-phipict26,
+  title =            {Sample-Efficient Control of Magnetoconvective Flows via Differentiable Simulation}, 
+  author =           {Jannis Becktepe and Dmitry Krasnov and Nils Thuerey and Jörg Schumacher and Sebastian Peitz},
+  year =             {2026},
+  eprint =           {2611.18008},
+  archivePrefix =    {arXiv},
+  primaryClass =     {cs.LG},
+  url =              {https://arxiv.org/abs/2611.18008}, 
+}
+```
