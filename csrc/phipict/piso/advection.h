@@ -1,5 +1,5 @@
 // Original work Copyright 2025 Aleksandra Franz, Nils Thuerey
-// Modified work Copyright 2026 Jannis Becktepe
+// Modified work Copyright 2026 Scientific Machine Learning Group, Paderborn University
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

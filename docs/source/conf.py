@@ -18,10 +18,10 @@ except ImportError:
     _MockObject.__ror__ = lambda self, other: self
 
 project = "phiPICT"
-author = "Jannis Becktepe, Safe Autonomous Systems (SAS), TU Dortmund University"
+author = "Scientific Machine Learning Group, Paderborn University"
 copyright = (
     f"{datetime.date.today().strftime('%Y')}, "
-    "Safe Autonomous Systems (SAS), TU Dortmund University"
+    "Scientific Machine Learning Group, Paderborn University"
 )
 release = "0.1.0"
 version = "0.1.0"
